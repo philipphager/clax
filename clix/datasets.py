@@ -8,8 +8,8 @@ from torch.utils.data import Dataset
 
 class YandexDataset(Dataset):
     def __init__(
-            self,
-            path: Union[str, Path],
+        self,
+        path: Union[str, Path],
     ):
         self.path = path
         self._parse_file(path)
@@ -65,7 +65,7 @@ class YandexDataset(Dataset):
         padding_config = {
             "query_doc_ids": np.int32,
             "positions": np.int16,
-            "clicks": np.float16
+            "clicks": np.float16,
         }
 
         for col, dtype in padding_config.items():
@@ -89,6 +89,6 @@ def pad(samples: List[Dict[str, np.ndarray]], column: str, max_n: int, dtype: np
     array = np.zeros((batch_size, max_n), dtype=dtype)
 
     for i, sample in enumerate(samples):
-        array[i, :sample["n"]] = sample[column]
+        array[i, : sample["n"]] = sample[column]
 
     return array

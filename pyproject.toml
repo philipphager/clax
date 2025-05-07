@@ -1,0 +1,14 @@
+[project]
+name = "clix"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "distrax>=0.1.5",
+    "jax>=0.6.0",
+    "jupyterlab>=4.4.2",
+    "pandas>=2.2.3",
+    "torch>=2.7.0",
+    "tqdm>=4.67.1",
+]

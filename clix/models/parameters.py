@@ -13,7 +13,7 @@ class BernoulliEmbedding(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        parameters = parameters + 1 # Embedding ids are 1-indexed as zero is padding.
+        parameters = parameters + 1  # Embedding ids are 1-indexed as zero is padding.
         self.use_feature = use_feature
         self.embeddings = nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs)
 
@@ -31,10 +31,18 @@ class BetaEmbedding(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        parameters = parameters + 1 # Embedding ids are 1-indexed as zero is padding.
+        parameters = parameters + 1  # Embedding ids are 1-indexed as zero is padding.
         self.use_feature = use_feature
-        self.alpha = nnx.Sequential(nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs), nnx.softplus, self._offset)
-        self.beta = nnx.Sequential(nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs), nnx.softplus, self._offset)
+        self.alpha = nnx.Sequential(
+            nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs),
+            nnx.softplus,
+            self._offset,
+        )
+        self.beta = nnx.Sequential(
+            nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs),
+            nnx.softplus,
+            self._offset,
+        )
 
     def __call__(self, batch: Dict) -> Array:
         x = batch[self.use_feature]

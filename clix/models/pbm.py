@@ -29,7 +29,7 @@ class PositionBasedModel(nnx.Module):
     def __call__(self, batch: Dict) -> Distribution:
         examination = self.examination(batch)
         relevance = self.relevance(batch)
-        return Bernoulli(probs = examination * relevance)
+        return Bernoulli(probs=examination * relevance)
 
     def log_loss(self, batch: Dict):
         clicks = batch["clicks"]

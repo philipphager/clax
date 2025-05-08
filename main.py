@@ -15,9 +15,9 @@ from clix.trainer import Trainer
 
 @partial(nnx.jit)
 def _train_step(
-        model: nnx.Module,
-        optimizer: nnx.Optimizer,
-        batch,
+    model: nnx.Module,
+    optimizer: nnx.Optimizer,
+    batch,
 ):
     def loss_fn(model, batch):
         return model.log_loss(batch)
@@ -27,16 +27,20 @@ def _train_step(
     optimizer.update(grads)
     return loss
 
+
 def main():
     rngs = nnx.Rngs(0)
     dataset = YandexDataset("data/yandex.csv")
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.8, 0.2])
 
-    train_loader = DataLoader(train_dataset, batch_size=512, collate_fn=dataset.collate_fn)
+    train_loader = DataLoader(
+        train_dataset, batch_size=512, collate_fn=dataset.collate_fn
+    )
     val_loader = DataLoader(val_dataset, batch_size=512, collate_fn=dataset.collate_fn)
     model = PositionBasedModel(positions=10, query_doc_pairs=140_000, rngs=rngs)
     trainer = Trainer(optax.adam(1e-3), epochs=10, patience=0)
     trainer.train(model, train_loader, val_loader)
+
 
 if __name__ == "__main__":
     main()

@@ -6,7 +6,7 @@ from clix.datasets import YandexDataset
 
 def main():
     dataset = YandexDataset("data/yandex.csv")
-    loader = DataLoader(dataset, batch_size=512, collate_fn=YandexDataset.collate_fn)
+    loader = DataLoader(dataset, batch_size=512, collate_fn=dataset.collate_fn)
 
     for batch in tqdm(loader):
         pass

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Union, List, Dict
 
@@ -13,17 +14,28 @@ class YandexDataset(Dataset):
     ):
         self.path = path
         self._parse_file(path)
+        self.collate_fn = SessionCollator(
+            query_features={"query_id": np.int32, "n": np.int16},
+            doc_features={
+                "query_doc_ids": np.int32,
+                "positions": np.int16,
+                "mask": np.bool_,
+                "clicks": np.float16,
+            },
+        )
 
     def __getitem__(self, idx):
         query_id = self.query_ids[idx]
         start, end = self.query_ranges[idx]
+        n = end - start
 
         return {
             "query_id": query_id,
             "query_doc_ids": self.query_doc_ids[start:end],
             "positions": self.positions[start:end],
             "clicks": self.clicks[start:end],
-            "n": end - start,
+            "mask": self.mask[:n],
+            "n": n,
         }
 
     def __len__(self):
@@ -49,46 +61,42 @@ class YandexDataset(Dataset):
         self.query_doc_ids = df["ITEM_ID"].to_numpy()
         self.positions = df["RANK"].to_numpy()
         self.clicks = df["CLICK"].to_numpy()
+        self.mask = np.ones((self.positions.max(),), dtype=np.bool_)
 
-    @staticmethod
-    def collate_fn(samples: List[Dict[str, Union[np.ndarray, int]]]):
-        query_ids = np.array([sample["query_id"] for sample in samples], dtype=np.int32)
-        n_values = np.array([sample["n"] for sample in samples], dtype=np.int16)
 
-        batch = {
-            "query_id": query_ids,
-            "mask": create_mask(n_values),
-            "n": n_values,
-        }
+class SessionCollator:
+    def __init__(
+        self,
+        query_features: Dict[str, np.dtype],
+        doc_features: Dict[str, np.dtype],
+    ):
+        self.query_features = query_features
+        self.doc_features = doc_features
 
-        # Add padded columns with appropriate dtypes:
-        padding_config = {
-            "query_doc_ids": np.int32,
-            "positions": np.int16,
-            "clicks": np.float16,
-        }
+    def __call__(
+        self, samples: List[Dict[str, Union[np.ndarray, int]]]
+    ) -> Dict[str, np.ndarray]:
+        batch = {}
 
-        for col, dtype in padding_config.items():
-            batch[col] = pad(samples, col, n_values.max(), dtype)
+        for feature, dtype in self.query_features.items():
+            batch[feature] = np.array([s[feature] for s in samples], dtype=dtype)
+
+        max_n = batch["n"].max()
+
+        for feature, dtype in self.doc_features.items():
+            batch[feature] = pad(samples, feature, max_n, dtype=dtype)
 
         return batch
 
 
-def create_mask(n_values: np.ndarray):
-    batch_size = len(n_values)
-    mask = np.zeros((batch_size, n_values.max()), dtype=np.bool_)
-
-    for i, n in enumerate(n_values):
-        mask[i, :n] = True
-
-    return mask
-
-
-def pad(samples: List[Dict[str, np.ndarray]], column: str, max_n: int, dtype: np.dtype):
+def pad(samples: List[Dict[str, np.ndarray]], feature: str, max_n, dtype: np.dtype):
     batch_size = len(samples)
+
+    # Allocate empty 2D array with correct datatype:
     array = np.zeros((batch_size, max_n), dtype=dtype)
 
-    for i, sample in enumerate(samples):
-        array[i, : sample["n"]] = sample[column]
+    # Fill the array with the feature values:
+    for row, sample in enumerate(samples):
+        array[row, : sample["n"]] = sample[feature]
 
     return array

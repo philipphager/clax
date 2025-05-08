@@ -11,3 +11,6 @@ wheels/
 
 # PyCHarm
 .idea/
+
+# Data files
+*.csv

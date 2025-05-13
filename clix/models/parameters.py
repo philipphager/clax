@@ -13,7 +13,6 @@ class BernoulliEmbedding(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        parameters = parameters + 1  # Embedding ids are 1-indexed as zero is padding.
         self.use_feature = use_feature
         self.embeddings = nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs)
 
@@ -31,7 +30,6 @@ class BetaEmbedding(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        parameters = parameters + 1  # Embedding ids are 1-indexed as zero is padding.
         self.use_feature = use_feature
         self.alpha = nnx.Sequential(
             nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs),

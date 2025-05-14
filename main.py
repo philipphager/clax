@@ -1,31 +1,12 @@
-import torch
-import numpy as np
-from functools import partial
-
 import optax
+import torch
 from flax import nnx
-
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from clix.datasets import YandexDataset
 from clix.models.pbm import PositionBasedModel
 from clix.trainer import Trainer
-
-
-@partial(nnx.jit)
-def _train_step(
-    model: nnx.Module,
-    optimizer: nnx.Optimizer,
-    batch,
-):
-    def loss_fn(model, batch):
-        return model.log_loss(batch)
-
-    grad_fn = nnx.value_and_grad(loss_fn)
-    loss, grads = grad_fn(model, batch)
-    optimizer.update(grads)
-    return loss
 
 
 def main():
@@ -46,6 +27,11 @@ def main():
     model = PositionBasedModel(positions=10, query_doc_pairs=140_000, rngs=rngs)
     trainer = Trainer(optax.adam(1e-3), epochs=10, patience=0)
     trainer.train(model, train_loader, val_loader)
+
+    for batch in tqdm(val_loader):
+        print(model.sample_clicks(batch, nnx.Rngs(0))[0])
+        print(model.predict_clicks(batch)[0])
+        break
 
 
 if __name__ == "__main__":

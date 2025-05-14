@@ -31,11 +31,11 @@ class CascadeModel(nnx.Module):
         return binary_cross_entropy(y_predict, y_true, where=batch["mask"])
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
-        clicks = self.predict_clicks(batch)
+        click_probs = self.predict_clicks(batch)
         before_first_click = batch["clicks"].cumsum(axis=-1) <= 1
-        clicks = jnp.where(before_first_click, clicks, self.min_probability)
+        click_probs = jnp.where(before_first_click, click_probs, self.min_probability)
 
-        return batch["mask"] * clicks
+        return batch["mask"] * click_probs
 
     def predict_clicks(self, batch: Dict) -> Array:
         relevance = self.relevance(batch)

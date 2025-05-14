@@ -1,5 +1,6 @@
 from typing import Dict
 
+import jax
 from flax import nnx
 from jaxlib.xla_extension import Array
 
@@ -39,3 +40,7 @@ class PositionBasedModel(nnx.Module):
 
     def predict_clicks(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
+
+    def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> Array:
+        y_predict = self.predict_conditional_clicks(batch)
+        return jax.random.bernoulli(rngs(), p=y_predict)

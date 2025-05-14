@@ -1,9 +1,10 @@
 from typing import Dict
 
-from distrax import Bernoulli, Distribution
 from flax import nnx
+from jaxlib.xla_extension import Array
 
-from clix.models.parameters import BernoulliEmbedding, BetaEmbedding
+from clix.models.loss import binary_cross_entropy
+from clix.models.parameters import BernoulliEmbedding
 
 
 class PositionBasedModel(nnx.Module):
@@ -26,12 +27,15 @@ class PositionBasedModel(nnx.Module):
             rngs=rngs,
         )
 
-    def __call__(self, batch: Dict) -> Distribution:
+    def compute_loss(self, batch: Dict):
+        y_true = batch["clicks"]
+        y_predict = self.predict_conditional_clicks(batch)
+        return binary_cross_entropy(y_predict, y_true, where=batch["mask"])
+
+    def predict_conditional_clicks(self, batch: Dict) -> Array:
         examination = self.examination(batch)
         relevance = self.relevance(batch)
-        return Bernoulli(probs=examination * relevance)
+        return batch["mask"] * examination * relevance
 
-    def log_loss(self, batch: Dict):
-        clicks = batch["clicks"]
-        predicted_clicks = self(batch)
-        return -predicted_clicks.log_prob(clicks).mean(where=batch["mask"])
+    def predict_clicks(self, batch: Dict) -> Array:
+        return self.predict_conditional_clicks(batch)

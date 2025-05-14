@@ -1,13 +1,11 @@
-import numpy as np
-from typing import Dict, Optional
+from typing import Dict
 
 import jax
 import jax.numpy as jnp
-from distrax import Bernoulli, Distribution
 from flax import nnx
 from jax import Array
 
-from clix.models import utils
+from clix.models.loss import binary_cross_entropy
 from clix.models.parameters import BernoulliEmbedding
 from clix.models.utils import last_clicked_positions as _last_clicked_positions
 
@@ -35,9 +33,9 @@ class UserBrowsingModel(nnx.Module):
         self.rngs = rngs
 
     def compute_loss(self, batch: Dict):
-        clicks = batch["clicks"]
-        predicted_clicks = self.predict_conditional_clicks(batch)
-        return -Bernoulli(predicted_clicks).log_prob(clicks).mean(where=batch["mask"])
+        y_true = batch["clicks"]
+        y_predict = self.predict_conditional_clicks(batch)
+        return binary_cross_entropy(y_predict, y_true, where=batch["mask"])
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
         clicks = batch["clicks"]

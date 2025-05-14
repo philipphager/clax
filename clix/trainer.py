@@ -43,7 +43,7 @@ class Trainer:
             model.eval()
 
             for batch in tqdm(val_loader, desc=f"Val - Epoch: {epoch}"):
-                self._test_click_step(model, metrics, batch)
+                self._test_step(model, metrics, batch)
 
             val_metrics = metrics.compute()
             early_stopping = early_stopping.update(val_metrics["loss"])
@@ -73,7 +73,7 @@ class Trainer:
         batch,
     ):
         def loss_fn(model, batch):
-            return model.log_loss(batch)
+            return model.compute_loss(batch).mean()
 
         grad_fn = nnx.value_and_grad(loss_fn)
         loss, grads = grad_fn(model, batch)
@@ -81,11 +81,11 @@ class Trainer:
         optimizer.update(grads)
 
     @partial(nnx.jit, static_argnums=(0))
-    def _test_click_step(
+    def _test_step(
         self,
         model: nnx.Module,
         metrics: nnx.MultiMetric,
         batch,
     ):
-        loss = model.log_loss(batch)
+        loss = model.compute_loss(batch).mean()
         metrics.update(loss=loss)

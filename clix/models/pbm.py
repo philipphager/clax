@@ -19,7 +19,7 @@ class PositionBasedModel(nnx.Module):
         super().__init__()
         self.examination = BernoulliEmbedding(
             use_feature="positions",
-            parameters=positions,
+            parameters=positions + 1,
             rngs=rngs,
         )
         self.relevance = BernoulliEmbedding(

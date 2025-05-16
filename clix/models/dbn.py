@@ -6,7 +6,7 @@ from flax import nnx
 from jaxlib.xla_extension import Array
 
 from clix.models.loss import binary_cross_entropy
-from clix.models.parameters import BernoulliEmbedding
+from clix.models.parameters import BernoulliEmbedding, BernoulliParameter
 
 
 class DynamicBayesianNetwork(nnx.Module):
@@ -29,11 +29,7 @@ class DynamicBayesianNetwork(nnx.Module):
             parameters=query_doc_pairs,
             rngs=rngs,
         )
-        self.continuation = BernoulliEmbedding(
-            use_feature="continuation_idx",
-            parameters=1,
-            rngs=rngs,
-        )
+        self.continuation = BernoulliParameter(rngs=rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
@@ -47,7 +43,7 @@ class DynamicBayesianNetwork(nnx.Module):
         examination = jnp.ones((n_batch, n_positions))
         attraction = self.attraction(batch)
         satisfaction = self.satisfaction(batch)
-        continuation = self._predict_continuation(batch)
+        continuation = self._predict_continuation()
 
         # Calculate examination probabilities based on observed clicks:
         for idx in range(n_positions - 1):
@@ -55,10 +51,10 @@ class DynamicBayesianNetwork(nnx.Module):
             no_click_prob = 1 - click_prob
 
             examined_and_not_relevant = (
-                examination[:, idx] * (1 - attraction[:, idx]) * continuation[:, idx]
+                examination[:, idx] * (1 - attraction[:, idx]) * continuation
             )
             # Not satisfied users will continue examination with continuation probability:
-            examination_after_click = (1 - satisfaction[:, idx]) * continuation[:, idx]
+            examination_after_click = (1 - satisfaction[:, idx]) * continuation
             # Users examined but were not attracted (also not satisfied) with the current doc:
             examination_after_no_click = examined_and_not_relevant / no_click_prob
             examination = examination.at[:, idx + 1].set(
@@ -74,7 +70,7 @@ class DynamicBayesianNetwork(nnx.Module):
     def predict_clicks(self, batch: Dict) -> Array:
         attraction = self.attraction(batch)
         satisfaction = self.satisfaction(batch)
-        continuation = self._predict_continuation(batch)
+        continuation = self._predict_continuation()
 
         examination = continuation * (
             attraction * (1 - satisfaction) + (1 - attraction)
@@ -88,7 +84,7 @@ class DynamicBayesianNetwork(nnx.Module):
     def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> Array:
         attraction = self.attraction(batch)
         satisfaction = self.satisfaction(batch)
-        continuation = self._predict_continuation(batch)
+        continuation = self._predict_continuation()
         n_batch, n_positions = attraction.shape
 
         clicks = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
@@ -119,7 +115,7 @@ class DynamicBayesianNetwork(nnx.Module):
                 # - Users continue when examined but the item is not attractive/clicked
                 continue_after_click = clicks[:, idx] & ~is_satisfied[:, idx]
                 continue_without_click = is_examined[:, idx] & ~clicks[:, idx]
-                continuation_probs = continuation[:, idx] * (
+                continuation_probs = continuation * (
                     continue_after_click | continue_without_click
                 )
                 should_continue = should_continue.at[:, idx].set(
@@ -132,10 +128,9 @@ class DynamicBayesianNetwork(nnx.Module):
         clicks = clicks.astype(jnp.float32)
         return batch["mask"] * clicks
 
-    def _predict_continuation(self, batch):
+    def _predict_continuation(self):
         if self.fix_continuation:
             # Users always continues when not satisfied:
-            return jnp.ones_like(batch["positions"], dtype=jnp.float32)
+            return jnp.array([1.0], dtype=jnp.float32)
         else:
-            continuation_idx = jnp.zeros_like(batch["positions"])
-            return self.continuation({"continuation_idx": continuation_idx})
+            return self.continuation()

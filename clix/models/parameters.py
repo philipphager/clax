@@ -1,7 +1,25 @@
-from typing import Dict
+import jax.numpy as jnp
+
+from typing import Dict, Tuple
 
 from flax import nnx
 from jax import Array
+from flax.nnx import initializers, Initializer
+
+
+class BernoulliParameter(nnx.Module):
+    def __init__(
+        self,
+        shape: Tuple[int] = (1,),
+        initializers: Initializer = initializers.normal(0.5),
+        *,
+        rngs: nnx.Rngs,
+    ):
+        super().__init__()
+        self.weight = nnx.Param(initializers(rngs.params(), shape, dtype=jnp.float32))
+
+    def __call__(self) -> Array:
+        return nnx.sigmoid(self.weight.value)
 
 
 class BernoulliEmbedding(nnx.Module):

@@ -1,10 +1,9 @@
-import jax.numpy as jnp
-
 from typing import Dict, Tuple
 
+import jax.numpy as jnp
 from flax import nnx
-from jax import Array
 from flax.nnx import initializers, Initializer
+from jax import Array
 
 
 class BernoulliParameter(nnx.Module):
@@ -37,6 +36,25 @@ class BernoulliEmbedding(nnx.Module):
     def __call__(self, batch: Dict) -> Array:
         x = batch[self.use_feature]
         return nnx.sigmoid(self.embeddings(x).squeeze())
+
+
+class BernoulliEmbedding(nnx.Module):
+    def __init__(
+        self,
+        use_feature: str,
+        parameters: int,
+        *,
+        log_prob: bool = False,
+        rngs: nnx.Rngs,
+    ):
+        super().__init__()
+        self.use_feature = use_feature
+        self.embeddings = nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs)
+        self.activation_fn = nnx.log_sigmoid if log_prob else nnx.sigmoid
+
+    def __call__(self, batch: Dict) -> Array:
+        x = batch[self.use_feature]
+        return self.activation_fn(self.embeddings(x).squeeze())
 
 
 class BetaEmbedding(nnx.Module):

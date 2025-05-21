@@ -3,10 +3,18 @@ from typing import Dict
 import jax
 import jax.numpy as jnp
 from flax import nnx
+from flax import struct
 from jaxlib.xla_extension import Array
 
 from clix.models.loss import binary_cross_entropy
 from clix.models.parameters import BernoulliEmbedding
+
+
+@struct.dataclass
+class PositionBasedModelOutput:
+    clicks: Array
+    examination: Array
+    attraction: Array
 
 
 class PositionBasedModel(nnx.Module):
@@ -23,7 +31,7 @@ class PositionBasedModel(nnx.Module):
             parameters=positions + 1,
             rngs=rngs,
         )
-        self.relevance = BernoulliEmbedding(
+        self.attraction = BernoulliEmbedding(
             use_feature="query_doc_ids",
             parameters=query_doc_pairs,
             rngs=rngs,
@@ -42,15 +50,24 @@ class PositionBasedModel(nnx.Module):
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
         exam_log_probs = self.examination.log_prob(batch)
-        rel_log_probs = self.relevance.log_prob(batch)
-        click_log_probs = exam_log_probs + rel_log_probs
+        attr_log_probs = self.attraction.log_prob(batch)
+        click_log_probs = exam_log_probs + attr_log_probs
 
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def predict_clicks(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
-    def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> Array:
-        click_log_probs = self.predict_clicks(batch)
-        click_probs = jnp.exp(click_log_probs)
-        return jax.random.bernoulli(rngs(), p=click_probs)
+    def sample(self, batch: Dict, rngs: nnx.Rngs) -> PositionBasedModelOutput:
+        exam_probs = self.examination.prob(batch)
+        attr_probs = self.attraction.prob(batch)
+
+        examination = batch["mask"] & jax.random.bernoulli(rngs(), p=exam_probs)
+        attraction = batch["mask"] & jax.random.bernoulli(rngs(), p=attr_probs)
+        clicks = examination & attraction
+
+        return PositionBasedModelOutput(
+            clicks=clicks,
+            examination=examination,
+            attraction=attraction,
+        )

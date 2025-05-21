@@ -79,9 +79,6 @@ class BernoulliEmbedding(nnx.Module):
     def log_prob(self, batch: Dict) -> Array:
         return nnx.log_sigmoid(self.logit(batch))
 
-    def one_minus_log_prob(self, batch: Dict) -> Array:
-        return nnx.log_sigmoid(-self.logit(batch))
-
 
 class BetaEmbedding(nnx.Module):
     def __init__(

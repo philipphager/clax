@@ -62,8 +62,8 @@ class CascadeModel(nnx.Module):
         exam_log_probs = exam_log_probs.at[:, 0].set(0)
         exam_log_probs = jnp.cumsum(exam_log_probs, axis=-1)
 
-        clicks_log_probs = exam_log_probs + rel_log_probs
-        return jnp.where(batch["mask"], clicks_log_probs, -jnp.inf)
+        click_log_probs = exam_log_probs + rel_log_probs
+        return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> Array:
         relevance = self.relevance.prob(batch)

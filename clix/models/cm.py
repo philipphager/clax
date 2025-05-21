@@ -2,12 +2,14 @@ from typing import Dict
 
 import jax
 import jax.numpy as jnp
-
 from flax import nnx
 from jaxlib.xla_extension import Array
 
 from clix.models.loss import binary_cross_entropy
+from clix.models.math import logits_to_log_probs, logits_to_complement_log_probs
 from clix.models.parameters import BernoulliEmbedding
+
+MIN_LOG_PROB = jnp.log(1e-8)
 
 
 class CascadeModel(nnx.Module):
@@ -23,32 +25,52 @@ class CascadeModel(nnx.Module):
             parameters=query_doc_pairs,
             rngs=rngs,
         )
-        self.min_probability = 0.00001
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
-        return binary_cross_entropy(y_predict, y_true, where=batch["mask"])
+
+        return binary_cross_entropy(
+            y_predict,
+            y_true,
+            where=batch["mask"],
+            log_probs=True,
+        )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
-        click_probs = self.predict_clicks(batch)
-        before_first_click = batch["clicks"].cumsum(axis=-1) <= 1
-        click_probs = jnp.where(before_first_click, click_probs, self.min_probability)
+        click_log_probs = self.predict_clicks(batch)
 
-        return batch["mask"] * click_probs
+        # Discard clicks after the first click by setting them to a minimum log prob:
+        before_first_click = batch["clicks"].cumsum(axis=-1) <= 1
+        click_log_probs = jnp.where(
+            before_first_click,
+            click_log_probs,
+            MIN_LOG_PROB,
+        )
+
+        return click_log_probs
 
     def predict_clicks(self, batch: Dict) -> Array:
-        relevance = self.relevance(batch)
+        rel_logits = self.relevance.logit(batch)
 
-        examination = jnp.roll((1 - relevance), shift=1, axis=-1)
-        examination = examination.at[:, 0].set(1)
-        examination = jnp.cumprod(examination, axis=-1)
+        # Compute log probabilities for relevance and non-relevance:
+        rel_log_probs = logits_to_log_probs(rel_logits)
+        non_rel_log_probs = logits_to_complement_log_probs(rel_logits)
 
-        return batch["mask"] * examination * relevance
+        # Compute log examination, the first item is always examined:
+        exam_log_probs = jnp.roll(non_rel_log_probs, shift=1, axis=-1)
+        exam_log_probs = exam_log_probs.at[:, 0].set(0)
+        exam_log_probs = jnp.cumsum(exam_log_probs, axis=-1)
+
+        clicks_log_probs = exam_log_probs + rel_log_probs
+        return jnp.where(batch["mask"], clicks_log_probs, -jnp.inf)
 
     def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> Array:
-        relevance = self.relevance(batch)
+        relevance = self.relevance.prob(batch)
         clicks = jax.random.bernoulli(rngs(), relevance)
+
+        # Only keep clicks if no other item was clicked before,
+        # this is equivalent to sequential sampling:
         before_first_click = clicks.cumsum(axis=-1) <= 1
         clicks = jnp.where(before_first_click, clicks, 0.0)
 

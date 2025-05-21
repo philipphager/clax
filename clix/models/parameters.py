@@ -57,6 +57,32 @@ class BernoulliEmbedding(nnx.Module):
         return self.activation_fn(self.embeddings(x).squeeze())
 
 
+class BernoulliEmbedding(nnx.Module):
+    def __init__(
+        self,
+        use_feature: str,
+        parameters: int,
+        *,
+        rngs: nnx.Rngs,
+    ):
+        super().__init__()
+        self.use_feature = use_feature
+        self.embeddings = nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs)
+
+    def logit(self, batch: Dict) -> Array:
+        x = batch[self.use_feature]
+        return self.embeddings(x).squeeze()
+
+    def prob(self, batch: Dict) -> Array:
+        return nnx.sigmoid(self.logit(batch))
+
+    def log_prob(self, batch: Dict) -> Array:
+        return nnx.log_sigmoid(self.logit(batch))
+
+    def one_minus_log_prob(self, batch: Dict) -> Array:
+        return nnx.log_sigmoid(-self.logit(batch))
+
+
 class BetaEmbedding(nnx.Module):
     def __init__(
         self,

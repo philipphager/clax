@@ -79,8 +79,9 @@ class CascadeModel(nnx.Module):
 
         # Create examination mask (positions up to and including first attractive item):
         before_first_attraction = jnp.cumsum(attraction, axis=1) < 1
-        rolled = jnp.roll(before_first_attraction, shift=1, axis=1).at[:, 0].set(True)
-        first_attraction = rolled & attraction
+        no_attraction_before = jnp.roll(before_first_attraction, shift=1, axis=1)
+        no_attraction_before = no_attraction_before.at[:, 0].set(True)
+        first_attraction = no_attraction_before & attraction
         examination = batch["mask"] & (before_first_attraction | first_attraction)
 
         clicks = examination & attraction

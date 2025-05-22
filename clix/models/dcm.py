@@ -30,6 +30,7 @@ class DependentClickModel(nnx.Module):
     3. After clicking, they may continue with some probability (continuation) or stop
     4. After examining but not clicking, they always continue
     """
+
     def __init__(
         self,
         positions: int,
@@ -77,7 +78,7 @@ class DependentClickModel(nnx.Module):
             exam_after_no_click = self._log_examination_after_no_click(
                 current_exam_log_prob=exam_log_probs[:, idx],
                 attraction_log_prob=attr_log_probs[:, idx],
-                non_attraction_log_prob=non_attr_log_probs[:, idx]
+                non_attraction_log_prob=non_attr_log_probs[:, idx],
             )
             next_exam_log_prob = jnp.where(
                 clicks[:, idx],
@@ -155,11 +156,11 @@ class DependentClickModel(nnx.Module):
             attraction=attraction,
         )
 
+    @staticmethod
     def _log_examination_after_no_click(
-        self,
         current_exam_log_prob: Array,
         attraction_log_prob: Array,
-        non_attraction_log_prob: Array
+        non_attraction_log_prob: Array,
     ) -> Array:
         """
         Compute examination probability after not clicking:
@@ -170,11 +171,11 @@ class DependentClickModel(nnx.Module):
         denominator_log = log1mexp(current_exam_log_prob + attraction_log_prob)
         return numerator_log - denominator_log
 
+    @staticmethod
     def _log_examination_step(
-            self,
-            attr_log_prob: Array,
-            non_attr_log_prob: Array,
-            cont_log_prob: Array,
+        attr_log_prob: Array,
+        non_attr_log_prob: Array,
+        cont_log_prob: Array,
     ) -> Array:
         """
         Compute one step of unconditional examination log probability:

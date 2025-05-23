@@ -85,7 +85,7 @@ class UserBrowsingModel(nnx.Module):
             return log_probs
 
         for idx in range(n_positions):
-            scenarios = []
+            scenario_log_probs = []
 
             for last_clicked_idx in range(-1, idx):
                 # We iterate over all possible last clicked positions
@@ -98,36 +98,34 @@ class UserBrowsingModel(nnx.Module):
                     last_clicked_positions = positions[:, last_clicked_idx]
                     last_click_log_probs = click_log_probs[:, last_clicked_idx]
 
-                # Then, calculate the probability of no clicks between the last
+                # Second, calculate the log probability of no clicks between the last
                 # clicked item and the current item:
-                if idx > 0:
-                    no_clicks_between_log_probs = _no_clicks_between(
-                        last_clicked_idx, idx, last_clicked_positions
-                    )
-                else:
-                    no_clicks_between_log_probs = jnp.zeros(n_batch)
+                no_clicks_between_log_probs = _no_clicks_between(
+                    last_clicked_idx, idx, last_clicked_positions
+                )
 
-                # Finally, calculate the click probability at the current position,
+                # Finally, calculate the click log probability at the current position,
                 # conditioned on the last clicked item:
                 exam_log_probs = self.examination.log_prob(self._examination_parameters(
                     positions[:, idx],
                     last_clicked_positions,
                 ))
                 conditional_click_log_probs = exam_log_probs + attr_log_probs[:, idx]
-                rank_log_probs = (
+
+                # Compute the click log probability for the current item,
+                # conditional on the last clicked item:
+                scenario_log_prob = (
                         last_click_log_probs +
                         no_clicks_between_log_probs +
                         conditional_click_log_probs
                 )
-                rank_log_probs = jnp.where(mask[:, idx], rank_log_probs, -jnp.inf)
+                scenario_log_prob = jnp.where(mask[:, idx], scenario_log_prob, -jnp.inf)
+                scenario_log_probs.append(scenario_log_prob)
 
-                # Add contribution for each possible last clicked items:
-                scenarios.append(rank_log_probs)
-
-            scenarios = jnp.stack(scenarios, axis=-1)
-            click_log_probs = click_log_probs.at[:, idx].set(
-                nnx.logsumexp(scenarios, axis=-1)
-            )
+            # Sum the click probabilities over all possible last clicked items:
+            scenario_log_probs = jnp.stack(scenario_log_probs, axis=-1)
+            scenario_log_probs = nnx.logsumexp(scenario_log_probs, axis=-1)
+            click_log_probs = click_log_probs.at[:, idx].set(scenario_log_probs)
 
         return click_log_probs
 

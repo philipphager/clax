@@ -3,11 +3,19 @@ from typing import Dict
 import jax
 import jax.numpy as jnp
 from flax import nnx
+from flax import struct
 from jax import Array
 
 from clix.models.loss import binary_cross_entropy
 from clix.models.parameters import BernoulliEmbedding
 from clix.models.utils import last_clicked_positions as _last_clicked_positions
+
+
+@struct.dataclass
+class UserBrowsingModelOutput:
+    clicks: Array
+    examination: Array
+    attraction: Array
 
 
 class UserBrowsingModel(nnx.Module):
@@ -25,7 +33,7 @@ class UserBrowsingModel(nnx.Module):
             parameters=(positions + 1) ** 2,
             rngs=rngs,
         )
-        self.relevance = BernoulliEmbedding(
+        self.attraction = BernoulliEmbedding(
             use_feature="query_doc_ids",
             parameters=query_doc_pairs,
             rngs=rngs,
@@ -35,109 +43,63 @@ class UserBrowsingModel(nnx.Module):
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
-        return binary_cross_entropy(y_predict, y_true, where=batch["mask"])
+        return binary_cross_entropy(
+            y_predict,
+            y_true,
+            where=batch["mask"],
+            log_probs=True,
+        )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
         clicks = batch["clicks"]
         positions = batch["positions"]
 
         last_clicked_positions = _last_clicked_positions(positions, clicks)
-        examination = self.predict_examination(positions, last_clicked_positions)
-        relevance = self.relevance(batch)
+        exam_log_probs = self.examination.log_prob(self._examination_param_idx(
+            positions,
+            last_clicked_positions,
+        ))
+        attr_log_probs = self.attraction.log_prob(batch)
+        click_log_probs = exam_log_probs + attr_log_probs
 
-        return examination * relevance
+        return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def predict_clicks(self, batch: Dict):
+        pass
+
+    def sample(self, batch: Dict, rngs: nnx.Rngs) -> UserBrowsingModelOutput:
         mask = batch["mask"]
         positions = batch["positions"]
         n_batch, n_positions = positions.shape
 
-        click_probs = jnp.zeros((n_batch, n_positions))
-        relevance = self.relevance(batch)
-
-        def no_clicks_between(last_clicked_idx, current_idx, last_clicked_positions):
-            prob = jnp.ones(n_batch)
-
-            for idx in range(last_clicked_idx + 1, current_idx):
-                examination = self.predict_examination(
-                    positions[:, idx],
-                    last_clicked_positions,
-                )
-                prob *= 1 - (examination * relevance[:, idx])
-
-            return prob
-
-        for idx in range(n_positions):
-            rank_probs = jnp.zeros(n_batch)
-
-            for last_clicked_idx in range(-1, idx):
-                # We iterate over all possible last clicked positions
-                # First, retrieve the click probability of the last clicked item
-
-                if last_clicked_idx == -1:
-                    # No previous click
-                    last_clicked_positions = jnp.zeros(n_batch, dtype=positions.dtype)
-                    last_click_prob = jnp.ones(n_batch)
-                else:
-                    last_clicked_positions = positions[:, last_clicked_idx]
-                    last_click_prob = click_probs[:, last_clicked_idx]
-
-                # Then, calculate the probability of no clicks between the last
-                # clicked item and the current item:
-                if idx > 0:
-                    no_clicks_between_prob = no_clicks_between(
-                        last_clicked_idx,
-                        idx,
-                        last_clicked_positions,
-                    )
-                else:
-                    no_clicks_between_prob = jnp.ones(n_batch)
-
-                # Finally, calculate the click probability at the current position,
-                # conditioned on the last clicked item:
-                examination = self.predict_examination(
-                    positions[:, idx],
-                    last_clicked_positions,
-                )
-                conditional_click_prob = mask[:, idx] * examination * relevance[:, idx]
-
-                # Add contribution for each possible last clicked items:
-                rank_probs += (
-                    last_click_prob * no_clicks_between_prob * conditional_click_prob
-                )
-
-            click_probs = click_probs.at[:, idx].set(rank_probs)
-
-        return click_probs
-
-    def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> Array:
-        positions = batch["positions"]
-        mask = batch["mask"]
-        n_batch, n_positions = positions.shape
-
-        clicks = jnp.zeros((n_batch, n_positions))
+        clicks = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
+        examination = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
         last_clicked_positions = jnp.zeros(n_batch, dtype=positions.dtype)
 
-        relevance = self.relevance(batch)
+        attr_probs = self.attraction.prob(batch)
+        attraction = mask & jax.random.bernoulli(rngs(), attr_probs)
 
         for idx in range(n_positions):
-            examination_idx = (
-                positions[:, idx] * self.positions + last_clicked_positions
-            )
-            examination = self.examination({"examination_idx": examination_idx})
-
-            click_probs = mask[:, idx] * examination * relevance[:, idx]
-            clicks_at_position = jax.random.bernoulli(rngs(), click_probs)
-            clicks = clicks.at[:, idx].set(clicks_at_position)
+            exam_probs = self.examination.prob(self._examination_param_idx(
+                positions[:, idx],
+                last_clicked_positions,
+            ))
+            examination_at_idx = jax.random.bernoulli(rngs(), p=exam_probs)
+            examination = examination.at[:, idx].set(mask[:, idx] & examination_at_idx)
+            clicks = clicks.at[:, idx].set(examination[:, idx] & attraction[:, idx])
 
             last_clicked_positions = jnp.where(
-                clicks_at_position > 0,
+                clicks[:, idx],
                 positions[:, idx],
                 last_clicked_positions,
             )
 
-        return clicks
+        return UserBrowsingModelOutput(
+            clicks=clicks,
+            examination=examination,
+            attraction=attraction,
+        )
 
-    def predict_examination(self, positions, last_clicked_positions):
+    def _examination_param_idx(self, positions, last_clicked_positions):
         examination_idx = positions * self.positions + last_clicked_positions
-        return self.examination({"examination_idx": examination_idx})
+        return {"examination_idx": examination_idx}

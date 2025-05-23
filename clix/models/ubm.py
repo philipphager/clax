@@ -8,6 +8,7 @@ from jax import Array
 from jax import lax
 
 from clix.models.loss import binary_cross_entropy
+from clix.models.math import log1mexp
 from clix.models.parameters import BernoulliEmbedding
 
 
@@ -38,7 +39,6 @@ class UserBrowsingModel(nnx.Module):
             parameters=query_doc_pairs,
             rngs=rngs,
         )
-        self.rngs = rngs
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
@@ -65,7 +65,71 @@ class UserBrowsingModel(nnx.Module):
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def predict_clicks(self, batch: Dict):
-        pass
+        mask = batch["mask"]
+        positions = batch["positions"]
+        n_batch, n_positions = positions.shape
+
+        click_log_probs = jnp.zeros((n_batch, n_positions))
+        attr_log_probs = self.attraction.log_prob(batch)
+
+        def _no_clicks_between(last_clicked_idx, current_idx, last_clicked_positions):
+            log_probs = jnp.zeros(n_batch)
+
+            for idx in range(last_clicked_idx + 1, current_idx):
+                exam_log_probs = self.examination.log_prob(self._examination_parameters(
+                    positions[:, idx],
+                    last_clicked_positions,
+                ))
+                log_probs += log1mexp(exam_log_probs + attr_log_probs[:, idx])
+
+            return log_probs
+
+        for idx in range(n_positions):
+            scenarios = []
+
+            for last_clicked_idx in range(-1, idx):
+                # We iterate over all possible last clicked positions
+                # First, retrieve the click probability of the last clicked item:
+                if last_clicked_idx == -1:
+                    # No previous click
+                    last_clicked_positions = jnp.zeros(n_batch, dtype=positions.dtype)
+                    last_click_log_probs = jnp.zeros(n_batch)
+                else:
+                    last_clicked_positions = positions[:, last_clicked_idx]
+                    last_click_log_probs = click_log_probs[:, last_clicked_idx]
+
+                # Then, calculate the probability of no clicks between the last
+                # clicked item and the current item:
+                if idx > 0:
+                    no_clicks_between_log_probs = _no_clicks_between(
+                        last_clicked_idx, idx, last_clicked_positions
+                    )
+                else:
+                    no_clicks_between_log_probs = jnp.zeros(n_batch)
+
+                # Finally, calculate the click probability at the current position,
+                # conditioned on the last clicked item:
+                exam_log_probs = self.examination.log_prob(self._examination_parameters(
+                    positions[:, idx],
+                    last_clicked_positions,
+                ))
+                conditional_click_log_probs = exam_log_probs + attr_log_probs[:, idx]
+                rank_log_probs = (
+                        last_click_log_probs +
+                        no_clicks_between_log_probs +
+                        conditional_click_log_probs
+                )
+                rank_log_probs = jnp.where(mask[:, idx], rank_log_probs, -jnp.inf)
+
+                # Add contribution for each possible last clicked items:
+                scenarios.append(rank_log_probs)
+
+            scenarios = jnp.stack(scenarios, axis=-1)
+            click_log_probs = click_log_probs.at[:, idx].set(
+                nnx.logsumexp(scenarios, axis=-1)
+            )
+
+        return click_log_probs
 
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> UserBrowsingModelOutput:
         mask = batch["mask"]

@@ -165,7 +165,7 @@ class DependentClickModel(nnx.Module):
         """
         Compute examination probability after not clicking:
         Formula: P(E_{k+1} = 1 | C_{d,k} = 0) = e_k(1-α_d) / (1-e_k α_d)
-        In log space: log(e_k) + log(1-a_d) - log(1-e_k a_d)
+        In log space: log(e_k) + log(1-a_d) - log(1-e_k*a_d)
         """
         numerator_log = current_exam_log_prob + non_attraction_log_prob
         denominator_log = log1mexp(current_exam_log_prob + attraction_log_prob)

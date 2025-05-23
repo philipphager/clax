@@ -39,7 +39,7 @@ class DependentClickModel(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.relevance = BernoulliEmbedding(
+        self.attraction = BernoulliEmbedding(
             use_feature="query_doc_ids",
             parameters=query_doc_pairs,
             rngs=rngs,
@@ -64,7 +64,7 @@ class DependentClickModel(nnx.Module):
         clicks = batch["clicks"]
 
         # Get log probabilities:
-        attr_logits = self.relevance.logit(batch)
+        attr_logits = self.attraction.logit(batch)
         attr_log_probs = logits_to_log_probs(attr_logits)
         non_attr_log_probs = logits_to_complement_log_probs(attr_logits)
         cont_log_probs = self.continuation.log_prob(batch)
@@ -98,7 +98,7 @@ class DependentClickModel(nnx.Module):
         - log e_{k + 1} = log e_k + log(exp(log a_d + log λ_k) + exp(log(1 - a_d)))
         """
         # Get log probabilities:
-        attr_logits = self.relevance.logit(batch)
+        attr_logits = self.attraction.logit(batch)
         attr_log_probs = logits_to_log_probs(attr_logits)
         non_attr_log_probs = logits_to_complement_log_probs(attr_logits)
         cont_log_probs = self.continuation.log_prob(batch)
@@ -118,7 +118,7 @@ class DependentClickModel(nnx.Module):
 
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> Array:
         mask = batch["mask"]
-        attr_probs = self.relevance.prob(batch)
+        attr_probs = self.attraction.prob(batch)
         continuation = self.continuation.prob(batch)
 
         # Initialize outputs:

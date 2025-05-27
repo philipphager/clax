@@ -55,10 +55,12 @@ class UserBrowsingModel(nnx.Module):
         positions = batch["positions"]
 
         last_clicked_positions = self._last_clicked_positions(positions, clicks)
-        exam_log_probs = self.examination.log_prob(self._examination_parameters(
-            positions,
-            last_clicked_positions,
-        ))
+        exam_log_probs = self.examination.log_prob(
+            self._examination_parameters(
+                positions,
+                last_clicked_positions,
+            )
+        )
         attr_log_probs = self.attraction.log_prob(batch)
         click_log_probs = exam_log_probs + attr_log_probs
 
@@ -76,10 +78,12 @@ class UserBrowsingModel(nnx.Module):
             log_probs = jnp.zeros(n_batch)
 
             for idx in range(last_clicked_idx + 1, current_idx):
-                exam_log_probs = self.examination.log_prob(self._examination_parameters(
-                    positions[:, idx],
-                    last_clicked_positions,
-                ))
+                exam_log_probs = self.examination.log_prob(
+                    self._examination_parameters(
+                        positions[:, idx],
+                        last_clicked_positions,
+                    )
+                )
                 log_probs += log1mexp(exam_log_probs + attr_log_probs[:, idx])
 
             return log_probs
@@ -106,18 +110,20 @@ class UserBrowsingModel(nnx.Module):
 
                 # Finally, calculate the click log probability at the current position,
                 # conditioned on the last clicked item:
-                exam_log_probs = self.examination.log_prob(self._examination_parameters(
-                    positions[:, idx],
-                    last_clicked_positions,
-                ))
+                exam_log_probs = self.examination.log_prob(
+                    self._examination_parameters(
+                        positions[:, idx],
+                        last_clicked_positions,
+                    )
+                )
                 conditional_click_log_probs = exam_log_probs + attr_log_probs[:, idx]
 
                 # Compute the click log probability for the current item,
                 # conditional on the last clicked item:
                 scenario_log_prob = (
-                        last_click_log_probs +
-                        no_clicks_between_log_probs +
-                        conditional_click_log_probs
+                    last_click_log_probs
+                    + no_clicks_between_log_probs
+                    + conditional_click_log_probs
                 )
                 scenario_log_prob = jnp.where(mask[:, idx], scenario_log_prob, -jnp.inf)
                 scenario_log_probs.append(scenario_log_prob)
@@ -142,10 +148,12 @@ class UserBrowsingModel(nnx.Module):
         attraction = mask & jax.random.bernoulli(rngs(), attr_probs)
 
         for idx in range(n_positions):
-            exam_probs = self.examination.prob(self._examination_parameters(
-                positions[:, idx],
-                last_clicked_positions,
-            ))
+            exam_probs = self.examination.prob(
+                self._examination_parameters(
+                    positions[:, idx],
+                    last_clicked_positions,
+                )
+            )
             examination_at_idx = jax.random.bernoulli(rngs(), p=exam_probs)
             examination = examination.at[:, idx].set(mask[:, idx] & examination_at_idx)
             clicks = clicks.at[:, idx].set(examination[:, idx] & attraction[:, idx])

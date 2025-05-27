@@ -13,6 +13,7 @@ dependencies = [
     "optax>=0.2.4",
     "pandas>=2.2.3",
     "pytest>=8.3.5",
+    "rax>=0.4.0",
     "torch>=2.7.0",
     "tqdm>=4.67.1",
 ]

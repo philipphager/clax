@@ -15,12 +15,14 @@ from clix.models.math import (
     log1mexp,
 )
 
+
 @struct.dataclass
 class DynamicBayesianNetworkOutput:
     clicks: Array
     examination: Array
     attraction: Array
     satisfaction: Array
+
 
 class DynamicBayesianNetwork(nnx.Module):
     def __init__(
@@ -47,20 +49,13 @@ class DynamicBayesianNetwork(nnx.Module):
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
-        return binary_cross_entropy(y_predict, y_true, where=batch["mask"], log_probs=True)
+        return binary_cross_entropy(
+            y_predict, y_true, where=batch["mask"], log_probs=True
+        )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
         clicks = batch["clicks"]
-
-        # Get log probabilities:
-        attr_logits = self.attraction.logit(batch)
-        attr_log_probs = logits_to_log_probs(attr_logits)
-        non_attr_log_probs = logits_to_complement_log_probs(attr_logits)
-
-        sat_logits = self.satisfaction.logit(batch)
-        non_sat_log_probs = logits_to_complement_log_probs(sat_logits)
-
-        cont_log_prob = jnp.array([0.0]) if self.fix_continuation else self.continuation.log_prob()
+        log_probs = self._get_log_probabilities(batch)
 
         # Initialize: first document always examined (log(1) = 0):
         n_batch, n_positions = clicks.shape
@@ -69,16 +64,15 @@ class DynamicBayesianNetwork(nnx.Module):
         # Compute examination probabilities based on click history:
         for idx in range(n_positions - 1):
             exam_after_click = self._log_examination_after_click(
-                non_sat_log_probs=non_sat_log_probs[:, idx],
-                cont_log_prob=cont_log_prob,
+                non_sat_log_probs=log_probs["non_sat"][:, idx],
+                cont_log_prob=log_probs["cont"],
             )
             exam_after_no_click = self._log_examination_after_no_click(
                 current_exam_log_prob=exam_log_probs[:, idx],
-                attraction_log_prob=attr_log_probs[:, idx],
-                non_attraction_log_prob=non_attr_log_probs[:, idx],
-                cont_log_prob=cont_log_prob,
+                attraction_log_prob=log_probs["attr"][:, idx],
+                non_attraction_log_prob=log_probs["non_attr"][:, idx],
+                cont_log_prob=log_probs["cont"],
             )
-
             exam_log_probs = exam_log_probs.at[:, idx + 1].set(
                 jnp.where(
                     clicks[:, idx],
@@ -87,62 +81,39 @@ class DynamicBayesianNetwork(nnx.Module):
                 )
             )
 
-        click_log_probs = exam_log_probs + attr_log_probs
+        click_log_probs = exam_log_probs + log_probs["attr"]
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def predict_clicks(self, batch: Dict) -> Array:
-        attr_logits = self.attraction.logit(batch)
-        attr_log_probs = logits_to_log_probs(attr_logits)
-        non_attr_log_probs = logits_to_complement_log_probs(attr_logits)
-
-        sat_logits = self.satisfaction.logit(batch)
-        non_sat_log_probs = logits_to_complement_log_probs(sat_logits)
-
-        cont_log_prob = jnp.array([0.0]) if self.fix_continuation else self.continuation.log_prob()
+        log_probs = self._get_log_probabilities(batch)
 
         exam_log_probs = self._log_examination_step(
-            attr_log_probs=attr_log_probs,
-            non_attr_log_probs=non_attr_log_probs,
-            non_sat_log_probs=non_sat_log_probs,
-            cont_log_prob=cont_log_prob,
+            attr_log_probs=log_probs["attr"],
+            non_attr_log_probs=log_probs["non_attr"],
+            non_sat_log_probs=log_probs["non_sat"],
+            cont_log_prob=log_probs["cont"],
         )
         exam_log_probs = jnp.roll(exam_log_probs, shift=1, axis=-1)
         exam_log_probs = exam_log_probs.at[:, 0].set(0)
         exam_log_probs = jnp.cumsum(exam_log_probs, axis=-1)
 
-        click_log_probs = exam_log_probs + attr_log_probs
+        click_log_probs = exam_log_probs + log_probs["attr"]
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
-    @staticmethod
-    def _log_examination_step(
-        attr_log_probs: Array,
-        non_attr_log_probs: Array,
-        non_sat_log_probs: Array,
-        cont_log_prob: Array,
-    ) -> Array:
-        """
-        Compute one step of unconditional examination log probability:
-        Formula:
-        In log space:
-        """
-        return cont_log_prob + jnp.logaddexp(
-            attr_log_probs + non_sat_log_probs, non_attr_log_probs
-        )
-
-
-    def sample(self, batch: Dict, rngs: nnx.Rngs) -> Array:
+    def sample(self, batch: Dict, rngs: nnx.Rngs) -> DynamicBayesianNetworkOutput:
         mask = batch["mask"]
         n_batch, n_positions = mask.shape
 
         attr_probs = self.attraction.prob(batch)
         sat_probs = self.satisfaction.prob(batch)
-        continuation = jnp.array([1.0]) if self.fix_continuation else self.continuation.prob()
+        continuation = (
+            jnp.array([1.0]) if self.fix_continuation else self.continuation.prob()
+        )
 
         clicks = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
         examination = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
         attraction = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
         satisfaction = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
-        should_continue = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
 
         # Always examine the first item (if valid)
         examination = examination.at[:, 0].set(batch["mask"][:, 0])
@@ -159,19 +130,16 @@ class DynamicBayesianNetwork(nnx.Module):
                     jax.random.bernoulli(rngs(), p=satisfaction_probs)
                 )
 
-                # Sample user continuation:
-                # - Users continue when not satisfied after click
-                # - Users continue when examined but the item is not attractive/clicked
+                # Users continue when not satisfied after click:
                 continue_after_click = clicks[:, idx] & ~satisfaction[:, idx]
+                # Users continue after examining but clicking the current item:
                 continue_without_click = examination[:, idx] & ~clicks[:, idx]
                 continuation_probs = continuation * (
                     continue_after_click | continue_without_click
                 )
-                should_continue = should_continue.at[:, idx].set(
-                    jax.random.bernoulli(rngs(), p=continuation_probs)
-                )
+                should_continue = jax.random.bernoulli(rngs(), p=continuation_probs)
                 examination = examination.at[:, idx + 1].set(
-                    should_continue[:, idx] & batch["mask"][:, idx + 1]
+                    should_continue & batch["mask"][:, idx + 1]
                 )
 
         return DynamicBayesianNetworkOutput(
@@ -181,10 +149,29 @@ class DynamicBayesianNetwork(nnx.Module):
             satisfaction=satisfaction,
         )
 
+    def _get_log_probabilities(self, batch: Dict) -> Dict[str, Array]:
+        attr_logits = self.attraction.logit(batch)
+        attr_log_probs = logits_to_log_probs(attr_logits)
+        non_attr_log_probs = logits_to_complement_log_probs(attr_logits)
+
+        sat_logits = self.satisfaction.logit(batch)
+        non_sat_log_probs = logits_to_complement_log_probs(sat_logits)
+
+        cont_log_prob = (
+            jnp.array([0.0]) if self.fix_continuation else self.continuation.log_prob()
+        )
+
+        return {
+            "attr": attr_log_probs,
+            "non_attr": non_attr_log_probs,
+            "non_sat": non_sat_log_probs,
+            "cont": cont_log_prob,
+        }
+
     @staticmethod
     def _log_examination_after_click(
-            non_sat_log_probs: Array,
-            cont_log_prob: Array,
+        non_sat_log_probs: Array,
+        cont_log_prob: Array,
     ) -> Array:
         """
         Compute log examination probability after clicking.
@@ -195,10 +182,10 @@ class DynamicBayesianNetwork(nnx.Module):
 
     @staticmethod
     def _log_examination_after_no_click(
-            current_exam_log_prob: Array,
-            attraction_log_prob: Array,
-            non_attraction_log_prob: Array,
-            cont_log_prob: Array,
+        current_exam_log_prob: Array,
+        attraction_log_prob: Array,
+        non_attraction_log_prob: Array,
+        cont_log_prob: Array,
     ) -> Array:
         """
         Compute log examination probability after not clicking.

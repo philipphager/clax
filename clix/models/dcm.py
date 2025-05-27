@@ -101,13 +101,12 @@ class DependentClickModel(nnx.Module):
         attr_probs = self.attraction.prob(batch)
         continuation = self.continuation.prob(batch)
 
-        # Initialize outputs:
         n_batch, n_positions = mask.shape
         clicks = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
         attraction = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
         examination = jnp.zeros((n_batch, n_positions), dtype=jnp.bool_)
 
-        # Always examine first position (if valid)
+        # Always examine first position (if valid):
         examination = examination.at[:, 0].set(mask[:, 0])
 
         for idx in range(n_positions):
@@ -115,7 +114,6 @@ class DependentClickModel(nnx.Module):
             attraction = attraction.at[:, idx].set(mask[:, idx] & attraction_at_idx)
             clicks = clicks.at[:, idx].set(examination[:, idx] & attraction[:, idx])
 
-            # Update examination for next position:
             if idx < n_positions - 1:
                 # Determine continuation probability:
                 # - If clicked: use continuation probability
@@ -126,8 +124,9 @@ class DependentClickModel(nnx.Module):
                     jnp.where(clicks[:, idx], continuation[:, idx], 1.0),
                     0.0,
                 )
+                should_continue = jax.random.bernoulli(rngs(), p=continuation_prob)
                 examination = examination.at[:, idx + 1].set(
-                    mask[:, idx + 1] & jax.random.bernoulli(rngs(), continuation_prob)
+                    should_continue & batch["mask"][:, idx + 1]
                 )
 
         return DependentClickModelOutput(

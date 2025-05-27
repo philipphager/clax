@@ -45,7 +45,12 @@ class ClickChainModel(nnx.Module):
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
-        return binary_cross_entropy(y_predict, y_true, where=batch["mask"], log_probs=True)
+        return binary_cross_entropy(
+            y_predict,
+            y_true,
+            where=batch["mask"],
+            log_probs=True,
+        )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
         clicks = batch["clicks"]

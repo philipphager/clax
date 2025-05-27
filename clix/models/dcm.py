@@ -23,7 +23,6 @@ class DependentClickModelOutput:
 
 
 class DependentClickModel(nnx.Module):
-
     def __init__(
         self,
         positions: int,

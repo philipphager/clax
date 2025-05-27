@@ -29,6 +29,7 @@ class BernoulliParameter(nnx.Module):
     def log_prob(self) -> Array:
         return nnx.log_sigmoid(self.weight.value)
 
+
 class BernoulliEmbedding(nnx.Module):
     def __init__(
         self,

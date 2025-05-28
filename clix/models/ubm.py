@@ -35,6 +35,7 @@ class UserBrowsingModel(nnx.Module):
     References:
     - Dupret and Piwowarski (2008). "A user browsing model to predict search engine click data from past observations"
     """
+
     def __init__(
         self,
         positions: int,
@@ -82,6 +83,7 @@ class UserBrowsingModel(nnx.Module):
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def predict_clicks(self, batch: Dict):
+        """Compute unconditional click probabilities by marginalizing over all possible click histories."""
         mask = batch["mask"]
         positions = batch["positions"]
         n_batch, n_positions = positions.shape
@@ -89,64 +91,46 @@ class UserBrowsingModel(nnx.Module):
         click_log_probs = jnp.zeros((n_batch, n_positions))
         attr_log_probs = self.attraction.log_prob(batch)
 
-        def _no_clicks_between(last_clicked_idx, current_idx, last_clicked_positions):
-            log_probs = jnp.zeros(n_batch)
-
-            for idx in range(last_clicked_idx + 1, current_idx):
-                exam_log_probs = self.examination.log_prob(
-                    self._examination_parameters(
-                        positions[:, idx],
-                        last_clicked_positions,
-                    )
-                )
-                log_probs += log1mexp(exam_log_probs + attr_log_probs[:, idx])
-
-            return log_probs
-
-        for idx in range(n_positions):
+        for current_idx in range(n_positions):
             scenario_log_probs = []
 
-            for last_clicked_idx in range(-1, idx):
-                # We iterate over all possible last clicked positions
-                # First, retrieve the click probability of the last clicked item:
-                if last_clicked_idx == -1:
-                    # No previous click
-                    last_clicked_positions = jnp.zeros(n_batch, dtype=positions.dtype)
-                    last_click_log_probs = jnp.zeros(n_batch)
-                else:
-                    last_clicked_positions = positions[:, last_clicked_idx]
-                    last_click_log_probs = click_log_probs[:, last_clicked_idx]
-
-                # Second, calculate the log probability of no clicks between the last
-                # clicked item and the current item:
-                no_clicks_between_log_probs = _no_clicks_between(
-                    last_clicked_idx, idx, last_clicked_positions
+            for last_clicked_idx in range(-1, current_idx):
+                # Each scenario represents one possible browsing history:
+                # Predict clicks at the current_idx given the last clicked doc is at last_clicked_idx.
+                last_click_log_prob = self._get_last_click_log_prob(
+                    click_log_probs=click_log_probs,
+                    last_clicked_idx=last_clicked_idx,
                 )
-
-                # Finally, calculate the click log probability at the current position,
-                # conditioned on the last clicked item:
-                exam_log_probs = self.examination.log_prob(
-                    self._examination_parameters(
-                        positions[:, idx],
-                        last_clicked_positions,
-                    )
+                no_clicks_log_prob = self._compute_no_clicks_between_log_prob(
+                    positions=positions,
+                    attr_log_probs=attr_log_probs,
+                    last_clicked_idx=last_clicked_idx,
+                    current_idx=current_idx,
                 )
-                conditional_click_log_probs = exam_log_probs + attr_log_probs[:, idx]
-
-                # Compute the click log probability for the current item,
-                # conditional on the last clicked item:
+                current_click_log_prob = self._compute_current_click_log_prob(
+                    positions=positions,
+                    attr_log_probs=attr_log_probs,
+                    current_idx=current_idx,
+                    last_clicked_idx=last_clicked_idx,
+                )
+                # The click probability of one scenario consists of:
+                # The prob. of the last item to be clicked, no clicks between the
+                # last item and the current item, and the current click probability.
                 scenario_log_prob = (
-                    last_click_log_probs
-                    + no_clicks_between_log_probs
-                    + conditional_click_log_probs
+                    last_click_log_prob + no_clicks_log_prob + current_click_log_prob
                 )
-                scenario_log_prob = jnp.where(mask[:, idx], scenario_log_prob, -jnp.inf)
+                scenario_log_prob = jnp.where(
+                    mask[:, current_idx], scenario_log_prob, -jnp.inf
+                )
                 scenario_log_probs.append(scenario_log_prob)
 
-            # Sum the click probabilities over all possible last clicked items:
+            # Marginalize over all scenarios:
             scenario_log_probs = jnp.stack(scenario_log_probs, axis=-1)
-            scenario_log_probs = nnx.logsumexp(scenario_log_probs, axis=-1)
-            click_log_probs = click_log_probs.at[:, idx].set(scenario_log_probs)
+            scenario_log_probs = jax.scipy.special.logsumexp(
+                scenario_log_probs,
+                axis=-1,
+            )
+            click_log_probs = click_log_probs.at[:, current_idx].set(scenario_log_probs)
 
         return click_log_probs
 
@@ -188,6 +172,81 @@ class UserBrowsingModel(nnx.Module):
     def _examination_parameters(self, positions, last_clicked_positions):
         examination_idx = positions * self.positions + last_clicked_positions
         return {"examination_idx": examination_idx}
+
+    def _get_last_click_log_prob(
+        self,
+        click_log_probs: Array,
+        last_clicked_idx: int,
+    ) -> Array:
+        """
+        Get log probability of the last click (or zero if no previous click).
+        """
+        if last_clicked_idx == -1:
+            return jnp.zeros(click_log_probs.shape[0])
+        else:
+            return click_log_probs[:, last_clicked_idx]
+
+    def _compute_no_clicks_between_log_prob(
+        self,
+        positions: Array,
+        attr_log_probs: Array,
+        last_clicked_idx: int,
+        current_idx: int,
+    ) -> Array:
+        """
+        Compute log probability of no clicks between last_clicked_idx and current_idx.
+        """
+        log_prob = jnp.zeros(positions.shape[0])
+
+        for intermediate_idx in range(last_clicked_idx + 1, current_idx):
+            intermediate_positions = positions[:, intermediate_idx]
+            last_clicked_positions = self._get_last_clicked_positions(
+                positions, last_clicked_idx
+            )
+            exam_log_prob = self.examination.log_prob(
+                self._examination_parameters(
+                    intermediate_positions, last_clicked_positions
+                )
+            )
+            click_log_prob = exam_log_prob + attr_log_probs[:, intermediate_idx]
+            no_click_log_prob = log1mexp(click_log_prob)
+            log_prob += no_click_log_prob
+
+        return log_prob
+
+    def _compute_current_click_log_prob(
+        self,
+        positions: Array,
+        attr_log_probs: Array,
+        current_idx: int,
+        last_clicked_idx: int,
+    ) -> Array:
+        """
+        Compute log probability of click at current position given last clicked position.
+        """
+        # Get actual positions (not indices) for parameter lookup:
+        current_positions = positions[:, current_idx]
+        last_clicked_positions = self._get_last_clicked_positions(
+            positions, last_clicked_idx
+        )
+        exam_log_prob = self.examination.log_prob(
+            self._examination_parameters(current_positions, last_clicked_positions)
+        )
+
+        return exam_log_prob + attr_log_probs[:, current_idx]
+
+    def _get_last_clicked_positions(
+        self,
+        positions: Array,
+        last_clicked_idx: int,
+    ) -> Array:
+        """
+        Get the actual position values for the last clicked index.
+        """
+        if last_clicked_idx == -1:
+            return jnp.zeros(positions.shape[0], dtype=positions.dtype)
+        else:
+            return positions[:, last_clicked_idx]
 
     @staticmethod
     def _last_clicked_positions(positions: Array, clicks: Array) -> Array:

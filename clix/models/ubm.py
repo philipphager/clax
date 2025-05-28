@@ -83,7 +83,6 @@ class UserBrowsingModel(nnx.Module):
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def predict_clicks(self, batch: Dict):
-        """Compute unconditional click probabilities by marginalizing over all possible click histories."""
         mask = batch["mask"]
         positions = batch["positions"]
         n_batch, n_positions = positions.shape

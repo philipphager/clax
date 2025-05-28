@@ -21,6 +21,22 @@ class CascadeModelOutput:
 
 
 class CascadeModel(nnx.Module):
+    """
+    Cascade Model (CM)
+
+    The cascade model assumes users examine documents from top to bottom and stop
+    after clicking the first relevant document. The model can only explain sessions
+    with a single click.
+
+    Model Assumptions:
+    - Users examine documents sequentially from top to bottom
+    - The first document is always examined
+    - A click occurs if and only if a document is examined and attractive
+    - Users stop examining after the first click
+
+    References:
+    - Craswell et al. (2008). "An experimental comparison of click position-bias models"
+    """
     def __init__(
         self,
         query_doc_pairs: int,
@@ -49,14 +65,10 @@ class CascadeModel(nnx.Module):
         click_log_probs = self.predict_clicks(batch)
 
         # Discard clicks after the first click by setting them to a minimum log prob:
-        before_first_click = batch["clicks"].cumsum(axis=-1) <= 1
-        click_log_probs = jnp.where(
-            before_first_click,
-            click_log_probs,
-            MIN_LOG_PROB,
-        )
+        no_clicks_before = self._no_clicks_before(batch["clicks"])
+        click_log_probs = jnp.where(no_clicks_before, click_log_probs, MIN_LOG_PROB)
 
-        return click_log_probs
+        return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def predict_clicks(self, batch: Dict) -> Array:
         attr_logits = self.attraction.logit(batch)
@@ -77,13 +89,7 @@ class CascadeModel(nnx.Module):
         attr_probs = self.attraction.prob(batch)
         attraction = batch["mask"] & jax.random.bernoulli(rngs(), attr_probs)
 
-        # Create examination mask (positions up to and including first attractive item):
-        before_first_attraction = jnp.cumsum(attraction, axis=1) < 1
-        no_attraction_before = jnp.roll(before_first_attraction, shift=1, axis=1)
-        no_attraction_before = no_attraction_before.at[:, 0].set(True)
-        first_attraction = no_attraction_before & attraction
-        examination = batch["mask"] & (before_first_attraction | first_attraction)
-
+        examination = self._no_clicks_before(attraction)
         clicks = examination & attraction
 
         return CascadeModelOutput(
@@ -91,3 +97,11 @@ class CascadeModel(nnx.Module):
             examination=examination,
             attraction=attraction,
         )
+
+    @staticmethod
+    def _no_clicks_before(clicks):
+        """
+        Check if there are no clicks before each position.
+        """
+        clicks_before = jnp.cumsum(clicks, axis=-1) - clicks
+        return clicks_before == 0

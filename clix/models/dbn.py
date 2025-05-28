@@ -25,6 +25,23 @@ class DynamicBayesianNetworkOutput:
 
 
 class DynamicBayesianNetwork(nnx.Module):
+    """
+    Dynamic Bayesian Network (DBN)
+
+    DBN extends the cascade model by introducing separate attraction and satisfaction
+    parameters, allowing users to continue examining after clicks if they are not
+    satisfied with the clicked item.
+
+    Assumptions:
+    - Users examine documents sequentially from top to bottom
+    - A click occurs if and only if a document is examined and attractive
+    - After clicking, users may be satisfied or dissatisfied
+    - Users continue examining only if not satisfied (either no click or unsatisfied click)
+    - Continuation probability γ governs likelihood of continuing after dissatisfaction
+
+    References:
+    - Chapelle and Zhang (2009). "A dynamic bayesian network click model for web search ranking"
+    """
     def __init__(
         self,
         query_doc_pairs: int,
@@ -192,7 +209,7 @@ class DynamicBayesianNetwork(nnx.Module):
     ) -> Array:
         """
         Compute log examination probability after not clicking.
-        Formula: ε_{r+1} = [(1 - α_r) × ε_r × γ] / [1 - α_r × ε_r]
+        Formula: P(E_{r+1} = 1 | E_r = 1, C_r = 0) = [(1 - α_r) × ε_r × γ] / [1 - α_r × ε_r]
         In log space: log ε_{r+1} = log(1 - α_r) + log ε_r + log γ - log(1 - α_r × ε_r)
         """
         numerator_log = current_exam_log_prob + non_attraction_log_prob + cont_log_prob
@@ -207,8 +224,8 @@ class DynamicBayesianNetwork(nnx.Module):
         cont_log_prob: Array,
     ) -> Array:
         """
-        Compute one step of unconditional examination log probability:
-        Formula: γ × [α(1-σ) + (1-α)]
+        Compute one step of unconditional examination log probability.
+        Formula: P(E_{r+1} = 1) = γ × [α(1-σ) + (1-α)]
         In log space: log(γ) + log[α(1-σ) + (1-α)]
         """
         return cont_log_prob + jnp.logaddexp(

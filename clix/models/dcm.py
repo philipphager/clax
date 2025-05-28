@@ -23,6 +23,23 @@ class DependentClickModelOutput:
 
 
 class DependentClickModel(nnx.Module):
+    """
+    Dependent Click Model (DCM)
+
+    DCM extends the cascade model to allow multiple clicks by introducing
+    rank-dependent continuation probabilities. Users may continue examining
+    after a click based on their current position in the ranking.
+
+    Assumptions:
+    - Users examine documents sequentially from top to bottom
+    - A click occurs if and only if a document is examined and attractive
+    - After clicking: continue with rank-dependent probability λ_r
+    - After examining but not clicking: always continue (probability 1)
+    - Implicit satisfaction: P(satisfied | click) = 1 - λ_r
+
+    References:
+    - Guo et al. (2009). "Efficient multiple-click models in web search"
+    """
     def __init__(
         self,
         positions: int,
@@ -153,9 +170,9 @@ class DependentClickModel(nnx.Module):
         non_attraction_log_prob: Array,
     ) -> Array:
         """
-        Compute examination probability after not clicking:
-        Formula:
-        In log space:
+        Compute examination probability after not clicking.
+        Formula: P(E_{r+1} = 1 | E_r = 1, C_r = 0) = [(1-α_r) × ε_r] / [1 - α_r × ε_r]
+        In log space: log(1-α_r) + log(ε_r) - log(1 - α_r × ε_r)
         """
         numerator_log = current_exam_log_prob + non_attraction_log_prob
         denominator_log = log1mexp(current_exam_log_prob + attraction_log_prob)
@@ -168,8 +185,8 @@ class DependentClickModel(nnx.Module):
         cont_log_prob: Array,
     ) -> Array:
         """
-        Compute one step of unconditional examination log probability:
-        Formula:
-        In log space:
+        Compute one step of unconditional examination log probability.
+        Formula: P(E_{r+1} = 1) = α_r × λ_r + (1-α_r) × 1
+        In log space: log[α_r × λ_r + (1-α_r)]
         """
         return jnp.logaddexp(cont_log_prob + attr_log_prob, non_attr_log_prob)

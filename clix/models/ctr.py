@@ -16,6 +16,15 @@ class CTRModelOutput:
 
 
 class RandomClickModel(nnx.Module):
+    """
+    Random Click Model (RCM)
+
+    Assumptions:
+    - All documents have the same probability of being clicked
+
+    References:
+    - Chuklin et al. (2015). "Click models for web search"
+    """
     def __init__(
         self,
         *,
@@ -46,7 +55,7 @@ class RandomClickModel(nnx.Module):
     def predict_clicks(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
-    def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> CTRModelOutput:
+    def sample(self, batch: Dict, rngs: nnx.Rngs) -> CTRModelOutput:
         ctr_idx = jnp.zeros_like(batch["query_doc_ids"])
         click_probs = self.ctr.prob({"ctr_idx": ctr_idx})
         clicks = batch["mask"] & jax.random.bernoulli(rngs(), click_probs)
@@ -54,6 +63,21 @@ class RandomClickModel(nnx.Module):
 
 
 class RankBasedCTRModel(nnx.Module):
+    """
+    Rank-based Click-Through Rate Model (RCTR).
+
+    Models click probability as dependent only on document position/rank.
+    Captures position bias where higher-ranked documents get more clicks
+    regardless of their relevance.
+
+    Assumptions:
+    - Click probability depends only on document rank
+    - Clicks are independent across positions
+    - All documents at same rank have identical click probability
+
+    References:
+    - Chuklin et al. (2015). "Click models for web search"
+    """
     def __init__(
         self,
         positions: int,
@@ -84,13 +108,27 @@ class RankBasedCTRModel(nnx.Module):
     def predict_clicks(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
-    def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> Array:
+    def sample(self, batch: Dict, rngs: nnx.Rngs) -> Array:
         click_probs = self.ctr.prob(batch)
         clicks = batch["mask"] & jax.random.bernoulli(rngs(), click_probs)
         return CTRModelOutput(clicks=clicks)
 
 
 class DocumentBasedCTRModel(nnx.Module):
+    """
+    Document-based Click-Through Rate Model (DCTR).
+
+    Clicks depend only on the relevance of each query-document pair,
+    ignoring position effects.
+
+    Assumptions:
+    - Click probability depends only on query-document pair
+    - Clicks are independent across positions
+    - No examination or position bias modeling
+
+    References:
+    - Chuklin et al. (2015). "Click models for web search"
+    """
     def __init__(
         self,
         query_doc_pairs: int,
@@ -127,6 +165,19 @@ class DocumentBasedCTRModel(nnx.Module):
         return CTRModelOutput(clicks=clicks)
 
 class DocumentRankBasedCTRModel(nnx.Module):
+    """
+    Document-Rank based Click-Through Rate Model (RDCTR).
+
+    Models click probability based on both query-document pair and position.
+    Prone to overfitting due to large number of parameters.
+
+    Assumptions:
+    - Click probability depends on both query-document pair and rank
+    - Clicks are independent across positions
+
+    References:
+    - Deffayet et al. (2023). "Evaluating the robustness of click models to policy distributional shift"
+    """
     def __init__(
         self,
         query_doc_pairs: int,
@@ -160,7 +211,7 @@ class DocumentRankBasedCTRModel(nnx.Module):
     def predict_clicks(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
-    def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> Array:
+    def sample(self, batch: Dict, rngs: nnx.Rngs) -> Array:
         ctr_idx = batch["query_doc_ids"] * self.positions + batch["positions"]
         click_probs = self.ctr.prob({"ctr_idx": ctr_idx})
         clicks = batch["mask"] & jax.random.bernoulli(rngs(), click_probs)

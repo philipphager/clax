@@ -24,6 +24,24 @@ class ClickChainModelOutput:
 
 
 class ClickChainModel(nnx.Module):
+    """
+    Click Chain Model (CCM)
+
+    The CCM extends the cascade model to handle multiple clicks by introducing three
+    continuation parameters to model examination behavior.
+
+    Assumptions:
+    - Users examine documents sequentially from top to bottom
+    - A click occurs if and only if a document is both examined and attractive
+    - After each position, users decide whether to continue based on:
+      * τ₁: Probability of continuing after examining but not clicking
+      * τ₂: Probability of continuing after clicking but being dissatisfied
+      * τ₃: Probability of continuing after clicking and being satisfied
+    - Attraction and satisfaction probabilities are identical (both αᵤᵧ)
+
+    References:
+    - Guo et al. (2009). "Click chain model in web search"
+    """
     def __init__(
         self,
         query_doc_pairs: int,
@@ -183,7 +201,7 @@ class ClickChainModel(nnx.Module):
     ) -> Array:
         """
         Compute log examination probability after clicking.
-        Formula: ε_{r+1} = α_r × τ3 + (1 - α_r) × τ2
+        Formula: P(E_{r+1} = 1 | E_r = 1, C_r = 1) = α_r × τ3 + (1 - α_r) × τ2
         In log space: log[α_r × τ3 + (1 - α_r) × τ2]
         """
         satisfied_log = rel_log_prob + tau3_log_prob
@@ -199,7 +217,7 @@ class ClickChainModel(nnx.Module):
     ) -> Array:
         """
         Compute log examination probability after not clicking.
-        Formula: ε_{r+1} = [(1 - α_r) × ε_r × τ1] / [1 - α_r × ε_r]
+        Formula: P(E_{r+1} = 1 | E_r = 1, C_r = 0) = [(1 - α_r) × ε_r × τ1] / [1 - α_r × ε_r]
         In log space: log(1 - α_r) + log ε_r + log τ1 - log(1 - α_r × ε_r)
         """
         numerator_log = non_rel_log_prob + current_exam_log_prob + tau1_log_prob
@@ -216,7 +234,7 @@ class ClickChainModel(nnx.Module):
     ) -> Array:
         """
         Compute one step of unconditional examination log probability.
-        Formula: α × ((1-α) × τ2 + α × τ3) + (1-α) × τ1
+        Formula: P(E_{r+1} = 1) = α × ((1-α) × τ2 + α × τ3) + (1-α) × τ1
         In log space: log[α × ((1-α) × τ2 + α × τ3) + (1-α) × τ1]
         """
         attraction_term = rel_log_prob + jnp.logaddexp(

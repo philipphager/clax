@@ -20,6 +20,21 @@ class UserBrowsingModelOutput:
 
 
 class UserBrowsingModel(nnx.Module):
+    """
+    User Browsing Model (UBM)
+
+    The UBM extends the PBM by making examination probability depend on both the
+    current position and the position of the last clicked document.
+
+    Model Assumptions:
+    - A click occurs if and only if a document is examined and attractive
+    - Examination probability depends on current position AND last clicked position
+    - Attraction probability depends only on query-document pair
+    - User examination is influenced by their last click location
+
+    References:
+    - Dupret and Piwowarski (2008). "A user browsing model to predict search engine click data from past observations"
+    """
     def __init__(
         self,
         positions: int,
@@ -176,6 +191,10 @@ class UserBrowsingModel(nnx.Module):
 
     @staticmethod
     def _last_clicked_positions(positions: Array, clicks: Array) -> Array:
+        """
+        Find the position of the last clicked document for each position.
+        Formula: r' = max{k ∈ {0,...,r-1} : c_k = 1}
+        """
         # Filter clicked positions, e.g.: [1, 2, 3, 4], [1, 0, 0, 1] -> [1, 0, 0, 4]
         clicked_positions = jnp.where(clicks == 1, positions, 0)
         # Find the last clicked position for each item: [1, 0, 0, 4] -> [1, 1, 1, 4]

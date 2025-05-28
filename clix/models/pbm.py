@@ -18,6 +18,23 @@ class PositionBasedModelOutput:
 
 
 class PositionBasedModel(nnx.Module):
+    """
+    Position-Based Model (PBM)
+
+    The PBM assumes uses click when they observed the position of an item and
+    the displayed document is attractive/relevant.
+
+    Assumptions:
+    - A click occurs if and only if a document is examined and attractive
+    - Examination probability depends only on document position
+    - Attraction probability depends only on query-document pair
+    - Examination and attraction are independent events
+    - No sequential behavior (unlike cascade-based models)
+
+    References:
+    - Richardson et al. (2007). "Predicting clicks: estimating the click-through rate for new ads"
+    - Craswell et al. (2008). "An experimental comparison of click position-bias models"
+    """
     def __init__(
         self,
         positions: int,

@@ -35,6 +35,7 @@ class PositionBasedModel(nnx.Module):
     - Richardson et al. (2007). "Predicting clicks: estimating the click-through rate for new ads"
     - Craswell et al. (2008). "An experimental comparison of click position-bias models"
     """
+
     def __init__(
         self,
         positions: int,

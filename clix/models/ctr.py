@@ -25,6 +25,7 @@ class RandomClickModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
+
     def __init__(
         self,
         *,
@@ -78,6 +79,7 @@ class RankBasedCTRModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
+
     def __init__(
         self,
         positions: int,
@@ -129,6 +131,7 @@ class DocumentBasedCTRModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
+
     def __init__(
         self,
         query_doc_pairs: int,
@@ -164,6 +167,7 @@ class DocumentBasedCTRModel(nnx.Module):
         clicks = batch["mask"] & jax.random.bernoulli(rngs(), click_probs)
         return CTRModelOutput(clicks=clicks)
 
+
 class DocumentRankBasedCTRModel(nnx.Module):
     """
     Document-Rank based Click-Through Rate Model (RDCTR).
@@ -178,6 +182,7 @@ class DocumentRankBasedCTRModel(nnx.Module):
     References:
     - Deffayet et al. (2023). "Evaluating the robustness of click models to policy distributional shift"
     """
+
     def __init__(
         self,
         query_doc_pairs: int,

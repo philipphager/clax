@@ -37,6 +37,7 @@ class CascadeModel(nnx.Module):
     References:
     - Craswell et al. (2008). "An experimental comparison of click position-bias models"
     """
+
     def __init__(
         self,
         query_doc_pairs: int,

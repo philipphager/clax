@@ -42,6 +42,7 @@ class DynamicBayesianNetwork(nnx.Module):
     References:
     - Chapelle and Zhang (2009). "A dynamic bayesian network click model for web search ranking"
     """
+
     def __init__(
         self,
         query_doc_pairs: int,

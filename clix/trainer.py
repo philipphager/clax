@@ -42,13 +42,14 @@ class Trainer:
         train_loader: DataLoader,
         val_loader: DataLoader,
     ) -> pd.DataFrame:
-        optimizer = nnx.Optimizer(model, self.optimizer)
 
+        optimizer = nnx.Optimizer(model, self.optimizer)
         train_metrics = MultiMetric(**self.train_metrics)
         val_metrics = MultiMetric(**self.test_metrics)
 
         early_stopping = EarlyStopping(patience=self.patience)
         best_state = nnx.state(model)
+
         logger = ProgressTable(
             columns=[
                 "epoch",

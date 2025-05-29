@@ -42,7 +42,6 @@ class DynamicBayesianNetwork(nnx.Module):
     References:
     - Chapelle and Zhang (2009). "A dynamic bayesian network click model for web search ranking"
     """
-    name = "DBN"
 
     def __init__(
         self,
@@ -53,6 +52,7 @@ class DynamicBayesianNetwork(nnx.Module):
     ):
         super().__init__()
         self.fix_continuation = fix_continuation
+        self.name = "SDBN" if fix_continuation else "DBN"
         self.attraction = BernoulliEmbedding(
             use_feature="query_doc_ids",
             parameters=query_doc_pairs,

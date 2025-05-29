@@ -260,6 +260,7 @@ dependencies = [
     { name = "jupyterlab" },
     { name = "optax" },
     { name = "pandas" },
+    { name = "progress-table" },
     { name = "pytest" },
     { name = "rax" },
     { name = "torch" },
@@ -275,6 +276,7 @@ requires-dist = [
     { name = "jupyterlab", specifier = ">=4.4.2" },
     { name = "optax", specifier = ">=0.2.4" },
     { name = "pandas", specifier = ">=2.2.3" },
+    { name = "progress-table", specifier = ">=3.1.2" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "rax", specifier = ">=0.4.0" },
     { name = "torch", specifier = ">=2.7.0" },
@@ -1408,6 +1410,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/96/2d/02d4312c973c6050a18b314a5ad0b3210edb65a906f868e31c111dede4a6/pluggy-1.5.0.tar.gz", hash = "sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1", size = 67955, upload-time = "2024-04-20T21:34:42.531Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/88/5f/e351af9a41f866ac3f1fac4ca0613908d9a41741cfcf2228f4ad853b697d/pluggy-1.5.0-py3-none-any.whl", hash = "sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669", size = 20556, upload-time = "2024-04-20T21:34:40.434Z" },
+]
+
+[[package]]
+name = "progress-table"
+version = "3.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/25/15/169f7a100a56e767b548eb3c1a32a5f4778861f1b97ffc47e5e71759971e/progress_table-3.1.2.tar.gz", hash = "sha256:49de3bbc73dfc214e251abbf94b05a478b37e9a374db1cabc9b3b8086b012440", size = 28321, upload-time = "2025-03-15T15:17:57.997Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a9/53/88a2cb5df2b7e6b46ed83fbff95ac2150a5255a78752a394073b36b6f52b/progress_table-3.1.2-py3-none-any.whl", hash = "sha256:2901af57b341c9316d4110cc11d5f1d4f3c83c44cfcd182b1ddec88aab1e7fed", size = 20890, upload-time = "2025-03-15T15:17:56.507Z" },
 ]
 
 [[package]]

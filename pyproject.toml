@@ -12,6 +12,7 @@ dependencies = [
     "jupyterlab>=4.4.2",
     "optax>=0.2.4",
     "pandas>=2.2.3",
+    "progress-table>=3.1.2",
     "pytest>=8.3.5",
     "rax>=0.4.0",
     "torch>=2.7.0",

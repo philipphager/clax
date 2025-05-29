@@ -57,6 +57,7 @@ class Trainer:
                 *[f"val_{m}" for m in val_metrics.metric_names],
                 "has_improved",
             ],
+            num_decimal_places=6,
             pbar_embedded=False,
             pbar_show_percents=True,
             pbar_style="angled alt red blue",

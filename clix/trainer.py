@@ -57,6 +57,7 @@ class Trainer:
                 *[f"train_{m}" for m in train_metrics.metric_names],
                 *[f"val_{m}" for m in val_metrics.metric_names],
                 "has_improved",
+                "should_stop",
             ],
             num_decimal_places=6,
             pbar_embedded=False,
@@ -85,13 +86,17 @@ class Trainer:
 
             early_stopping = early_stopping.update(val_results["loss"])
             logger.update_from_dict({f"val_{k}": v for k, v in val_results.items()})
-            logger.update("has_improved", early_stopping.has_improved)
+            logger.update_from_dict(
+                {
+                    "has_improved": early_stopping.has_improved,
+                    "should_stop": early_stopping.should_stop,
+                }
+            )
 
             if early_stopping.has_improved:
                 best_state = nnx.state(model)
 
             if early_stopping.should_stop:
-                print("Stopping early, loading best model state")
                 nnx.update(model, best_state)
                 break
 

@@ -40,6 +40,7 @@ class DependentClickModel(nnx.Module):
     References:
     - Guo et al. (2009). "Efficient multiple-click models in web search"
     """
+    name = "DCM"
 
     def __init__(
         self,

@@ -35,6 +35,7 @@ class UserBrowsingModel(nnx.Module):
     References:
     - Dupret and Piwowarski (2008). "A user browsing model to predict search engine click data from past observations"
     """
+    name = "UBM"
 
     def __init__(
         self,

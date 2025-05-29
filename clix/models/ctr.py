@@ -25,6 +25,7 @@ class RandomClickModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
+    name = "RCM"
 
     def __init__(
         self,
@@ -79,6 +80,7 @@ class RankBasedCTRModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
+    name = "RCTR"
 
     def __init__(
         self,
@@ -131,6 +133,7 @@ class DocumentBasedCTRModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
+    name = "DCTR"
 
     def __init__(
         self,
@@ -182,6 +185,7 @@ class DocumentRankBasedCTRModel(nnx.Module):
     References:
     - Deffayet et al. (2023). "Evaluating the robustness of click models to policy distributional shift"
     """
+    name = "RDCTR"
 
     def __init__(
         self,

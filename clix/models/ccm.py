@@ -42,6 +42,7 @@ class ClickChainModel(nnx.Module):
     References:
     - Guo et al. (2009). "Click chain model in web search"
     """
+    name = "CCM"
 
     def __init__(
         self,

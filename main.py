@@ -2,17 +2,19 @@ import optax
 import torch
 from flax import nnx
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 from clix.datasets import YandexDataset
-from clix.models.pbm import PositionBasedModel
+from clix.models import (
+    PositionBasedModel,
+)
 from clix.trainer import Trainer
 
 
 def main():
     rngs = nnx.Rngs(0)
     dataset = YandexDataset("data/yandex.csv")
-    train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.8, 0.2])
+    train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.6, 0.4])
+    val_dataset, test_dataset = torch.utils.data.random_split(val_dataset, [0.5, 0.5])
 
     train_loader = DataLoader(
         train_dataset,
@@ -24,14 +26,18 @@ def main():
         batch_size=512,
         collate_fn=dataset.collate_fn,
     )
-    model = PositionBasedModel(positions=10, query_doc_pairs=140_000, rngs=rngs)
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=512,
+        collate_fn=dataset.collate_fn,
+    )
+    model = PositionBasedModel(rngs=rngs, query_doc_pairs=140_000, positions=10)
     trainer = Trainer(optax.adam(1e-3), epochs=10, patience=0)
-    trainer.train(model, train_loader, val_loader)
+    train_df = trainer.train(model, train_loader, val_loader)
+    test_df = trainer.test(model, test_loader)
 
-    for batch in tqdm(val_loader):
-        print(model.sample_clicks(batch, nnx.Rngs(0))[0])
-        print(model.predict_clicks(batch)[0])
-        break
+    train_df.to_csv("train.csv")
+    test_df.to_csv("test.csv")
 
 
 if __name__ == "__main__":

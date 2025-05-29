@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Optional, Any
 
 import jax.numpy as jnp
@@ -27,6 +28,7 @@ class Metric(Object):
 class MultiMetric(Metric):
     def __init__(self, **metrics):
         self.metric_names = []
+        metrics = deepcopy(metrics)
 
         for metric_name, metric in metrics.items():
             self.metric_names.append(metric_name)
@@ -105,7 +107,6 @@ class RankBasedAverage(Metric):
 
 
 class LogLikelihood(RankBasedAverage):
-
     def update(
         self,
         *,
@@ -122,7 +123,6 @@ class LogLikelihood(RankBasedAverage):
 
 
 class ConditionalPerplexity(RankBasedAverage):
-
     def update(
         self,
         *,
@@ -146,7 +146,6 @@ class ConditionalPerplexity(RankBasedAverage):
 
 
 class Perplexity(RankBasedAverage):
-
     def update(
         self,
         *,

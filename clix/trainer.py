@@ -54,8 +54,8 @@ class Trainer:
             columns=[
                 "epoch",
                 "model",
-                *[f"train_{m}" for m in train_metrics.metric_names],
-                *[f"val_{m}" for m in val_metrics.metric_names],
+                *train_metrics.compute(prefix="train_").keys(),
+                *val_metrics.compute(prefix="val_").keys(),
                 "has_improved",
                 "should_stop",
             ],
@@ -72,20 +72,20 @@ class Trainer:
             for batch in logger(train_loader, description="Train"):
                 self._train_step(model, optimizer, train_metrics, batch)
 
-            train_results = train_metrics.compute()
+            train_results = train_metrics.compute(prefix="train_")
             train_metrics.reset()
-            logger.update_from_dict({f"train_{k}": v for k, v in train_results.items()})
+            logger.update_from_dict(train_results)
 
             model.eval()
 
             for batch in logger(val_loader, description="Val"):
                 self._test_step(model, val_metrics, batch)
 
-            val_results = val_metrics.compute()
+            val_results = val_metrics.compute(prefix="val_")
             val_metrics.reset()
 
-            early_stopping = early_stopping.update(val_results["loss"])
-            logger.update_from_dict({f"val_{k}": v for k, v in val_results.items()})
+            early_stopping = early_stopping.update(val_results["val_loss"])
+            logger.update_from_dict(val_results)
             logger.update_from_dict(
                 {
                     "has_improved": early_stopping.has_improved,
@@ -115,7 +115,7 @@ class Trainer:
         logger = ProgressTable(
             columns=[
                 "model",
-                *[f"test_{m}" for m in metrics.metric_names],
+                *metrics.compute(prefix="test_").keys(),
             ],
             pbar_embedded=False,
             pbar_show_percents=True,
@@ -126,10 +126,10 @@ class Trainer:
         for batch in logger(test_loader, description="Test"):
             self._test_step(model, metrics, batch)
 
-        results = metrics.compute()
+        results = metrics.compute(prefix="test_")
         metrics.reset()
 
-        logger.update_from_dict({f"test_{k}": v for k, v in results.items()})
+        logger.update_from_dict(results)
         logger.close()
         return logger.to_df()
 

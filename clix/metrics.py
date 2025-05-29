@@ -42,10 +42,17 @@ class MultiMetric(Metric):
         for metric_name in self.metric_names:
             getattr(self, metric_name).update(**updates)
 
-    def compute(self) -> dict[str, Any]:
+    def compute(self, prefix: str = "") -> dict[str, Any]:
         return {
-            f"{metric_name}": getattr(self, metric_name).compute()
+            f"{prefix}{metric_name}": getattr(self, metric_name).compute()
             for metric_name in self.metric_names
+        }
+
+    def compute_per_rank(self, prefix: str = "") -> dict[str, Any]:
+        return {
+            f"{prefix}{metric_name}": getattr(self, metric_name).compute_per_rank()
+            for metric_name in self.metric_names
+            if isinstance(getattr(self, metric_name), RankBasedAverage)
         }
 
 

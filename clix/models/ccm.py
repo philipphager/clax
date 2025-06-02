@@ -4,7 +4,7 @@ import jax
 import jax.numpy as jnp
 from flax import nnx
 from flax import struct
-from jaxlib.xla_extension import Array
+from jax import Array
 
 from clix.models.loss import binary_cross_entropy
 from clix.models.math import (

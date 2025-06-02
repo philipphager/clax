@@ -4,13 +4,11 @@ import jax
 import jax.numpy as jnp
 from flax import nnx
 from flax import struct
-from jaxlib.xla_extension import Array
+from jax import Array
 
 from clix.models.loss import binary_cross_entropy
 from clix.models.math import logits_to_log_probs, logits_to_complement_log_probs
 from clix.models.parameters import BernoulliEmbedding
-
-MIN_LOG_PROB = jnp.log(1e-8)
 
 
 @struct.dataclass
@@ -68,7 +66,7 @@ class CascadeModel(nnx.Module):
 
         # Discard clicks after the first click by setting them to a minimum log prob:
         no_clicks_before = self._no_clicks_before(batch["clicks"])
-        click_log_probs = jnp.where(no_clicks_before, click_log_probs, MIN_LOG_PROB)
+        click_log_probs = jnp.where(no_clicks_before, click_log_probs, jnp.log(1e-8))
 
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 

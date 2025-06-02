@@ -4,8 +4,8 @@ import pandas as pd
 from flax import nnx
 from flax.training.early_stopping import EarlyStopping
 from optax._src.base import GradientTransformation
-from progress_table import ProgressTable
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from clix.metrics import (
     LogLikelihood,
@@ -50,48 +50,24 @@ class Trainer:
         early_stopping = EarlyStopping(patience=self.patience)
         best_state = nnx.state(model)
 
-        logger = ProgressTable(
-            columns=[
-                "epoch",
-                "model",
-                *train_metrics.compute(prefix="train_").keys(),
-                *val_metrics.compute(prefix="val_").keys(),
-                "has_improved",
-                "should_stop",
-            ],
-            num_decimal_places=6,
-            pbar_embedded=False,
-            pbar_show_percents=True,
-            pbar_style="angled alt red blue",
-        )
-
-        for epoch in logger(range(self.epochs), description="Epochs"):
-            logger.update_from_dict({"epoch": epoch, "model": model.name})
+        for epoch in range(self.epochs):
             model.train()
 
-            for batch in logger(train_loader, description="Train"):
+            for batch in tqdm(train_loader, desc="Train"):
                 self._train_step(model, optimizer, train_metrics, batch)
 
             train_results = train_metrics.compute(prefix="train_")
             train_metrics.reset()
-            logger.update_from_dict(train_results)
 
             model.eval()
 
-            for batch in logger(val_loader, description="Val"):
+            for batch in tqdm(val_loader, desc="Val"):
                 self._test_step(model, val_metrics, batch)
 
             val_results = val_metrics.compute(prefix="val_")
             val_metrics.reset()
 
             early_stopping = early_stopping.update(val_results["val_loss"])
-            logger.update_from_dict(val_results)
-            logger.update_from_dict(
-                {
-                    "has_improved": early_stopping.has_improved,
-                    "should_stop": early_stopping.should_stop,
-                }
-            )
 
             if early_stopping.has_improved:
                 best_state = nnx.state(model)
@@ -100,11 +76,6 @@ class Trainer:
                 nnx.update(model, best_state)
                 break
 
-            logger.next_row()
-
-        logger.close()
-        return logger.to_df()
-
     def test(
         self,
         model: nnx.Module,
@@ -112,26 +83,12 @@ class Trainer:
     ) -> pd.DataFrame:
         metrics = MultiMetric(**self.test_metrics)
         model.eval()
-        logger = ProgressTable(
-            columns=[
-                "model",
-                *metrics.compute(prefix="test_").keys(),
-            ],
-            pbar_embedded=False,
-            pbar_show_percents=True,
-            pbar_style="angled alt red blue",
-        )
-        logger.update("model", model.name)
 
-        for batch in logger(test_loader, description="Test"):
+        for batch in tqdm(test_loader, desc="Test"):
             self._test_step(model, metrics, batch)
 
         results = metrics.compute(prefix="test_")
         metrics.reset()
-
-        logger.update_from_dict(results)
-        logger.close()
-        return logger.to_df()
 
     @partial(nnx.jit, static_argnums=(0))
     def _train_step(

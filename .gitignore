@@ -5,15 +5,17 @@ build/
 dist/
 wheels/
 *.egg-info
+.ipynb_checkpoints
 
 # Virtual environments
 .venv
 
-# PyCHarm
+# PyCharm
 .idea/
 
-# Data files
+# Data
 *.csv
+*.txt
 
 # OS
 .DS_Store

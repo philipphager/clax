@@ -43,7 +43,7 @@ class BernoulliEmbedding(nnx.Module):
         self.embeddings = nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs)
 
     def logit(self, batch: Dict) -> Array:
-        x = batch[self.use_feature]
+        x = batch[self.use_feature] % 120
         return self.embeddings(x).squeeze()
 
     def prob(self, batch: Dict) -> Array:

@@ -47,7 +47,7 @@ def main():
         num_workers=1,
         collate_fn=test_dataset.collate_fn,
     )
-    model = PositionBasedModel(rngs=rngs, query_doc_pairs=120_000_000, positions=10)
+    model = PositionBasedModel(rngs=rngs, query_doc_pairs=1_000_000, positions=10)
     trainer = Trainer(optax.adam(1e-3), epochs=10, patience=0)
     train_df = trainer.train(model, train_loader, val_loader)
     test_df = trainer.test(model, test_loader)

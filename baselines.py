@@ -107,7 +107,7 @@ class PyClickTrainer:
 
 
 def main():
-    path = Path("data/wscd-2012/YandexClicks.txt")
+    path = Path("/ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt")
     index_path = Path("data/wscd-2012/index.json")
 
     train_dataset = YandexDataset(

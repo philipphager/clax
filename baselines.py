@@ -134,6 +134,7 @@ def main():
         test_dfs.append(test_df)
 
         del model
+        del trainer
         pd.concat(test_dfs).to_csv("em_test.csv")
 
 

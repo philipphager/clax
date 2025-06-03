@@ -16,6 +16,8 @@ def logits_to_complement_log_probs(logits: Array) -> Array:
     """
     return nnx.log_sigmoid(-logits)
 
+def probs_to_log_probs(probs: Array, eps=1e-10) -> Array:
+    return jnp.log(jnp.clip(probs, eps, 1.0))
 
 def log1mexp(x):
     """

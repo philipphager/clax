@@ -23,9 +23,13 @@ from clix.models.math import probs_to_log_probs
 
 class PyClickTrainer:
 
-    def train(self, model, sessions):
+    def train(self, model, train_dataset: YandexDataset):
         timer_start = perf_counter()
 
+        sessions = tqdm(
+            [self._to_session(row) for row in train_dataset],
+            desc="Creating PyClick sessions...",
+        )
         print("Begin training...")
         model.train(sessions)
 
@@ -117,20 +121,19 @@ def main():
         session_range=(800_000, 1_000_000),
     )
 
-    models = [UBM(), DBN(), CCM(), DCM()]
+    model_fns = [GCTR, RCTR, DCTR, PBM, UBM, DBN, CCM, DCM]
 
     test_dfs = []
-    sessions = tqdm(
-        [PyClickTrainer._to_session(row) for row in train_dataset],
-        desc="Creating PyClick sessions...",
-    )
 
-    for model in models:
+    for model_fn in model_fns:
+        model = model_fn()
+
         trainer = PyClickTrainer()
-        trainer.train(model, sessions)
+        trainer.train(model, train_dataset)
         test_df = trainer.test(model, test_dataset)
         test_dfs.append(test_df)
 
+        del model
         pd.concat(test_dfs).to_csv("em_test.csv")
 
 

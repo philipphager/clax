@@ -15,9 +15,9 @@ class CTRModelOutput:
     clicks: Array
 
 
-class RandomClickModel(nnx.Module):
+class GlobalClickModel(nnx.Module):
     """
-    Random Click Model (RCM)
+    Global/Random Click Model (GCTR)
 
     Assumptions:
     - All documents have the same probability of being clicked
@@ -25,7 +25,7 @@ class RandomClickModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
-    name = "RCM"
+    name = "GCTR"
 
     def __init__(
         self,

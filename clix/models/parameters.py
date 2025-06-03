@@ -15,7 +15,7 @@ class BernoulliParameter(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.weight = nnx.Param(initializers(rngs.params(), shape, dtype=jnp.float32))
+        self.weight = nnx.Param(initializers(rngs.params(), shape))
 
     def __call__(self) -> Array:
         return nnx.sigmoid(self.weight.value)
@@ -35,16 +35,31 @@ class BernoulliEmbedding(nnx.Module):
         self,
         use_feature: str,
         parameters: int,
+        add_baseline: bool = True,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
         self.use_feature = use_feature
-        self.embeddings = nnx.Embed(num_embeddings=parameters, features=1, rngs=rngs)
+        self.add_baseline = add_baseline
+        self.baseline = nnx.Param(jnp.zeros(1))
+        self.embeddings = nnx.Embed(
+            num_embeddings=parameters,
+            features=1,
+            rngs=rngs,
+            embedding_init=initializers.zeros_init(),
+        )
 
     def logit(self, batch: Dict) -> Array:
-        x = batch[self.use_feature] % 120
-        return self.embeddings(x).squeeze()
+        x = batch[self.use_feature]
+        logit = self.embeddings(x).squeeze()
+
+        if self.add_baseline:
+            # Add a baseline prediction, similar to a wide&deep model.
+            # The model resorts to avg. predictions for prev. unseen parameters:
+            logit = self.baseline.value + logit
+
+        return logit
 
     def prob(self, batch: Dict) -> Array:
         return nnx.sigmoid(self.logit(batch))

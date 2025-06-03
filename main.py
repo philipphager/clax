@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 
 from clix.datasets.yandex import YandexDataset
 from clix.models import (
-    RandomClickModel,
+    GlobalCTRModel,
     DocumentBasedCTRModel,
     RankBasedCTRModel,
     UserBrowsingModel,
@@ -65,7 +65,7 @@ def main():
     positions = 10
 
     models = [
-        RandomClickModel(rngs=rngs),
+        GlobalCTRModel(rngs=rngs),
         DocumentBasedCTRModel(rngs=rngs, query_doc_pairs=query_doc_pairs),
         RankBasedCTRModel(rngs=rngs, positions=positions),
         PositionBasedModel(

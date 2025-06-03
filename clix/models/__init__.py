@@ -1,7 +1,7 @@
 from .ccm import ClickChainModel
 from .cm import CascadeModel
 from .ctr import (
-    RandomClickModel,
+    GlobalCTRModel,
     RankBasedCTRModel,
     DocumentBasedCTRModel,
     DocumentRankBasedCTRModel,

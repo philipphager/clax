@@ -15,7 +15,7 @@ class CTRModelOutput:
     clicks: Array
 
 
-class GlobalClickModel(nnx.Module):
+class GlobalCTRModel(nnx.Module):
     """
     Global/Random Click Model (GCTR)
 

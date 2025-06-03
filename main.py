@@ -6,6 +6,15 @@ from flax import nnx
 from torch.utils.data import DataLoader
 
 from clix.datasets.yandex import YandexDataset
+from clix.models import (
+    RandomClickModel,
+    DocumentBasedCTRModel,
+    RankBasedCTRModel,
+    UserBrowsingModel,
+    DynamicBayesianNetwork,
+    ClickChainModel,
+    DependentClickModel,
+)
 from clix.models.pbm import PositionBasedModel
 from clix.trainer import Trainer
 
@@ -29,21 +38,9 @@ def main():
     path = Path("data/wscd-2012/YandexClicks.txt")
     index_path = Path("data/wscd-2012/index.json")
 
-    train_dataset = YandexDataset(
-        path,
-        index_path,
-        session_range=(0, 600_000),
-    )
-    val_dataset = YandexDataset(
-        path,
-        index_path,
-        session_range=(600_000, 800_000),
-    )
-    test_dataset = YandexDataset(
-        path,
-        index_path,
-        session_range=(800_000, 1_000_000),
-    )
+    train_dataset = YandexDataset(path, index_path, session_range=(0, 600_000))
+    val_dataset = YandexDataset(path, index_path, session_range=(600_000, 800_000))
+    test_dataset = YandexDataset(path, index_path, session_range=(800_000, 1_000_000))
 
     train_loader = DataLoader(
         train_dataset,
@@ -64,13 +61,51 @@ def main():
         collate_fn=test_dataset.collate_fn,
     )
 
-    model = PositionBasedModel(rngs=rngs, query_doc_pairs=5_000_000, positions=10)
-    trainer = Trainer(optax.adamw(1e-3), epochs=10, patience=0)
-    train_df = trainer.train(model, train_loader, val_loader)
-    test_df = trainer.test(model, test_loader)
+    query_doc_pairs = 5_000_000
+    positions = 10
 
-    train_df.to_csv("train.csv")
-    test_df.to_csv("test.csv")
+    models = [
+        RandomClickModel(rngs=rngs),
+        DocumentBasedCTRModel(rngs=rngs, query_doc_pairs=query_doc_pairs),
+        RankBasedCTRModel(rngs=rngs, positions=positions),
+        PositionBasedModel(
+            rngs=rngs,
+            query_doc_pairs=query_doc_pairs,
+            positions=positions,
+        ),
+        UserBrowsingModel(
+            rngs=rngs,
+            query_doc_pairs=query_doc_pairs,
+            positions=positions,
+        ),
+        DynamicBayesianNetwork(
+            rngs=rngs,
+            query_doc_pairs=query_doc_pairs,
+        ),
+        ClickChainModel(
+            rngs=rngs,
+            query_doc_pairs=query_doc_pairs,
+        ),
+        DependentClickModel(
+            rngs=rngs,
+            query_doc_pairs=query_doc_pairs,
+            positions=positions,
+        ),
+    ]
+
+    train_dfs = []
+    test_dfs = []
+
+    for model in models:
+        trainer = Trainer(optax.adamw(1e-3), epochs=25, patience=0)
+        train_df = trainer.train(model, train_loader, val_loader)
+        test_df = trainer.test(model, test_loader)
+
+        train_dfs.append(train_df)
+        test_dfs.append(test_df)
+
+        pd.concat(train_dfs).to_csv("train.csv")
+        pd.concat(test_dfs).to_csv("test.csv")
 
 
 if __name__ == "__main__":

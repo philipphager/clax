@@ -26,10 +26,10 @@ class PyClickTrainer:
     def train(self, model, train_dataset: YandexDataset):
         timer_start = perf_counter()
 
-        sessions = tqdm(
-            [self._to_session(row) for row in train_dataset],
-            desc="Creating PyClick sessions...",
-        )
+        sessions = [
+            self._to_session(row)
+            for row in tqdm(train_dataset, desc="Creating PyClick train sessions....")
+        ]
         print("Begin training...")
         model.train(sessions)
 

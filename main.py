@@ -60,7 +60,7 @@ def main():
     test_loader = DataLoader(
         test_dataset,
         batch_size=512,
-        num_workers=1,
+        num_workers=4,
         collate_fn=test_dataset.collate_fn,
     )
 

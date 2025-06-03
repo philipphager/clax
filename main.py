@@ -97,7 +97,7 @@ def main():
     test_dfs = []
 
     for model in models:
-        trainer = Trainer(optax.adamw(1e-3), epochs=25, patience=0)
+        trainer = Trainer(optax.adamw(1e-3), epochs=50, patience=0)
         train_df = trainer.train(model, train_loader, val_loader)
         test_df = trainer.test(model, test_loader)
 

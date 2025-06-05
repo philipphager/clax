@@ -1,4 +1,5 @@
 from pathlib import Path
+from time import perf_counter
 
 import optax
 import pandas as pd
@@ -98,10 +99,14 @@ def main():
 
     for model in models:
         trainer = Trainer(optax.adamw(1e-3), epochs=50, patience=0)
-        train_df = trainer.train(model, train_loader, val_loader)
-        test_df = trainer.test(model, test_loader)
 
+        timer_start = perf_counter()
+        train_df = trainer.train(model, train_loader, val_loader)
+        timer_stop = perf_counter()
+        train_df["train_time_s"] = timer_stop - timer_start
         train_dfs.append(train_df)
+
+        test_df = trainer.test(model, test_loader)
         test_dfs.append(test_df)
 
         pd.concat(train_dfs).to_csv("train.csv")

@@ -146,7 +146,8 @@ class ConditionalPerplexity(RankBasedAverage):
         super().update_values(log_likelihood, where=where)
 
     def compute(self):
-        return 2 ** -super().compute()
+        # Avg. cond. perplexity is calculated over all ranks
+        return self.compute_per_rank().mean()
 
     def compute_per_rank(self):
         return 2 ** -super().compute_per_rank()
@@ -169,7 +170,8 @@ class Perplexity(RankBasedAverage):
         super().update_values(log_likelihood, where=where)
 
     def compute(self):
-        return 2 ** -super().compute()
+        # Avg. perplexity is calculated over all ranks
+        return self.compute_per_rank().mean()
 
     def compute_per_rank(self):
         return 2 ** -super().compute_per_rank()

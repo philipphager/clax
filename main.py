@@ -5,6 +5,7 @@ import optax
 import pandas as pd
 from flax import nnx
 from torch.utils.data import DataLoader
+from jax.lib import xla_bridge
 
 from clix.datasets.yandex import YandexDataset
 from clix.models import (
@@ -35,8 +36,10 @@ def get_judged_queries(path: Path):
 
 
 def main():
+    print(xla_bridge.get_backend().platform)
+
     rngs = nnx.Rngs(0)
-    path = Path("/ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt")
+    path = Path("data/wscd-2012/YandexClicks.txt")
     index_path = Path("data/wscd-2012/index.json")
 
     train_dataset = YandexDataset(path, index_path, session_range=(0, 6_000_000))

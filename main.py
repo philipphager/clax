@@ -39,9 +39,11 @@ def main():
     path = Path("/ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt")
     index_path = Path("data/wscd-2012/index.json")
 
-    train_dataset = YandexDataset(path, index_path, session_range=(0, 600_000))
-    val_dataset = YandexDataset(path, index_path, session_range=(600_000, 800_000))
-    test_dataset = YandexDataset(path, index_path, session_range=(800_000, 1_000_000))
+    train_dataset = YandexDataset(path, index_path, session_range=(0, 6_000_000))
+    val_dataset = YandexDataset(path, index_path, session_range=(6_000_000, 8_000_000))
+    test_dataset = YandexDataset(
+        path, index_path, session_range=(8_000_000, 10_000_000)
+    )
 
     train_loader = DataLoader(
         train_dataset,
@@ -66,32 +68,32 @@ def main():
     positions = 10
 
     models = [
-        GlobalCTRModel(rngs=rngs),
+        # GlobalCTRModel(rngs=rngs),
         DocumentBasedCTRModel(rngs=rngs, query_doc_pairs=query_doc_pairs),
-        RankBasedCTRModel(rngs=rngs, positions=positions),
-        PositionBasedModel(
-            rngs=rngs,
-            query_doc_pairs=query_doc_pairs,
-            positions=positions,
-        ),
-        UserBrowsingModel(
-            rngs=rngs,
-            query_doc_pairs=query_doc_pairs,
-            positions=positions,
-        ),
-        DynamicBayesianNetwork(
-            rngs=rngs,
-            query_doc_pairs=query_doc_pairs,
-        ),
-        ClickChainModel(
-            rngs=rngs,
-            query_doc_pairs=query_doc_pairs,
-        ),
-        DependentClickModel(
-            rngs=rngs,
-            query_doc_pairs=query_doc_pairs,
-            positions=positions,
-        ),
+        # RankBasedCTRModel(rngs=rngs, positions=positions),
+        # PositionBasedModel(
+        #     rngs=rngs,
+        #     query_doc_pairs=query_doc_pairs,
+        #     positions=positions,
+        # ),
+        # UserBrowsingModel(
+        #     rngs=rngs,
+        #     query_doc_pairs=query_doc_pairs,
+        #     positions=positions,
+        # ),
+        # DynamicBayesianNetwork(
+        #     rngs=rngs,
+        #     query_doc_pairs=query_doc_pairs,
+        # ),
+        # ClickChainModel(
+        #     rngs=rngs,
+        #     query_doc_pairs=query_doc_pairs,
+        # ),
+        # DependentClickModel(
+        #     rngs=rngs,
+        #     query_doc_pairs=query_doc_pairs,
+        #     positions=positions,
+        # ),
     ]
 
     train_dfs = []

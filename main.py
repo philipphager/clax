@@ -64,7 +64,7 @@ def main():
         collate_fn=test_dataset.collate_fn,
     )
 
-    query_doc_pairs = 120_000_000
+    query_doc_pairs = 10_000_000
     positions = 10
 
     models = [

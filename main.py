@@ -53,12 +53,15 @@ def main():
         batch_size=512,
         num_workers=8,
         collate_fn=train_dataset.collate_fn,
+        persistent_workers=True,
+        pin_memory=True,
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=512,
         num_workers=8,
         collate_fn=val_dataset.collate_fn,
+        persistent_workers=True,
     )
     test_loader = DataLoader(
         test_dataset,

@@ -75,18 +75,18 @@ def main():
 
     models = [
         # GlobalCTRModel(rngs=rngs),
-        DocumentBasedCTRModel(rngs=rngs, query_doc_pairs=query_doc_pairs),
+        # DocumentBasedCTRModel(rngs=rngs, query_doc_pairs=query_doc_pairs),
         # RankBasedCTRModel(rngs=rngs, positions=positions),
         # PositionBasedModel(
         #     rngs=rngs,
         #     query_doc_pairs=query_doc_pairs,
         #     positions=positions,
         # ),
-        # UserBrowsingModel(
-        #     rngs=rngs,
-        #     query_doc_pairs=query_doc_pairs,
-        #     positions=positions,
-        # ),
+        UserBrowsingModel(
+            rngs=rngs,
+            query_doc_pairs=query_doc_pairs,
+            positions=positions,
+        ),
         # DynamicBayesianNetwork(
         #     rngs=rngs,
         #     query_doc_pairs=query_doc_pairs,

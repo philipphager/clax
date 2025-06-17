@@ -51,7 +51,7 @@ def main():
     train_loader = DataLoader(
         train_dataset,
         batch_size=512,
-        num_workers=1,
+        num_workers=8,
         collate_fn=train_dataset.collate_fn,
         persistent_workers=True,
         pin_memory=True,

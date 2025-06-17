@@ -39,7 +39,7 @@ def main():
     print(xla_bridge.get_backend().platform)
 
     rngs = nnx.Rngs(0)
-    path = Path("data/wscd-2012/YandexClicks.txt")
+    path = Path("/ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt")
     index_path = Path("data/wscd-2012/index.json")
 
     train_dataset = YandexDataset(path, index_path, session_range=(0, 6_000_000))

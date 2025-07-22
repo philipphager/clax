@@ -1,11 +1,27 @@
 import math
+from dataclasses import dataclass
 
 import jax.numpy as jnp
 
 from flax import nnx
 from flax.typing import Initializer
 
+from clix.embeddings.base import EmbeddingConfig
 from clix.embeddings.utils import UniversalHash
+
+
+@dataclass
+class HashEmbeddingConfig(EmbeddingConfig):
+    compression_ratio: int = 100
+
+    def create_embedding(self, num_embeddings: int, rngs: nnx.Rngs) -> nnx.Module:
+        return HashEmbedding(
+            num_embeddings=num_embeddings,
+            features=self.features,
+            embedding_init=self.embedding_init,
+            compression_ratio=self.compression_ratio,
+            rngs=rngs,
+        )
 
 
 class HashEmbedding(nnx.Module):
@@ -22,7 +38,7 @@ class HashEmbedding(nnx.Module):
         features: int,
         embedding_init: Initializer,
         *,
-        compression_ratio: int = 4,
+        compression_ratio: int,
         rngs: nnx.Rngs,
     ):
         self.num_hash_embeddings = math.ceil(num_embeddings / compression_ratio)

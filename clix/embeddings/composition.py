@@ -1,30 +1,49 @@
 import math
+from dataclasses import dataclass
 from enum import StrEnum
 
 import jax.numpy as jnp
 from flax import nnx
 from flax.typing import Initializer
 
+from clix.embeddings.base import EmbeddingConfig
 
-class Combination(StrEnum):
+
+class EmbeddingCombination(StrEnum):
     MULTIPLICATION = "multiplication"
     ADDITION = "addition"
     CONCATENATION = "concatenation"
 
 
-class QuotientRemainderEmbedding(nnx.Module):
+@dataclass
+class QREmbeddingConfig(EmbeddingConfig):
+    compression_ratio: int = 100
+    combination: EmbeddingCombination = EmbeddingCombination.MULTIPLICATION
+
+    def create_embedding(self, num_embeddings: int, rngs: nnx.Rngs) -> nnx.Module:
+        return QREmbedding(
+            num_embeddings=num_embeddings,
+            features=self.features,
+            embedding_init=self.embedding_init,
+            compression_ratio=self.compression_ratio,
+            combination=self.combination,
+            rngs=rngs,
+        )
+
+
+class QREmbedding(nnx.Module):
     def __init__(
         self,
         num_embeddings: int,
         features: int,
         embedding_init: Initializer,
         *,
-        num_collisions: int = 4,
-        combination: Combination = Combination.CONCATENATION,
+        compression_ratio: int,
+        combination: EmbeddingCombination,
         rngs: nnx.Rngs,
     ):
-        self.num_collisions = num_collisions
-        self.num_quotient_embeddings = math.ceil(num_embeddings / num_collisions)
+        self.compression_ratio = compression_ratio
+        self.num_quotient_embeddings = math.ceil(num_embeddings / compression_ratio)
         self.quotient_embedding = nnx.Embed(
             num_embeddings=self.num_quotient_embeddings,
             features=features,
@@ -32,17 +51,17 @@ class QuotientRemainderEmbedding(nnx.Module):
             rngs=rngs,
         )
         self.remainder_embedding = nnx.Embed(
-            num_embeddings=self.num_collisions,
+            num_embeddings=self.compression_ratio,
             features=features,
             embedding_init=embedding_init,
             rngs=rngs,
         )
 
-        if combination == Combination.MULTIPLICATION:
+        if combination == EmbeddingCombination.MULTIPLICATION:
             self.combine_fn = lambda q, r: q * r
-        elif combination == Combination.ADDITION:
+        elif combination == EmbeddingCombination.ADDITION:
             self.combine_fn = lambda q, r: q + r
-        elif combination == Combination.CONCATENATION:
+        elif combination == EmbeddingCombination.CONCATENATION:
             self.projection = nnx.Linear(2 * features, features, rngs=rngs)
             self.combine_fn = lambda q, r: self.projection(
                 jnp.concatenate([q, r], axis=-1)
@@ -51,8 +70,8 @@ class QuotientRemainderEmbedding(nnx.Module):
             raise ValueError(f"Unknown combination type: {combination}")
 
     def __call__(self, idx):
-        quotient_idx = idx // self.num_collisions
-        remainder_idx = idx % self.num_collisions
+        quotient_idx = idx // self.compression_ratio
+        remainder_idx = idx % self.compression_ratio
 
         quotient_embed = self.quotient_embedding(quotient_idx)
         remainder_embed = self.remainder_embedding(remainder_idx)

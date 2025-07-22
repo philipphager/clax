@@ -1,8 +1,25 @@
+from dataclasses import dataclass
+
 import jax.numpy as jnp
 from flax import nnx
 from flax.typing import Initializer
 
+from clix.embeddings.base import EmbeddingConfig
 from clix.embeddings.utils import UniversalHash
+
+
+@dataclass
+class RobeDEmbeddingConfig(EmbeddingConfig):
+    compression_ratio: int = 100
+
+    def create_embedding(self, num_embeddings: int, rngs: nnx.Rngs) -> nnx.Module:
+        return RobeDEmbedding(
+            num_embeddings=num_embeddings,
+            features=self.features,
+            embedding_init=self.embedding_init,
+            compression_ratio=self.compression_ratio,
+            rngs=rngs,
+        )
 
 
 class RobeDEmbedding(nnx.Module):
@@ -20,7 +37,7 @@ class RobeDEmbedding(nnx.Module):
         features: int,
         embedding_init: Initializer,
         *,
-        compression_ratio: int = 100,
+        compression_ratio: int,
         rngs: nnx.Rngs,
     ):
         self.features = features

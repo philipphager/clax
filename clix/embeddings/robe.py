@@ -10,7 +10,7 @@ from clix.embeddings.utils import UniversalHash
 
 @dataclass
 class RobeDEmbeddingConfig(EmbeddingConfig):
-    compression_ratio: int = 100
+    compression_ratio: int = 1_000
 
     def create_embedding(self, num_embeddings: int, rngs: nnx.Rngs) -> nnx.Module:
         return RobeDEmbedding(

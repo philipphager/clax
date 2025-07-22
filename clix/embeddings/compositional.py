@@ -17,7 +17,7 @@ class EmbeddingCombination(StrEnum):
 
 @dataclass
 class QREmbeddingConfig(EmbeddingConfig):
-    compression_ratio: int = 100
+    compression_ratio: int = 1_000
     combination: EmbeddingCombination = EmbeddingCombination.MULTIPLICATION
 
     def create_embedding(self, num_embeddings: int, rngs: nnx.Rngs) -> nnx.Module:

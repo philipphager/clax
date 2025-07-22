@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, Callable
+from typing import Dict, Tuple
 
 import jax.numpy as jnp
 from flax import nnx

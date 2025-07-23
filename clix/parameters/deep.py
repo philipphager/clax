@@ -43,9 +43,6 @@ class DeepParameterConfig(ParameterConfig):
     dropout: float = 0.0
     activation: str = "elu"
 
-    def create(self, rngs: nnx.Rngs) -> Parameter:
-        return DeepParameter(self, rngs=rngs)
-
 
 class DeepParameter(Parameter):
     """

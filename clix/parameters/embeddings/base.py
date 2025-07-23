@@ -30,9 +30,6 @@ class EmbeddingParameterConfig:
     baseline_init: Initializer = initializers.ones
     embedding_init: Initializer = near_zero_init
 
-    def create(self, rngs: nnx.Rngs):
-        return EmbeddingParameter(self, rngs=rngs)
-
 
 class EmbeddingParameter(Parameter):
     def __init__(

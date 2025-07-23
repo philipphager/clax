@@ -6,8 +6,9 @@ from flax import nnx
 from flax import struct
 from jax import Array
 
+from clix.models.base import ClickModel
 from clix.models.loss import binary_cross_entropy
-from clix.parameters import ParameterConfig
+from clix.parameters import ParameterConfig, build_parameter
 
 
 @struct.dataclass
@@ -23,7 +24,7 @@ class PositionBasedModelConfig:
     attraction: ParameterConfig
 
 
-class PositionBasedModel(nnx.Module):
+class PositionBasedModel(ClickModel):
     """
     Position-Based Model (PBM)
 
@@ -49,8 +50,8 @@ class PositionBasedModel(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.examination = config.examination.create(rngs)
-        self.attraction = config.attraction.create(rngs)
+        self.examination = build_parameter(config.examination, rngs)
+        self.attraction = build_parameter(config.attraction, rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

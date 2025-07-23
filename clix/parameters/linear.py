@@ -13,9 +13,6 @@ class LinearParameterConfig(ParameterConfig):
     use_feature: str
     features: int
 
-    def create(self, rngs: nnx.Rngs) -> Parameter:
-        return LinearParameter(self, rngs=rngs)
-
 
 class LinearParameter(Parameter):
     def __init__(

@@ -9,9 +9,7 @@ from jax import Array
 
 
 class ParameterConfig(ABC):
-    @abstractmethod
-    def create(self, rngs: nnx.Rngs):
-        pass
+    pass
 
 
 class Parameter(nnx.Module, ABC):
@@ -32,9 +30,6 @@ class Parameter(nnx.Module, ABC):
 class GlobalParameterConfig(ParameterConfig):
     parameters: int = 1
     initializers: Initializer = initializers.normal(0.5)
-
-    def create(self, rngs: nnx.Rngs) -> Parameter:
-        return GlobalParameter(self, rngs=rngs)
 
 
 class GlobalParameter(Parameter):

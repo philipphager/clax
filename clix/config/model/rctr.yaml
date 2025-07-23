@@ -1,0 +1,3 @@
+_target_: clix.models.RankCTRModel
+_partial_: true
+examination_config: ${parameter.examination}

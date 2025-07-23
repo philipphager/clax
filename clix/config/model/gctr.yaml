@@ -1,0 +1,2 @@
+_target_: clix.models.GlobalCTRModel
+_partial_: true

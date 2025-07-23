@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Callable
 
 import jax
 import jax.numpy as jnp
@@ -7,7 +7,8 @@ from flax import struct
 from jax import Array
 
 from clix.models.loss import binary_cross_entropy
-from clix.models.parameters import BernoulliEmbedding
+from clix.parameters import GlobalParameter, build_parameter, EmbeddingParameterConfig, \
+    ParameterConfig, FullEmbedding
 
 
 @struct.dataclass
@@ -33,11 +34,7 @@ class GlobalCTRModel(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.ctr = BernoulliEmbedding(
-            use_feature="ctr_idx",
-            parameters=1,
-            rngs=rngs,
-        )
+        self.ctr = GlobalParameter(rngs=rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
@@ -64,7 +61,7 @@ class GlobalCTRModel(nnx.Module):
         return CTRModelOutput(clicks=clicks)
 
 
-class RankBasedCTRModel(nnx.Module):
+class RankCTRModel(nnx.Module):
     """
     Rank-based Click-Through Rate Model (RCTR).
 
@@ -84,16 +81,15 @@ class RankBasedCTRModel(nnx.Module):
 
     def __init__(
         self,
-        positions: int,
+        examination_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="positions",
+            parameters=10,
+        ),
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.ctr = BernoulliEmbedding(
-            use_feature="positions",
-            parameters=positions + 1,
-            rngs=rngs,
-        )
+        self.ctr = build_parameter(examination_config, rngs=rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
@@ -118,7 +114,7 @@ class RankBasedCTRModel(nnx.Module):
         return CTRModelOutput(clicks=clicks)
 
 
-class DocumentBasedCTRModel(nnx.Module):
+class DocumentCTRModel(nnx.Module):
     """
     Document-based Click-Through Rate Model (DCTR).
 
@@ -137,16 +133,15 @@ class DocumentBasedCTRModel(nnx.Module):
 
     def __init__(
         self,
-        query_doc_pairs: int,
+        attraction_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="query_doc_ids",
+            parameters=1_000_000,
+        ),
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.ctr = BernoulliEmbedding(
-            use_feature="query_doc_ids",
-            parameters=query_doc_pairs,
-            rngs=rngs,
-        )
+        self.ctr = build_parameter(attraction_config, rngs=rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
@@ -171,7 +166,7 @@ class DocumentBasedCTRModel(nnx.Module):
         return CTRModelOutput(clicks=clicks)
 
 
-class DocumentRankBasedCTRModel(nnx.Module):
+class DocumentRankCTRModel(nnx.Module):
     """
     Document-Rank based Click-Through Rate Model (RDCTR).
 
@@ -185,22 +180,24 @@ class DocumentRankBasedCTRModel(nnx.Module):
     References:
     - Deffayet et al. (2023). "Evaluating the robustness of click models to policy distributional shift"
     """
-    name = "RDCTR"
+    name = "DRCTR"
 
     def __init__(
         self,
-        query_doc_pairs: int,
-        positions: int,
+        query_doc_pairs: int = 1_000_000,
+        positions: int = 10,
+        embedding_fn: Callable = FullEmbedding,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
         self.positions = positions
-        self.ctr = BernoulliEmbedding(
+        # Unify API in future version:
+        self.ctr = build_parameter(EmbeddingParameterConfig(
             use_feature="ctr_idx",
             parameters=(query_doc_pairs * positions),
-            rngs=rngs,
-        )
+            embedding_fn=embedding_fn,
+        ), rngs=rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

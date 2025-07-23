@@ -7,8 +7,8 @@ from flax import struct
 from jax import Array
 from jax import lax
 
-from clix.models.loss import binary_cross_entropy
-from clix.models.math import log1mexp
+from clix.loss import binary_cross_entropy
+from clix.utils.math import log1mexp
 from clix.parameters import ParameterConfig, build_parameter
 from clix.parameters.defaults import (
     default_attraction_config,
@@ -39,6 +39,7 @@ class UserBrowsingModel(nnx.Module):
     References:
     - Dupret and Piwowarski (2008). "A user browsing model to predict search engine click data from past observations"
     """
+
     name = "UBM"
 
     def __init__(
@@ -53,8 +54,12 @@ class UserBrowsingModel(nnx.Module):
         super().__init__()
 
         self.positions = positions
-        examination_config = examination_config or default_ubm_examination_config(positions)
-        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
+        examination_config = examination_config or default_ubm_examination_config(
+            positions
+        )
+        attraction_config = attraction_config or default_attraction_config(
+            query_doc_pairs
+        )
         self.attraction = build_parameter(attraction_config, rngs)
         self.examination = build_parameter(examination_config, rngs)
 

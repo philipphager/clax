@@ -7,7 +7,7 @@ from flax.nnx.object import Object
 from flax.nnx.variablelib import Variable
 from jax import Array
 
-from clix.models.math import log1mexp
+from clix.utils.math import log1mexp
 
 
 class MetricState(Variable):

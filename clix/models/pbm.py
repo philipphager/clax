@@ -7,7 +7,7 @@ from flax import struct
 from jax import Array
 
 from clix.models.base import ClickModel
-from clix.models.loss import binary_cross_entropy
+from clix.loss import binary_cross_entropy
 from clix.parameters import ParameterConfig, build_parameter
 from clix.parameters.defaults import (
     default_examination_config,
@@ -30,14 +30,16 @@ class PositionBasedModel(ClickModel):
         positions: Optional[int] = None,
         query_doc_pairs: Optional[int] = None,
         examination_config: Optional[ParameterConfig] = None,
-        attraction_config: Optional[ParameterConfig]  = None,
+        attraction_config: Optional[ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
 
         examination_config = examination_config or default_examination_config(positions)
-        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
+        attraction_config = attraction_config or default_attraction_config(
+            query_doc_pairs
+        )
         self.examination = build_parameter(examination_config, rngs)
         self.attraction = build_parameter(attraction_config, rngs)
 

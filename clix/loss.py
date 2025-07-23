@@ -1,11 +1,14 @@
 import jax.numpy as jnp
 from jax import Array
 
-from clix.models.math import log1mexp
+from clix.utils.math import log1mexp
 
 
 def binary_cross_entropy(
-    y_predict: Array, y_true: Array, where: Array, log_probs: bool = False
+    y_predict: Array,
+    y_true: Array,
+    where: Array,
+    log_probs: bool = False,
 ):
     if log_probs:
         p_click = y_predict

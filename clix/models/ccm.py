@@ -6,14 +6,18 @@ from flax import nnx
 from flax import struct
 from jax import Array
 
-from clix.models.loss import binary_cross_entropy
-from clix.models.math import (
+from clix.loss import binary_cross_entropy
+from clix.utils.math import (
     logits_to_log_probs,
     logits_to_complement_log_probs,
     log1mexp,
 )
-from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter, \
-    GlobalParameter
+from clix.parameters import (
+    ParameterConfig,
+    EmbeddingParameterConfig,
+    build_parameter,
+    GlobalParameter,
+)
 from clix.parameters.defaults import default_attraction_config
 
 
@@ -44,6 +48,7 @@ class ClickChainModel(nnx.Module):
     References:
     - Guo et al. (2009). "Click chain model in web search"
     """
+
     name = "CCM"
 
     def __init__(
@@ -56,7 +61,9 @@ class ClickChainModel(nnx.Module):
         super().__init__()
 
         # The CCM models attraction and satisfaction as the same variable:
-        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
+        attraction_config = attraction_config or default_attraction_config(
+            query_doc_pairs
+        )
         self.attraction = build_parameter(attraction_config, rngs)
 
         # Continuation are global variables that don't depend on features.

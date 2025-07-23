@@ -6,9 +6,9 @@ from flax import nnx
 from flax import struct
 from jax import Array
 
-from clix.models.loss import binary_cross_entropy
-from clix.models.math import logits_to_log_probs, logits_to_complement_log_probs
-from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter
+from clix.loss import binary_cross_entropy
+from clix.utils.math import logits_to_log_probs, logits_to_complement_log_probs
+from clix.parameters import ParameterConfig, build_parameter
 from clix.parameters.defaults import default_attraction_config
 
 
@@ -36,6 +36,7 @@ class CascadeModel(nnx.Module):
     References:
     - Craswell et al. (2008). "An experimental comparison of click position-bias models"
     """
+
     name = "CM"
 
     def __init__(
@@ -47,7 +48,9 @@ class CascadeModel(nnx.Module):
     ):
         super().__init__()
 
-        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
+        attraction_config = attraction_config or default_attraction_config(
+            query_doc_pairs
+        )
         self.attraction = build_parameter(attraction_config, rngs)
 
     def compute_loss(self, batch: Dict):

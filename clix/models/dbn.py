@@ -6,8 +6,8 @@ from flax import nnx
 from flax import struct
 from jax import Array
 
-from clix.models.loss import binary_cross_entropy
-from clix.models.math import (
+from clix.loss import binary_cross_entropy
+from clix.utils.math import (
     logits_to_log_probs,
     logits_to_complement_log_probs,
     log1mexp,
@@ -17,8 +17,10 @@ from clix.parameters import (
     build_parameter,
     GlobalParameter,
 )
-from clix.parameters.defaults import default_attraction_config, \
-    default_satisfaction_config
+from clix.parameters.defaults import (
+    default_attraction_config,
+    default_satisfaction_config,
+)
 
 
 @struct.dataclass
@@ -59,9 +61,13 @@ class DynamicBayesianNetwork(nnx.Module):
     ):
         super().__init__()
 
-        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
-        satisfaction_config = satisfaction_config or default_satisfaction_config(query_doc_pairs)
-        self.attraction = build_parameter(attraction_config , rngs)
+        attraction_config = attraction_config or default_attraction_config(
+            query_doc_pairs
+        )
+        satisfaction_config = satisfaction_config or default_satisfaction_config(
+            query_doc_pairs
+        )
+        self.attraction = build_parameter(attraction_config, rngs)
         self.satisfaction = build_parameter(satisfaction_config, rngs)
 
         self.fix_continuation = fix_continuation

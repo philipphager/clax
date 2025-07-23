@@ -6,11 +6,18 @@ from flax import nnx
 from flax import struct
 from jax import Array
 
-from clix.models.loss import binary_cross_entropy
-from clix.parameters import GlobalParameter, build_parameter, EmbeddingParameterConfig, \
-    ParameterConfig, FullEmbedding
-from clix.parameters.defaults import default_examination_config, \
-    default_attraction_config
+from clix.loss import binary_cross_entropy
+from clix.parameters import (
+    GlobalParameter,
+    build_parameter,
+    EmbeddingParameterConfig,
+    ParameterConfig,
+    FullEmbedding,
+)
+from clix.parameters.defaults import (
+    default_examination_config,
+    default_attraction_config,
+)
 
 
 @struct.dataclass
@@ -28,6 +35,7 @@ class GlobalCTRModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
+
     name = "GCTR"
 
     def __init__(self, *, rngs: nnx.Rngs):
@@ -75,6 +83,7 @@ class RankCTRModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
+
     name = "RCTR"
 
     def __init__(
@@ -126,6 +135,7 @@ class DocumentCTRModel(nnx.Module):
     References:
     - Chuklin et al. (2015). "Click models for web search"
     """
+
     name = "DCTR"
 
     def __init__(
@@ -136,7 +146,9 @@ class DocumentCTRModel(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
+        attraction_config = attraction_config or default_attraction_config(
+            query_doc_pairs
+        )
         self.ctr = build_parameter(attraction_config, rngs=rngs)
 
     def compute_loss(self, batch: Dict):
@@ -176,6 +188,7 @@ class DocumentRankCTRModel(nnx.Module):
     References:
     - Deffayet et al. (2023). "Evaluating the robustness of click models to policy distributional shift"
     """
+
     name = "DRCTR"
 
     def __init__(
@@ -189,11 +202,14 @@ class DocumentRankCTRModel(nnx.Module):
         super().__init__()
         self.positions = positions
         # Unify API in future version:
-        self.ctr = build_parameter(EmbeddingParameterConfig(
-            use_feature="ctr_idx",
-            parameters=(query_doc_pairs * positions),
-            embedding_fn=embedding_fn,
-        ), rngs=rngs)
+        self.ctr = build_parameter(
+            EmbeddingParameterConfig(
+                use_feature="ctr_idx",
+                parameters=(query_doc_pairs * positions),
+                embedding_fn=embedding_fn,
+            ),
+            rngs=rngs,
+        )
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

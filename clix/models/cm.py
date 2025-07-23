@@ -8,7 +8,7 @@ from jax import Array
 
 from clix.models.loss import binary_cross_entropy
 from clix.models.math import logits_to_log_probs, logits_to_complement_log_probs
-from clix.models.parameters import BernoulliEmbedding
+from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter
 
 
 @struct.dataclass
@@ -39,16 +39,15 @@ class CascadeModel(nnx.Module):
 
     def __init__(
         self,
-        query_doc_pairs: int,
+        attraction_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="query_doc_ids",
+            parameters=1_000_000,
+        ),
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.attraction = BernoulliEmbedding(
-            use_feature="query_doc_ids",
-            parameters=query_doc_pairs,
-            rngs=rngs,
-        )
+        self.attraction = build_parameter(attraction_config, rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

@@ -1,0 +1,3 @@
+_target_: clix.models.CascadeModel
+_partial_: true
+attraction_config: ${parameter.attraction}

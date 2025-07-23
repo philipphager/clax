@@ -3,7 +3,7 @@ defaults:
   - parameter/examination: position
   - parameter/attraction: embedding/robe-d
   - parameter/satisfaction: embedding/robe-d
-  - model: dcm
+  - model: ubm
 
 random_state: 42
 query_doc_pairs: 120_000_000

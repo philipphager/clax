@@ -9,7 +9,7 @@ from jax import lax
 
 from clix.models.loss import binary_cross_entropy
 from clix.models.math import log1mexp
-from clix.models.parameters import BernoulliEmbedding
+from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter
 
 
 @struct.dataclass
@@ -40,22 +40,21 @@ class UserBrowsingModel(nnx.Module):
     def __init__(
         self,
         positions: int,
-        query_doc_pairs: int,
+        attraction_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="query_doc_ids",
+            parameters=1_000_000,
+        ),
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
+
         self.positions = positions
-        self.examination = BernoulliEmbedding(
+        self.examination = build_parameter(EmbeddingParameterConfig(
             use_feature="examination_idx",
-            parameters=(positions + 1) ** 2,
-            rngs=rngs,
-        )
-        self.attraction = BernoulliEmbedding(
-            use_feature="query_doc_ids",
-            parameters=query_doc_pairs,
-            rngs=rngs,
-        )
+            parameters=(self.positions + 1) ** 2,
+        ), rngs)
+        self.attraction = build_parameter(attraction_config, rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

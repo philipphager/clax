@@ -6,7 +6,7 @@ from flax.nnx.nn import initializers
 from flax.typing import Initializer
 from jax import Array
 
-from clix.parameters import Parameter
+from clix.parameters import Parameter, ParameterConfig
 
 # Alias NNX embedding layer for clarity:
 FullEmbedding = nnx.Embed
@@ -20,7 +20,7 @@ near_zero_init = initializers.variance_scaling(
 
 
 @dataclass
-class EmbeddingParameterConfig:
+class EmbeddingParameterConfig(ParameterConfig):
     use_feature: str
     parameters: int
     embedding_features: int = 4

@@ -1,0 +1,4 @@
+_target_: clix.models.UserBrowsingModel
+_partial_: true
+positions: "${positions}"
+attraction_config: ${parameter.attraction}

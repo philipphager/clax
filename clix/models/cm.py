@@ -48,10 +48,8 @@ class CascadeModel(nnx.Module):
     ):
         super().__init__()
 
-        attraction_config = attraction_config or default_attraction_config(
-            query_doc_pairs
-        )
-        self.attraction = build_parameter(attraction_config, rngs)
+        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
+        self.attraction = build_parameter(attr_config, rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

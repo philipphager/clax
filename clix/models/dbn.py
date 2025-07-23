@@ -61,14 +61,10 @@ class DynamicBayesianNetwork(nnx.Module):
     ):
         super().__init__()
 
-        attraction_config = attraction_config or default_attraction_config(
-            query_doc_pairs
-        )
-        satisfaction_config = satisfaction_config or default_satisfaction_config(
-            query_doc_pairs
-        )
-        self.attraction = build_parameter(attraction_config, rngs)
-        self.satisfaction = build_parameter(satisfaction_config, rngs)
+        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
+        sat_config = satisfaction_config or default_satisfaction_config(query_doc_pairs)
+        self.attraction = build_parameter(attr_config, rngs)
+        self.satisfaction = build_parameter(sat_config, rngs)
 
         self.fix_continuation = fix_continuation
         self.name = "SDBN" if fix_continuation else "DBN"

@@ -94,8 +94,8 @@ class RankCTRModel(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        examination_config = examination_config or default_examination_config(positions)
-        self.ctr = build_parameter(examination_config, rngs=rngs)
+        exam_config = examination_config or default_examination_config(positions)
+        self.ctr = build_parameter(exam_config, rngs=rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
@@ -146,10 +146,8 @@ class DocumentCTRModel(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        attraction_config = attraction_config or default_attraction_config(
-            query_doc_pairs
-        )
-        self.ctr = build_parameter(attraction_config, rngs=rngs)
+        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
+        self.ctr = build_parameter(attr_config, rngs=rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

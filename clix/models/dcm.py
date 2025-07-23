@@ -64,14 +64,10 @@ class DependentClickModel(nnx.Module):
     ):
         super().__init__()
 
-        attraction_config = attraction_config or default_attraction_config(
-            query_doc_pairs
-        )
-        continuation_config = continuation_config or default_continuation_config(
-            positions
-        )
-        self.attraction = build_parameter(attraction_config, rngs)
-        self.continuation = build_parameter(continuation_config, rngs)
+        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
+        cont_config = continuation_config or default_continuation_config(positions)
+        self.attraction = build_parameter(attr_config, rngs)
+        self.continuation = build_parameter(cont_config, rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

@@ -7,6 +7,9 @@ wheels/
 *.egg-info
 .ipynb_checkpoints
 
+# Hydra
+outputs/
+
 # Virtual environments
 .venv
 

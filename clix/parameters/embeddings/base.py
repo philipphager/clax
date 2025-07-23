@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Dict, Callable
 
 from flax import nnx
@@ -18,38 +19,49 @@ near_zero_init = initializers.variance_scaling(
 )
 
 
+@dataclass
+class EmbeddingParameterConfig:
+    use_feature: str
+    parameters: int
+    embedding_features: int = 4
+    add_baseline: bool = True
+    has_padding: bool = True
+    embedding_fn: Callable = FullEmbedding
+    baseline_init: Initializer = initializers.ones
+    embedding_init: Initializer = near_zero_init
+
+    def create(self, rngs: nnx.Rngs):
+        return EmbeddingParameter(self, rngs=rngs)
+
+
 class EmbeddingParameter(Parameter):
     def __init__(
         self,
-        use_feature: str,
-        parameters: int,
-        embedding_features: int = 4,
-        add_baseline: bool = True,
-        embedding_fn: Callable = FullEmbedding,
-        baseline_init: Initializer = initializers.ones,
-        embedding_init: Initializer = near_zero_init,
+        config: EmbeddingParameterConfig,
         *,
         rngs: nnx.Rngs,
-        **kwargs,
     ):
         super().__init__()
-        self.use_feature = use_feature
-        self.add_baseline = add_baseline
-        self.baseline = nnx.Param(baseline_init(rngs.params(), (1,)))
-        self.embeddings = embedding_fn(
-            num_embeddings=parameters,
-            features=embedding_features,
-            embedding_init=embedding_init,
-            rngs=rngs,
-            **kwargs,
+        self.config = config
+
+        # Make sure to allocate an additional parameter if input uses padding:
+        num_embeddings = (
+            config.parameters + 1 if config.has_padding else config.parameters
         )
-        self.projection = nnx.Linear(embedding_features, 1, rngs=rngs)
+        self.baseline = nnx.Param(config.baseline_init(rngs.params(), (1,)))
+        self.embeddings = config.embedding_fn(
+            num_embeddings=num_embeddings,
+            features=config.embedding_features,
+            embedding_init=config.embedding_init,
+            rngs=rngs,
+        )
+        self.projection = nnx.Linear(config.embedding_features, 1, rngs=rngs)
 
     def logit(self, batch: Dict) -> Array:
-        x = batch[self.use_feature]
+        x = batch[self.config.use_feature]
         logit = self.projection(self.embeddings(x)).squeeze()
 
-        if self.add_baseline:
+        if self.config.add_baseline:
             # Add a baseline prediction, similar to a wide&deep model.
             # The model resorts to avg. predictions for prev. unseen parameters:
             logit = self.baseline.value + logit

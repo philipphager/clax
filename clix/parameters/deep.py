@@ -1,8 +1,11 @@
+from dataclasses import dataclass
 from typing import Dict
 
 from flax import nnx
 from flax.nnx import rnglib
 from jax import Array
+
+from clix.parameters import ParameterConfig
 
 
 class ActivationFactory:
@@ -31,6 +34,19 @@ class ActivationFactory:
         cls.name2activation[name] = activation_fn
 
 
+@dataclass
+class DeepParameterConfig(ParameterConfig):
+    use_feature: str
+    features: int
+    hidden_units: int = 16
+    layers: int = 2
+    dropout: float = 0.0
+    activation: str = "elu"
+
+    def create(self, rngs: nnx.Rngs):
+        return DeepParameter(self, rngs=rngs)
+
+
 class DeepParameter(nnx.Module):
     """
     Parameter using input features and a deep feed forward network, e.g.,
@@ -39,31 +55,27 @@ class DeepParameter(nnx.Module):
 
     def __init__(
         self,
-        use_feature: str,
-        features: int,
-        hidden_units: int = 16,
-        layers: int = 2,
-        dropout: float = 0.0,
-        activation: str = "elu",
+        config: DeepParameterConfig,
         *,
         rngs: rnglib.Rngs,
     ):
         super().__init__()
-        self.use_feature = use_feature
+        self.use_feature = config.use_feature
         modules = []
-        activation_fn = ActivationFactory.get(activation)
+        activation_fn = ActivationFactory.get(config.activation)
+        features = config.features
 
-        for _ in range(layers):
+        for _ in range(config.layers):
             modules.extend(
                 [
-                    nnx.Linear(features, hidden_units, rngs=rngs),
+                    nnx.Linear(features, config.hidden_units, rngs=rngs),
                     activation_fn,
-                    nnx.Dropout(rate=dropout, rngs=rngs),
+                    nnx.Dropout(rate=config.dropout, rngs=rngs),
                 ]
             )
-            features = hidden_units
+            features = config.hidden_units
 
-        modules.append(nnx.Linear(features, 1, rngs=rngs))
+        modules.append(nnx.Linear(config.features, 1, rngs=rngs))
         self.model = nnx.Sequential(*modules)
 
     def logit(self, batch: Dict) -> Array:

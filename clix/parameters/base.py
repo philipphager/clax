@@ -7,6 +7,12 @@ from flax.typing import Initializer
 from jax import Array
 
 
+class ParameterConfig(ABC):
+    @abstractmethod
+    def create(self, rngs: nnx.Rngs):
+        pass
+
+
 class Parameter(nnx.Module, ABC):
     @abstractmethod
     def logit(self, batch) -> Array:

@@ -1,23 +1,36 @@
+from dataclasses import dataclass
 from typing import Dict
 
 from flax import nnx
 from flax.nnx import rnglib
 from jax import Array
 
-from clix.parameters.base import Parameter
+from clix.parameters.base import Parameter, ParameterConfig
+
+
+@dataclass
+class LinearParameterConfig(ParameterConfig):
+    use_feature: str
+    features: int
+
+    def create(self, rngs: nnx.Rngs):
+        return LinearParameter(self, rngs=rngs)
 
 
 class LinearParameter(Parameter):
     def __init__(
         self,
-        use_feature: str,
-        features: int,
+        config: LinearParameterConfig,
         *,
         rngs: rnglib.Rngs,
     ):
         super().__init__()
-        self.use_feature = use_feature
-        self.linear = nnx.Linear(in_features=features, out_features=1, rngs=rngs)
+        self.use_feature = config.use_feature
+        self.linear = nnx.Linear(
+            in_features=config.features,
+            out_features=1,
+            rngs=rngs,
+        )
 
     def logit(self, batch: Dict) -> Array:
         return self.linear(batch[self.use_feature]).squeeze()

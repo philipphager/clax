@@ -7,7 +7,7 @@ from flax import struct
 from jax import Array
 
 from clix.models.loss import binary_cross_entropy
-from clix.models.parameters import BernoulliEmbedding
+from clix.parameters import ParameterConfig
 
 
 @struct.dataclass
@@ -15,6 +15,12 @@ class PositionBasedModelOutput:
     clicks: Array
     examination: Array
     attraction: Array
+
+
+@struct.dataclass
+class PositionBasedModelConfig:
+    examination: ParameterConfig
+    attraction: ParameterConfig
 
 
 class PositionBasedModel(nnx.Module):
@@ -39,22 +45,12 @@ class PositionBasedModel(nnx.Module):
 
     def __init__(
         self,
-        positions: int,
-        query_doc_pairs: int,
-        *,
+        config: PositionBasedModelConfig,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.examination = BernoulliEmbedding(
-            use_feature="positions",
-            parameters=positions + 1,
-            rngs=rngs,
-        )
-        self.attraction = BernoulliEmbedding(
-            use_feature="query_doc_ids",
-            parameters=query_doc_pairs,
-            rngs=rngs,
-        )
+        self.examination = config.examination.create(rngs)
+        self.attraction = config.attraction.create(rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

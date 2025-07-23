@@ -58,13 +58,14 @@ class DynamicBayesianNetwork(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
+
         attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
         satisfaction_config = satisfaction_config or default_satisfaction_config(query_doc_pairs)
+        self.attraction = build_parameter(attraction_config , rngs)
+        self.satisfaction = build_parameter(satisfaction_config, rngs)
 
         self.fix_continuation = fix_continuation
         self.name = "SDBN" if fix_continuation else "DBN"
-        self.attraction = build_parameter(attraction_config , rngs)
-        self.satisfaction = build_parameter(satisfaction_config, rngs)
         self.continuation = GlobalParameter(rngs=rngs)
 
     def compute_loss(self, batch: Dict):

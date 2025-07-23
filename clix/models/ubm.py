@@ -53,10 +53,8 @@ class UserBrowsingModel(nnx.Module):
         super().__init__()
 
         self.positions = positions
-
         examination_config = examination_config or default_ubm_examination_config(positions)
         attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
-
         self.attraction = build_parameter(attraction_config, rngs)
         self.examination = build_parameter(examination_config, rngs)
 

@@ -60,11 +60,9 @@ class DependentClickModel(nnx.Module):
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        attraction_config = attraction_config or default_attraction_config(
-            query_doc_pairs)
-        continuation_config = continuation_config or default_continuation_config(
-            positions)
 
+        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
+        continuation_config = continuation_config or default_continuation_config(positions)
         self.attraction = build_parameter(attraction_config, rngs)
         self.continuation = build_parameter(continuation_config, rngs)
 

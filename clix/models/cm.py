@@ -9,6 +9,7 @@ from jax import Array
 from clix.models.loss import binary_cross_entropy
 from clix.models.math import logits_to_log_probs, logits_to_complement_log_probs
 from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter
+from clix.parameters.defaults import default_attraction_config
 
 
 @struct.dataclass
@@ -46,16 +47,7 @@ class CascadeModel(nnx.Module):
     ):
         super().__init__()
 
-        if attraction_config is None:
-            assert query_doc_pairs is not None, (
-                "Please provide the number of query_doc_pairs "
-                "or a custom attraction parameter configuration."
-            )
-            attraction_config = EmbeddingParameterConfig(
-                use_feature="query_doc_ids",
-                parameters=query_doc_pairs,
-            )
-
+        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
         self.attraction = build_parameter(attraction_config, rngs)
 
     def compute_loss(self, batch: Dict):

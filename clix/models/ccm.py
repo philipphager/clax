@@ -14,6 +14,7 @@ from clix.models.math import (
 )
 from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter, \
     GlobalParameter
+from clix.parameters.defaults import default_attraction_config
 
 
 @struct.dataclass
@@ -54,18 +55,10 @@ class ClickChainModel(nnx.Module):
     ):
         super().__init__()
 
-        if attraction_config is None:
-            assert query_doc_pairs is not None, (
-                "Please provide the number of query_doc_pairs "
-                "or a custom attraction parameter configuration."
-            )
-            attraction_config = EmbeddingParameterConfig(
-                use_feature="query_doc_ids",
-                parameters=query_doc_pairs,
-            )
-
         # The CCM models attraction and satisfaction as the same variable:
+        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
         self.attraction = build_parameter(attraction_config, rngs)
+
         # Continuation are global variables that don't depend on features.
         # These might be configurable in future versions if useful:
         self.continuation_exam_no_click = GlobalParameter(rngs=rngs)

@@ -1,4 +1,4 @@
-from typing import Dict, Callable
+from typing import Dict, Callable, Optional
 
 import jax
 import jax.numpy as jnp
@@ -9,6 +9,8 @@ from jax import Array
 from clix.models.loss import binary_cross_entropy
 from clix.parameters import GlobalParameter, build_parameter, EmbeddingParameterConfig, \
     ParameterConfig, FullEmbedding
+from clix.parameters.defaults import default_examination_config, \
+    default_attraction_config
 
 
 @struct.dataclass
@@ -28,11 +30,7 @@ class GlobalCTRModel(nnx.Module):
     """
     name = "GCTR"
 
-    def __init__(
-        self,
-        *,
-        rngs: nnx.Rngs,
-    ):
+    def __init__(self, *, rngs: nnx.Rngs):
         super().__init__()
         self.ctr = GlobalParameter(rngs=rngs)
 
@@ -81,14 +79,13 @@ class RankCTRModel(nnx.Module):
 
     def __init__(
         self,
-        examination_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="positions",
-            parameters=10,
-        ),
+        positions: Optional[int] = None,
+        examination_config: Optional[ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
+        examination_config = examination_config or default_examination_config(positions)
         self.ctr = build_parameter(examination_config, rngs=rngs)
 
     def compute_loss(self, batch: Dict):
@@ -133,14 +130,13 @@ class DocumentCTRModel(nnx.Module):
 
     def __init__(
         self,
-        attraction_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="query_doc_ids",
-            parameters=1_000_000,
-        ),
+        query_doc_pairs: Optional[int] = None,
+        attraction_config: Optional[ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
+        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
         self.ctr = build_parameter(attraction_config, rngs=rngs)
 
     def compute_loss(self, batch: Dict):
@@ -184,9 +180,9 @@ class DocumentRankCTRModel(nnx.Module):
 
     def __init__(
         self,
-        query_doc_pairs: int = 1_000_000,
-        positions: int = 10,
-        embedding_fn: Callable = FullEmbedding,
+        positions: int,
+        query_doc_pairs: int,
+        embedding: Callable = FullEmbedding,
         *,
         rngs: nnx.Rngs,
     ):
@@ -196,7 +192,7 @@ class DocumentRankCTRModel(nnx.Module):
         self.ctr = build_parameter(EmbeddingParameterConfig(
             use_feature="ctr_idx",
             parameters=(query_doc_pairs * positions),
-            embedding_fn=embedding_fn,
+            embedding=embedding,
         ), rngs=rngs)
 
     def compute_loss(self, batch: Dict):

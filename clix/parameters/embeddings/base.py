@@ -5,6 +5,7 @@ from flax.nnx.nn import initializers
 from flax.typing import Initializer
 from jax import Array
 
+from clix.parameters import Parameter
 
 # Alias NNX embedding layer for clarity:
 FullEmbedding = nnx.Embed
@@ -17,7 +18,7 @@ near_zero_init = initializers.variance_scaling(
 )
 
 
-class EmbeddingParameter(nnx.Module):
+class EmbeddingParameter(Parameter):
     def __init__(
         self,
         use_feature: str,

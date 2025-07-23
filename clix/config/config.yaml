@@ -1,0 +1,9 @@
+defaults:
+  - _self_
+  - model: pbm
+  - parameter/examination: embedding/full
+  - parameter/attraction: embedding/robe-d
+
+random_state: 42
+query_doc_pairs: 120_000_000
+positions: 10

@@ -1,37 +1,11 @@
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Callable
 
 from flax import nnx
 from flax.nnx import rnglib
 from jax import Array
 
 from clix.parameters import ParameterConfig, Parameter
-
-
-class ActivationFactory:
-    """
-    Global factory to retrieve activation functions by name.
-    Can be used to register custom activation functions:
-
-    >>> ActivationFactory.register("selu", nnx.selu)
-    """
-
-    name2activation = {
-        "tanh": nnx.tanh,
-        "relu": nnx.relu,
-        "elu": nnx.elu,
-        "gelu": nnx.gelu,
-    }
-
-    @classmethod
-    def get(cls, name):
-        return cls.name2activation[name]
-
-    @classmethod
-    def register(cls, name, activation_fn):
-        if name in cls.name2activation:
-            raise Exception(f"Activation {name} already registered")
-        cls.name2activation[name] = activation_fn
 
 
 @dataclass
@@ -41,7 +15,7 @@ class DeepParameterConfig(ParameterConfig):
     hidden_units: int = 16
     layers: int = 2
     dropout: float = 0.0
-    activation: str = "elu"
+    activation_fn: Callable = nnx.elu
 
 
 class DeepParameter(Parameter):
@@ -59,14 +33,13 @@ class DeepParameter(Parameter):
         super().__init__()
         self.config = config
         modules = []
-        activation_fn = ActivationFactory.get(config.activation)
         features = config.features
 
         for _ in range(config.layers):
             modules.extend(
                 [
                     nnx.Linear(features, config.hidden_units, rngs=rngs),
-                    activation_fn,
+                    config.activation_fn,
                     nnx.Dropout(rate=config.dropout, rngs=rngs),
                 ]
             )

@@ -12,7 +12,8 @@ from clix.models.math import (
     logits_to_complement_log_probs,
     log1mexp,
 )
-from clix.models.parameters import BernoulliEmbedding
+from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter
+from clix.parameters.embeddings import EmbeddingFactory
 
 
 @struct.dataclass
@@ -20,6 +21,12 @@ class DependentClickModelOutput:
     clicks: Array
     examination: Array
     attraction: Array
+
+
+@struct.dataclass
+class DependentClickModelConfig:
+    attraction: ParameterConfig
+    continuation: ParameterConfig
 
 
 class DependentClickModel(nnx.Module):
@@ -44,22 +51,20 @@ class DependentClickModel(nnx.Module):
 
     def __init__(
         self,
-        positions: int,
-        query_doc_pairs: int,
+        continuation_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="positions",
+            parameters=10,
+        ),
+        attraction_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="query_doc_ids",
+            parameters=1_000_000,
+        ),
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.attraction = BernoulliEmbedding(
-            use_feature="query_doc_ids",
-            parameters=query_doc_pairs,
-            rngs=rngs,
-        )
-        self.continuation = BernoulliEmbedding(
-            use_feature="positions",
-            parameters=positions + 1,
-            rngs=rngs,
-        )
+        self.continuation = build_parameter(continuation_config, rngs)
+        self.attraction = build_parameter(attraction_config, rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

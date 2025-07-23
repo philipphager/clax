@@ -1,0 +1,9 @@
+# @package _global_
+defaults:
+  - override /parameter/continuation: position # Force the DCM to always have a continuation parameter dependent on position:
+
+model:
+  _target_: clix.models.dcm.DependentClickModel
+  _partial_: true
+  attraction_config: ${parameter.attraction}
+  continuation_config: ${parameter.continuation}

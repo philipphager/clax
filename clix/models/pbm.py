@@ -8,7 +8,8 @@ from jax import Array
 
 from clix.models.base import ClickModel
 from clix.models.loss import binary_cross_entropy
-from clix.parameters import ParameterConfig, build_parameter
+from clix.parameters import ParameterConfig, build_parameter, EmbeddingParameterConfig
+from clix.parameters.embeddings import EmbeddingFactory
 
 
 @struct.dataclass
@@ -18,40 +19,25 @@ class PositionBasedModelOutput:
     attraction: Array
 
 
-@struct.dataclass
-class PositionBasedModelConfig:
-    examination: ParameterConfig
-    attraction: ParameterConfig
-
-
 class PositionBasedModel(ClickModel):
-    """
-    Position-Based Model (PBM)
-
-    The PBM assumes uses click when they observed the position of an item and
-    the displayed document is attractive/relevant.
-
-    Assumptions:
-    - A click occurs if and only if a document is examined and attractive
-    - Examination probability depends only on document position
-    - Attraction probability depends only on query-document pair
-    - Examination and attraction are independent events
-    - No sequential behavior (unlike cascade-based models)
-
-    References:
-    - Richardson et al. (2007). "Predicting clicks: estimating the click-through rate for new ads"
-    - Craswell et al. (2008). "An experimental comparison of click position-bias models"
-    """
     name = "PBM"
 
     def __init__(
         self,
-        config: PositionBasedModelConfig,
+        examination_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="positions",
+            parameters=10,
+        ),
+        attraction_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="query_doc_ids",
+            parameters=1_000_000,
+        ),
+        *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.examination = build_parameter(config.examination, rngs)
-        self.attraction = build_parameter(config.attraction, rngs)
+        self.examination = build_parameter(examination_config, rngs)
+        self.attraction = build_parameter(attraction_config, rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

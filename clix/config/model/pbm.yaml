@@ -1,6 +1,4 @@
 _target_: clix.models.PositionBasedModel
 _partial_: true
-config:
-  _target_: clix.models.pbm.PositionBasedModelConfig
-  examination: ${parameter.examination}
-  attraction: ${parameter.attraction}
+examination_config: ${parameter.examination}
+attraction_config: ${parameter.attraction}

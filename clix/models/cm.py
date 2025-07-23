@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import jax
 import jax.numpy as jnp
@@ -39,14 +39,23 @@ class CascadeModel(nnx.Module):
 
     def __init__(
         self,
-        attraction_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="query_doc_ids",
-            parameters=1_000_000,
-        ),
+        query_doc_pairs: Optional[int] = None,
+        attraction_config: Optional[ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
+
+        if attraction_config is None:
+            assert query_doc_pairs is not None, (
+                "Please provide the number of query_doc_pairs "
+                "or a custom attraction parameter configuration."
+            )
+            attraction_config = EmbeddingParameterConfig(
+                use_feature="query_doc_ids",
+                parameters=query_doc_pairs,
+            )
+
         self.attraction = build_parameter(attraction_config, rngs)
 
     def compute_loss(self, batch: Dict):

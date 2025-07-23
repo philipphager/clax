@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import jax.numpy as jnp
 import jax.random
@@ -12,8 +12,9 @@ from clix.models.math import (
     logits_to_complement_log_probs,
     log1mexp,
 )
-from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter
-from clix.parameters.embeddings import EmbeddingFactory
+from clix.parameters import ParameterConfig, build_parameter
+from clix.parameters.defaults import default_continuation_config, \
+    default_attraction_config
 
 
 @struct.dataclass
@@ -51,20 +52,21 @@ class DependentClickModel(nnx.Module):
 
     def __init__(
         self,
-        continuation_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="positions",
-            parameters=10,
-        ),
-        attraction_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="query_doc_ids",
-            parameters=1_000_000,
-        ),
+        positions: Optional[int] = None,
+        query_doc_pairs: Optional[int] = None,
+        attraction_config: Optional[ParameterConfig] = None,
+        continuation_config: Optional[ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.continuation = build_parameter(continuation_config, rngs)
+        attraction_config = attraction_config or default_attraction_config(
+            query_doc_pairs)
+        continuation_config = continuation_config or default_continuation_config(
+            positions)
+
         self.attraction = build_parameter(attraction_config, rngs)
+        self.continuation = build_parameter(continuation_config, rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

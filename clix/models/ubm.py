@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import jax
 import jax.numpy as jnp
@@ -9,7 +9,11 @@ from jax import lax
 
 from clix.models.loss import binary_cross_entropy
 from clix.models.math import log1mexp
-from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter
+from clix.parameters import ParameterConfig, build_parameter
+from clix.parameters.defaults import (
+    default_attraction_config,
+    default_ubm_examination_config,
+)
 
 
 @struct.dataclass
@@ -40,21 +44,21 @@ class UserBrowsingModel(nnx.Module):
     def __init__(
         self,
         positions: int,
-        attraction_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="query_doc_ids",
-            parameters=1_000_000,
-        ),
+        query_doc_pairs: Optional[int] = None,
+        examination_config: Optional[ParameterConfig] = None,
+        attraction_config: Optional[ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
 
         self.positions = positions
-        self.examination = build_parameter(EmbeddingParameterConfig(
-            use_feature="examination_idx",
-            parameters=(self.positions + 1) ** 2,
-        ), rngs)
+
+        examination_config = examination_config or default_ubm_examination_config(positions)
+        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
+
         self.attraction = build_parameter(attraction_config, rngs)
+        self.examination = build_parameter(examination_config, rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

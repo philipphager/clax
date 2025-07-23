@@ -26,7 +26,7 @@ class EmbeddingParameterConfig(ParameterConfig):
     embedding_features: int = 4
     add_baseline: bool = True
     has_padding: bool = True
-    embedding_fn: Callable = FullEmbedding
+    embedding: Callable = FullEmbedding
     baseline_init: Initializer = initializers.ones
     embedding_init: Initializer = near_zero_init
 
@@ -46,7 +46,7 @@ class EmbeddingParameter(Parameter):
             config.parameters + 1 if config.has_padding else config.parameters
         )
         self.baseline = nnx.Param(config.baseline_init(rngs.params(), (1,)))
-        self.embeddings = config.embedding_fn(
+        self.embeddings = config.embedding(
             num_embeddings=num_embeddings,
             features=config.embedding_features,
             embedding_init=config.embedding_init,

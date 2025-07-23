@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import jax
 import jax.numpy as jnp
@@ -14,10 +14,11 @@ from clix.models.math import (
 )
 from clix.parameters import (
     ParameterConfig,
-    EmbeddingParameterConfig,
     build_parameter,
     GlobalParameter,
 )
+from clix.parameters.defaults import default_attraction_config, \
+    default_satisfaction_config
 
 
 @struct.dataclass
@@ -49,22 +50,20 @@ class DynamicBayesianNetwork(nnx.Module):
 
     def __init__(
         self,
-        attraction_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="query_doc_ids",
-            parameters=1_000_000,
-        ),
-        satisfaction_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="query_doc_ids",
-            parameters=1_000_000,
-        ),
+        query_doc_pairs: Optional[int] = None,
+        attraction_config: Optional[ParameterConfig] = None,
+        satisfaction_config: Optional[ParameterConfig] = None,
         fix_continuation: bool = False,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
+        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
+        satisfaction_config = satisfaction_config or default_satisfaction_config(query_doc_pairs)
+
         self.fix_continuation = fix_continuation
         self.name = "SDBN" if fix_continuation else "DBN"
-        self.attraction = build_parameter(attraction_config, rngs)
+        self.attraction = build_parameter(attraction_config , rngs)
         self.satisfaction = build_parameter(satisfaction_config, rngs)
         self.continuation = GlobalParameter(rngs=rngs)
 

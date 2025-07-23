@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import jax
 import jax.numpy as jnp
@@ -8,8 +8,11 @@ from jax import Array
 
 from clix.models.base import ClickModel
 from clix.models.loss import binary_cross_entropy
-from clix.parameters import ParameterConfig, build_parameter, EmbeddingParameterConfig
-from clix.parameters.embeddings import EmbeddingFactory
+from clix.parameters import ParameterConfig, build_parameter
+from clix.parameters.defaults import (
+    default_examination_config,
+    default_attraction_config,
+)
 
 
 @struct.dataclass
@@ -24,18 +27,17 @@ class PositionBasedModel(ClickModel):
 
     def __init__(
         self,
-        examination_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="positions",
-            parameters=10,
-        ),
-        attraction_config: ParameterConfig = EmbeddingParameterConfig(
-            use_feature="query_doc_ids",
-            parameters=1_000_000,
-        ),
+        positions: Optional[int] = None,
+        query_doc_pairs: Optional[int] = None,
+        examination_config: Optional[ParameterConfig] = None,
+        attraction_config: Optional[ParameterConfig]  = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
+
+        examination_config = examination_config or default_examination_config(positions)
+        attraction_config = attraction_config or default_attraction_config(query_doc_pairs)
         self.examination = build_parameter(examination_config, rngs)
         self.attraction = build_parameter(attraction_config, rngs)
 

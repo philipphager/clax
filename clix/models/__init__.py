@@ -2,9 +2,9 @@ from .ccm import ClickChainModel
 from .cm import CascadeModel
 from .ctr import (
     GlobalCTRModel,
-    RankBasedCTRModel,
-    DocumentBasedCTRModel,
-    DocumentRankBasedCTRModel,
+    RankCTRModel,
+    DocumentCTRModel,
+    DocumentRankCTRModel,
 )
 from .dbn import DynamicBayesianNetwork
 from .dcm import DependentClickModel

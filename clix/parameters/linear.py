@@ -20,7 +20,7 @@ class LinearParameter(Parameter):
         self.linear = nnx.Linear(in_features=features, out_features=1, rngs=rngs)
 
     def logit(self, batch: Dict) -> Array:
-        return self.linear(batch[self.use_feature])
+        return self.linear(batch[self.use_feature]).squeeze()
 
     def prob(self, batch: Dict) -> Array:
         return nnx.sigmoid(self.logit(batch))

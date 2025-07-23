@@ -182,7 +182,7 @@ class DocumentRankCTRModel(nnx.Module):
         self,
         positions: int,
         query_doc_pairs: int,
-        embedding: Callable = FullEmbedding,
+        embedding_fn: Callable = FullEmbedding,
         *,
         rngs: nnx.Rngs,
     ):
@@ -192,7 +192,7 @@ class DocumentRankCTRModel(nnx.Module):
         self.ctr = build_parameter(EmbeddingParameterConfig(
             use_feature="ctr_idx",
             parameters=(query_doc_pairs * positions),
-            embedding=embedding,
+            embedding_fn=embedding_fn,
         ), rngs=rngs)
 
     def compute_loss(self, batch: Dict):

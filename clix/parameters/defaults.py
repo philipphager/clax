@@ -52,6 +52,6 @@ def default_continuation_config(positions: Optional[int]) -> EmbeddingParameterC
 
 def default_ubm_examination_config(positions: int) -> EmbeddingParameterConfig:
     return EmbeddingParameterConfig(
-        use_feature="positions",
+        use_feature="examination_idx",
         parameters=(positions + 1) ** 2,
     )

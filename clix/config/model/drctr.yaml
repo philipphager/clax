@@ -2,4 +2,4 @@ _target_: clix.models.DocumentRankCTRModel
 _partial_: true
 positions: "${positions}"
 query_doc_pairs: "${query_doc_pairs}"
-embedding: "${parameter.attraction.embedding_fn}"
+embedding_fn: "${parameter.attraction.embedding_fn}"

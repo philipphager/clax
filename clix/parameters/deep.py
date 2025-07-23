@@ -5,7 +5,7 @@ from flax import nnx
 from flax.nnx import rnglib
 from jax import Array
 
-from clix.parameters import ParameterConfig
+from clix.parameters import ParameterConfig, Parameter
 
 
 class ActivationFactory:
@@ -43,11 +43,11 @@ class DeepParameterConfig(ParameterConfig):
     dropout: float = 0.0
     activation: str = "elu"
 
-    def create(self, rngs: nnx.Rngs):
+    def create(self, rngs: nnx.Rngs) -> Parameter:
         return DeepParameter(self, rngs=rngs)
 
 
-class DeepParameter(nnx.Module):
+class DeepParameter(Parameter):
     """
     Parameter using input features and a deep feed forward network, e.g.,
     to model user attraction from query-document features.
@@ -60,7 +60,7 @@ class DeepParameter(nnx.Module):
         rngs: rnglib.Rngs,
     ):
         super().__init__()
-        self.use_feature = config.use_feature
+        self.config = config
         modules = []
         activation_fn = ActivationFactory.get(config.activation)
         features = config.features
@@ -75,11 +75,11 @@ class DeepParameter(nnx.Module):
             )
             features = config.hidden_units
 
-        modules.append(nnx.Linear(config.features, 1, rngs=rngs))
+        modules.append(nnx.Linear(features, 1, rngs=rngs))
         self.model = nnx.Sequential(*modules)
 
     def logit(self, batch: Dict) -> Array:
-        return self.model(batch[self.use_feature]).squeeze()
+        return self.model(batch[self.config.use_feature]).squeeze()
 
     def prob(self, batch: Dict) -> Array:
         return nnx.sigmoid(self.logit(batch))

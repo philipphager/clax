@@ -13,7 +13,7 @@ class LinearParameterConfig(ParameterConfig):
     use_feature: str
     features: int
 
-    def create(self, rngs: nnx.Rngs):
+    def create(self, rngs: nnx.Rngs) -> Parameter:
         return LinearParameter(self, rngs=rngs)
 
 
@@ -25,7 +25,7 @@ class LinearParameter(Parameter):
         rngs: rnglib.Rngs,
     ):
         super().__init__()
-        self.use_feature = config.use_feature
+        self.config = config
         self.linear = nnx.Linear(
             in_features=config.features,
             out_features=1,
@@ -33,7 +33,7 @@ class LinearParameter(Parameter):
         )
 
     def logit(self, batch: Dict) -> Array:
-        return self.linear(batch[self.use_feature]).squeeze()
+        return self.linear(batch[self.config.use_feature]).squeeze()
 
     def prob(self, batch: Dict) -> Array:
         return nnx.sigmoid(self.logit(batch))

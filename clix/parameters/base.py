@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Dict
 
 from flax import nnx
@@ -27,6 +28,15 @@ class Parameter(nnx.Module, ABC):
         pass
 
 
+@dataclass
+class GlobalParameterConfig(ParameterConfig):
+    parameters: int = 1
+    initializers: Initializer = initializers.normal(0.5)
+
+    def create(self, rngs: nnx.Rngs) -> Parameter:
+        return GlobalParameter(self, rngs=rngs)
+
+
 class GlobalParameter(Parameter):
     """
     Unconditional, global parameter that does not depend on any input features.
@@ -35,13 +45,15 @@ class GlobalParameter(Parameter):
 
     def __init__(
         self,
-        parameters: int = 1,
-        initializers: Initializer = initializers.normal(0.5),
+        config: GlobalParameterConfig,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        self.weight = nnx.Param(initializers(rngs.params(), (parameters,)))
+        self.config = config
+        self.weight = nnx.Param(
+            config.initializers(rngs.params(), (config.parameters,))
+        )
 
     def logit(self, *args, **kwargs) -> Array:
         return self.weight.value

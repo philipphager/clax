@@ -1,4 +1,12 @@
-from .base import Parameter, GlobalParameter
-from .deep import DeepParameter
-from .linear import LinearParameter
-from .embeddings import EmbeddingParameter, HashEmbedding, QREmbedding, RobeDEmbedding
+from .base import Parameter, ParameterConfig
+from .base import GlobalParameter, GlobalParameterConfig
+from .deep import DeepParameter, DeepParameterConfig
+from .linear import LinearParameter, LinearParameterConfig
+from .embeddings import (
+    EmbeddingParameter,
+    EmbeddingParameterConfig,
+    FullEmbedding,
+    HashEmbedding,
+    QREmbedding,
+    RobeDEmbedding,
+)

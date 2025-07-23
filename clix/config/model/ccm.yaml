@@ -1,0 +1,3 @@
+_target_: clix.models.ccm.ClickChainModel
+_partial_: True
+attraction_config: ${parameter.attraction}

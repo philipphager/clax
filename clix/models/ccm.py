@@ -12,7 +12,8 @@ from clix.models.math import (
     logits_to_complement_log_probs,
     log1mexp,
 )
-from clix.models.parameters import BernoulliParameter, BernoulliEmbedding
+from clix.parameters import ParameterConfig, EmbeddingParameterConfig, build_parameter, \
+    GlobalParameter
 
 
 @struct.dataclass
@@ -46,21 +47,21 @@ class ClickChainModel(nnx.Module):
 
     def __init__(
         self,
-        query_doc_pairs: int,
+        attraction_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="query_doc_ids",
+            parameters=1_000_000,
+        ),
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        # The CCM models attraction and satisfaction as the same variable,
-        # which we call relevance:
-        self.relevance = BernoulliEmbedding(
-            use_feature="query_doc_ids",
-            parameters=query_doc_pairs,
-            rngs=rngs,
-        )
-        self.continuation_exam_no_click = BernoulliParameter(rngs=rngs)
-        self.continuation_click_satisfied = BernoulliParameter(rngs=rngs)
-        self.continuation_click_not_satisfied = BernoulliParameter(rngs=rngs)
+        # The CCM models attraction and satisfaction as the same variable:
+        self.attraction = build_parameter(attraction_config, rngs)
+        # Continuation are global variables that don't depend on features.
+        # These might be configurable in future versions if useful:
+        self.continuation_exam_no_click = GlobalParameter(rngs=rngs)
+        self.continuation_click_satisfied = GlobalParameter(rngs=rngs)
+        self.continuation_click_not_satisfied = GlobalParameter(rngs=rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]
@@ -123,7 +124,7 @@ class ClickChainModel(nnx.Module):
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> ClickChainModelOutput:
-        rel_probs = self.relevance.prob(batch)
+        rel_probs = self.attraction.prob(batch)
         tau1 = self.continuation_exam_no_click.prob()
         tau2 = self.continuation_click_not_satisfied.prob()
         tau3 = self.continuation_click_satisfied.prob()
@@ -178,7 +179,7 @@ class ClickChainModel(nnx.Module):
         )
 
     def _get_log_probabilities(self, batch: Dict) -> Dict[str, Array]:
-        rel_logits = self.relevance.logit(batch)
+        rel_logits = self.attraction.logit(batch)
         rel_log_probs = logits_to_log_probs(rel_logits)
         non_rel_log_probs = logits_to_complement_log_probs(rel_logits)
 

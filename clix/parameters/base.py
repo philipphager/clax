@@ -40,7 +40,7 @@ class GlobalParameter(Parameter):
 
     def __init__(
         self,
-        config: GlobalParameterConfig,
+        config: GlobalParameterConfig = GlobalParameterConfig(),
         *,
         rngs: nnx.Rngs,
     ):

@@ -1,0 +1,5 @@
+_target_: clix.models.DynamicBayesianNetwork
+_partial_: true
+attraction_config: ${parameter.attraction}
+satisfaction_config: ${parameter.satisfaction}
+fix_continuation: False

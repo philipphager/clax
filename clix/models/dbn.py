@@ -6,13 +6,17 @@ from flax import nnx
 from flax import struct
 from jax import Array
 
-
 from clix.models.loss import binary_cross_entropy
-from clix.models.parameters import BernoulliEmbedding, BernoulliParameter
 from clix.models.math import (
     logits_to_log_probs,
     logits_to_complement_log_probs,
     log1mexp,
+)
+from clix.parameters import (
+    ParameterConfig,
+    EmbeddingParameterConfig,
+    build_parameter,
+    GlobalParameter,
 )
 
 
@@ -45,7 +49,14 @@ class DynamicBayesianNetwork(nnx.Module):
 
     def __init__(
         self,
-        query_doc_pairs: int,
+        attraction_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="query_doc_ids",
+            parameters=1_000_000,
+        ),
+        satisfaction_config: ParameterConfig = EmbeddingParameterConfig(
+            use_feature="query_doc_ids",
+            parameters=1_000_000,
+        ),
         fix_continuation: bool = False,
         *,
         rngs: nnx.Rngs,
@@ -53,17 +64,9 @@ class DynamicBayesianNetwork(nnx.Module):
         super().__init__()
         self.fix_continuation = fix_continuation
         self.name = "SDBN" if fix_continuation else "DBN"
-        self.attraction = BernoulliEmbedding(
-            use_feature="query_doc_ids",
-            parameters=query_doc_pairs,
-            rngs=rngs,
-        )
-        self.satisfaction = BernoulliEmbedding(
-            use_feature="query_doc_ids",
-            parameters=query_doc_pairs,
-            rngs=rngs,
-        )
-        self.continuation = BernoulliParameter(rngs=rngs)
+        self.attraction = build_parameter(attraction_config, rngs)
+        self.satisfaction = build_parameter(satisfaction_config, rngs)
+        self.continuation = GlobalParameter(rngs=rngs)
 
     def compute_loss(self, batch: Dict):
         y_true = batch["clicks"]

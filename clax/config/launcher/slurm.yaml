@@ -7,7 +7,7 @@ hydra:
   launcher:
     mem_gb: 32
     cpus_per_task: 14
-    array_parallelism: 8
+    array_parallelism: 4
     timeout_min: 3600
     partition: gpu
     gres: gpu:nvidia_rtx_a6000:1

@@ -1,7 +1,7 @@
-_target_: clix.parameters.EmbeddingParameterConfig
+_target_: clax.parameters.EmbeddingParameterConfig
 use_feature: "positions"
 parameters: "${positions}"
 has_padding: True
 embedding_fn:
-  _target_: clix.parameters.FullEmbedding
+  _target_: clax.parameters.FullEmbedding
   _partial_: True

@@ -1,4 +1,4 @@
-_target_: clix.models.UserBrowsingModel
+_target_: clax.models.UserBrowsingModel
 _partial_: true
 positions: "${positions}"
 attraction_config: ${parameter.attraction}

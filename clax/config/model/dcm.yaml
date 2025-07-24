@@ -3,7 +3,7 @@ defaults:
   - /parameter/continuation: position  # The DCM should always have a continuation parameter dependent on position.
 
 model:
-  _target_: clix.models.DependentClickModel
+  _target_: clax.models.DependentClickModel
   _partial_: true
   attraction_config: ${parameter.attraction}
   continuation_config: ${parameter.continuation}

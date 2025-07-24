@@ -1,4 +1,4 @@
-_target_: clix.models.DocumentRankCTRModel
+_target_: clax.models.DocumentRankCTRModel
 _partial_: true
 positions: "${positions}"
 query_doc_pairs: "${query_doc_pairs}"

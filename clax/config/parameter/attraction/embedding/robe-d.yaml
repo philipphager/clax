@@ -1,7 +1,7 @@
-_target_: clix.parameters.EmbeddingParameterConfig
+_target_: clax.parameters.EmbeddingParameterConfig
 use_feature: "query_doc_ids"
 parameters: "${query_doc_pairs}"
 embedding_fn:
-  _target_: clix.parameters.RobeDEmbedding
+  _target_: clax.parameters.RobeDEmbedding
   _partial_: True
   compression_ratio: 1_000

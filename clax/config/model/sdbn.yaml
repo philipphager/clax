@@ -1,4 +1,4 @@
-_target_: clix.models.DynamicBayesianNetwork
+_target_: clax.models.DynamicBayesianNetwork
 _partial_: true
 attraction_config: ${parameter.attraction}
 satisfaction_config: ${parameter.satisfaction}

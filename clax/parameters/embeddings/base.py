@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 from typing import Dict, Callable
 
+from clax.parameters import Parameter, ParameterConfig
 from flax import nnx
 from flax.nnx.nn import initializers
 from flax.typing import Initializer
 from jax import Array
-
-from clax.parameters import Parameter, ParameterConfig
 
 # Alias NNX embedding layer for clarity:
 FullEmbedding = nnx.Embed

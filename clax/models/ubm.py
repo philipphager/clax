@@ -2,18 +2,17 @@ from typing import Dict, Optional
 
 import jax
 import jax.numpy as jnp
-from flax import nnx
-from flax import struct
-from jax import Array
-from jax import lax
-
 from clax.loss import binary_cross_entropy
-from clax.utils.math import log1mexp
 from clax.parameters import ParameterConfig, build_parameter
 from clax.parameters.defaults import (
     default_attraction_config,
     default_ubm_examination_config,
 )
+from clax.utils.math import log1mexp
+from flax import nnx
+from flax import struct
+from jax import Array
+from jax import lax
 
 
 @struct.dataclass

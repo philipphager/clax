@@ -1,14 +1,13 @@
 import json
 import math
 from pathlib import Path
-from typing import Optional, Dict, Tuple, Any, Set
+from typing import Optional, Dict, Tuple, Any
 
 import numpy as np
 import torch
+from clax.datasets.utils import SessionCollator
 from torch.utils.data import IterableDataset
 from tqdm import tqdm
-
-from clax.datasets.utils import SessionCollator
 
 
 class YandexDataset(IterableDataset):

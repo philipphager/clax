@@ -1,12 +1,6 @@
 from functools import partial
 
 import pandas as pd
-from flax import nnx
-from flax.training.early_stopping import EarlyStopping
-from optax._src.base import GradientTransformation
-from progress_table import ProgressTable
-from torch.utils.data import DataLoader
-
 from clax.metrics import (
     LogLikelihood,
     Perplexity,
@@ -14,6 +8,11 @@ from clax.metrics import (
     Average,
     MultiMetric,
 )
+from flax import nnx
+from flax.training.early_stopping import EarlyStopping
+from optax._src.base import GradientTransformation
+from progress_table import ProgressTable
+from torch.utils.data import DataLoader
 
 
 class Trainer:

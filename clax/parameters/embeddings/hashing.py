@@ -1,10 +1,9 @@
 import math
 
 import jax.numpy as jnp
+from clax.parameters.embeddings.utils import UniversalHash
 from flax import nnx
 from flax.typing import Initializer
-
-from clax.parameters.embeddings.utils import UniversalHash
 
 
 class HashEmbedding(nnx.Module):

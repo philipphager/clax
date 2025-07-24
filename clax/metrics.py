@@ -2,12 +2,11 @@ from copy import deepcopy
 from typing import Optional, Any
 
 import jax.numpy as jnp
+from clax.utils.math import log1mexp
 from flax import nnx
 from flax.nnx.object import Object
 from flax.nnx.variablelib import Variable
 from jax import Array
-
-from clax.utils.math import log1mexp
 
 
 class MetricState(Variable):

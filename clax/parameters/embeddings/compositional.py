@@ -1,5 +1,5 @@
 import math
-from enum import StrEnum
+from enum import Enum
 from typing import Union
 
 import jax.numpy as jnp
@@ -7,7 +7,7 @@ from flax import nnx
 from flax.typing import Initializer
 
 
-class Combination(StrEnum):
+class Combination((Enum, str)):
     MULTIPLICATION = "multiplication"
     ADDITION = "addition"
     CONCATENATION = "concatenation"

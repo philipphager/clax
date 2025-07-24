@@ -7,7 +7,7 @@ from optax._src.base import GradientTransformation
 from progress_table import ProgressTable
 from torch.utils.data import DataLoader
 
-from clix.metrics import (
+from clax.metrics import (
     LogLikelihood,
     Perplexity,
     ConditionalPerplexity,

@@ -6,14 +6,14 @@ from flax import nnx
 from flax import struct
 from jax import Array
 
-from clix.loss import binary_cross_entropy
-from clix.utils.math import (
+from clax.loss import binary_cross_entropy
+from clax.utils.math import (
     logits_to_log_probs,
     logits_to_complement_log_probs,
     log1mexp,
 )
-from clix.parameters import ParameterConfig, build_parameter
-from clix.parameters.defaults import (
+from clax.parameters import ParameterConfig, build_parameter
+from clax.parameters.defaults import (
     default_continuation_config,
     default_attraction_config,
 )

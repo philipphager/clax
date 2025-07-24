@@ -5,7 +5,7 @@ from flax import nnx
 from flax.nnx import rnglib
 from jax import Array
 
-from clix.parameters.base import Parameter, ParameterConfig
+from clax.parameters.base import Parameter, ParameterConfig
 
 
 @dataclass

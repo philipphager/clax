@@ -1,0 +1,10 @@
+defaults:
+  - _self_
+  - parameter/examination: position
+  - parameter/attraction: embedding/hash
+  - parameter/satisfaction: embedding/hash
+  - model: pbm
+
+random_state: 42
+query_doc_pairs: 20_000_000
+positions: 10

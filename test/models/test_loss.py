@@ -2,7 +2,7 @@ import jax.numpy as jnp
 import pytest
 from jax import Array
 
-from clix.models.loss import binary_cross_entropy
+from clax.models.loss import binary_cross_entropy
 
 
 @pytest.mark.parametrize(

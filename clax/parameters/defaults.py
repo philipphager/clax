@@ -1,6 +1,6 @@
 from typing import Optional
 
-from clix.parameters import EmbeddingParameterConfig
+from clax.parameters import EmbeddingParameterConfig
 
 
 def default_attraction_config(

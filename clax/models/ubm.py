@@ -7,10 +7,10 @@ from flax import struct
 from jax import Array
 from jax import lax
 
-from clix.loss import binary_cross_entropy
-from clix.utils.math import log1mexp
-from clix.parameters import ParameterConfig, build_parameter
-from clix.parameters.defaults import (
+from clax.loss import binary_cross_entropy
+from clax.utils.math import log1mexp
+from clax.parameters import ParameterConfig, build_parameter
+from clax.parameters.defaults import (
     default_attraction_config,
     default_ubm_examination_config,
 )

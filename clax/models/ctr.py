@@ -6,15 +6,15 @@ from flax import nnx
 from flax import struct
 from jax import Array
 
-from clix.loss import binary_cross_entropy
-from clix.parameters import (
+from clax.loss import binary_cross_entropy
+from clax.parameters import (
     GlobalParameter,
     build_parameter,
     EmbeddingParameterConfig,
     ParameterConfig,
     FullEmbedding,
 )
-from clix.parameters.defaults import (
+from clax.parameters.defaults import (
     default_examination_config,
     default_attraction_config,
 )

@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 from jax import Array
 
-from clix.utils.math import log1mexp
+from clax.utils.math import log1mexp
 
 
 def binary_cross_entropy(

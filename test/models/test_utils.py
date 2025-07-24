@@ -2,7 +2,7 @@ import jax.numpy as jnp
 import pytest
 from jax import Array
 
-from clix.models.utils import last_clicked_positions
+from clax.models.utils import last_clicked_positions
 
 
 @pytest.mark.parametrize(

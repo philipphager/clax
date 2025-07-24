@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import IterableDataset
 from tqdm import tqdm
 
-from clix.datasets.utils import SessionCollator
+from clax.datasets.utils import SessionCollator
 
 
 class YandexDataset(IterableDataset):

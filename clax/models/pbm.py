@@ -6,10 +6,10 @@ from flax import nnx
 from flax import struct
 from jax import Array
 
-from clix.models.base import ClickModel
-from clix.loss import binary_cross_entropy
-from clix.parameters import ParameterConfig, build_parameter
-from clix.parameters.defaults import (
+from clax.models.base import ClickModel
+from clax.loss import binary_cross_entropy
+from clax.parameters import ParameterConfig, build_parameter
+from clax.parameters.defaults import (
     default_examination_config,
     default_attraction_config,
 )

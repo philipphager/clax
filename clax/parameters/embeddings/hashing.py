@@ -4,7 +4,7 @@ import jax.numpy as jnp
 from flax import nnx
 from flax.typing import Initializer
 
-from clix.parameters.embeddings.utils import UniversalHash
+from clax.parameters.embeddings.utils import UniversalHash
 
 
 class HashEmbedding(nnx.Module):

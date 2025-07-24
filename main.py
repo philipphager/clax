@@ -8,15 +8,15 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
-from clix.datasets.yandex import YandexDataset
-from clix.models import PositionBasedModel, UserBrowsingModel
-from clix.parameters import EmbeddingParameterConfig, HashEmbedding
-from clix.trainer import Trainer
+from clax.datasets.yandex import YandexDataset
+from clax.models import PositionBasedModel, UserBrowsingModel
+from clax.parameters import EmbeddingParameterConfig, HashEmbedding
+from clax.trainer import Trainer
 
 OmegaConf.register_new_resolver("eval", eval)
 
 
-@hydra.main(version_base="1.3", config_path="clix/config/", config_name="config")
+@hydra.main(version_base="1.3", config_path="clax/config/", config_name="config")
 def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)

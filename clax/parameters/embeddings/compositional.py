@@ -7,7 +7,7 @@ from flax import nnx
 from flax.typing import Initializer
 
 
-class Combination(Enum, str):
+class Combination(str, Enum):
     MULTIPLICATION = "multiplication"
     ADDITION = "addition"
     CONCATENATION = "concatenation"

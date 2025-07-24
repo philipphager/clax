@@ -3,15 +3,12 @@ from time import perf_counter
 
 import hydra
 import optax
+from clax.datasets.yandex import YandexDataset
+from clax.trainer import Trainer
 from flax import nnx
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
-
-from clax.datasets.yandex import YandexDataset
-from clax.models import PositionBasedModel, UserBrowsingModel
-from clax.parameters import EmbeddingParameterConfig, HashEmbedding
-from clax.trainer import Trainer
 
 OmegaConf.register_new_resolver("eval", eval)
 

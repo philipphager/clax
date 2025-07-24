@@ -51,18 +51,22 @@ class EmbeddingParameter(Parameter):
             embedding_init=config.embedding_init,
             rngs=rngs,
         )
+
         self.projection = nnx.Linear(config.embedding_features, 1, rngs=rngs)
+        self.add_projection = config.embedding_features > 1
+        self.add_baseline = self.config.add_baseline
 
     def logit(self, batch: Dict) -> Array:
         x = batch[self.config.use_feature]
-        logit = self.projection(self.embeddings(x)).squeeze()
+        logit = self.embeddings(x)
 
-        if self.config.add_baseline:
-            # Add a baseline prediction, similar to a wide&deep model.
-            # The model resorts to avg. predictions for prev. unseen parameters:
+        if self.add_projection:
+            logit = self.projection(logit)
+
+        if self.add_baseline:
             logit = self.baseline.value + logit
 
-        return logit
+        return logit.squeeze()
 
     def prob(self, batch: Dict) -> Array:
         return nnx.sigmoid(self.logit(batch))

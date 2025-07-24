@@ -46,7 +46,7 @@ class Trainer:
         train_metrics = MultiMetric(**self.train_metrics)
         val_metrics = MultiMetric(**self.test_metrics)
 
-        early_stopping = EarlyStopping(patience=self.patience)
+        early_stopping = EarlyStopping(patience=self.patience, min_delta=1e-5)
         best_state = nnx.state(model)
 
         logger = ProgressTable(

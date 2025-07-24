@@ -39,7 +39,7 @@ def main(config: DictConfig):
 
     train_loader = DataLoader(
         train_dataset,
-        batch_size=4096,
+        batch_size=config.train_batch_size,
         num_workers=8,
         collate_fn=train_dataset.collate_fn,
         persistent_workers=True,
@@ -47,14 +47,14 @@ def main(config: DictConfig):
     )
     val_loader = DataLoader(
         val_dataset,
-        batch_size=4096,
+        batch_size=config.eval_batch_size,
         num_workers=8,
         collate_fn=val_dataset.collate_fn,
         persistent_workers=True,
     )
     test_loader = DataLoader(
         test_dataset,
-        batch_size=4096,
+        batch_size=config.eval_batch_size,
         num_workers=4,
         collate_fn=test_dataset.collate_fn,
     )

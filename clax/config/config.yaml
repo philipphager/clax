@@ -8,3 +8,5 @@ defaults:
 random_state: 42
 query_doc_pairs: 20_000_000
 positions: 10
+
+dataset: data/wscd-2012/YandexClicks.txt

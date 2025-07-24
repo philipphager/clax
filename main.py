@@ -18,15 +18,23 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    path = Path("data/wscd-2012/YandexClicks.txt")
+    path = Path(config.dataset)
     index_path = Path("data/wscd-2012/index.json")
 
-    train_dataset = YandexDataset(path, index_path, session_range=(0, 10_000_000))
+    train_dataset = YandexDataset(
+        path,
+        index_path,
+        session_range=(0, 5_000_000),
+    )
     val_dataset = YandexDataset(
-        path, index_path, session_range=(10_000_000, 15_000_000)
+        path,
+        index_path,
+        session_range=(6_000_000, 8_000_000),
     )
     test_dataset = YandexDataset(
-        path, index_path, session_range=(15_000_000, 20_000_000)
+        path,
+        index_path,
+        session_range=(8_000_000, 10_000_000),
     )
 
     train_loader = DataLoader(
@@ -62,8 +70,11 @@ def main(config: DictConfig):
     train_df["train_time_s"] = timer_stop - timer_start
     test_df = trainer.test(model, test_loader)
 
-    train_df.to_csv("train.csv")
-    test_df.to_csv("test.csv")
+    result_dir = Path("results/")
+    result_dir.mkdir(exist_ok=True)
+
+    train_df.to_csv(result_dir / f"train_{model.name.lower()}.csv", index=False)
+    test_df.to_csv(result_dir / f"test_{model.name.lower()}.csv", index=False)
 
 
 if __name__ == "__main__":

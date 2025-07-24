@@ -71,7 +71,7 @@ def main(config: DictConfig):
     test_df["train_time_s"] = timer_stop - timer_start
 
     result_dir = Path(f"results/{config.experiment}")
-    result_dir.mkdir(exist_ok=True)
+    result_dir.mkdir(exist_ok=True, parents=True)
 
     train_df.to_csv(result_dir / f"train_{model.name.lower()}.csv", index=False)
     test_df.to_csv(result_dir / f"test_{model.name.lower()}.csv", index=False)

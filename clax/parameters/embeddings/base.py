@@ -22,7 +22,7 @@ near_zero_init = initializers.variance_scaling(
 class EmbeddingParameterConfig(ParameterConfig):
     use_feature: str
     parameters: int
-    embedding_features: int = 1
+    embedding_features: int = 4
     add_baseline: bool = True
     has_padding: bool = True
     embedding_fn: Callable = FullEmbedding

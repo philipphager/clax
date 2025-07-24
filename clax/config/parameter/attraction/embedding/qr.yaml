@@ -4,4 +4,4 @@ parameters: "${query_doc_pairs}"
 embedding_fn:
   _target_: clax.parameters.QREmbedding
   _partial_: True
-  compression_ratio: 1_000
+  compression_ratio: "${compression_ratio}"

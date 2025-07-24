@@ -12,5 +12,7 @@ train_batch_size: 512
 eval_batch_size: 512
 positions: 10
 
+compression_ratio: 1
+
 dataset: data/wscd-2012/YandexClicks.txt
 experiment: ""

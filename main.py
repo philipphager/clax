@@ -24,17 +24,17 @@ def main(config: DictConfig):
     train_dataset = YandexDataset(
         path,
         index_path,
-        session_range=(0, 5_000_000),
+        session_range=(0, 100_000_000),
     )
     val_dataset = YandexDataset(
         path,
         index_path,
-        session_range=(6_000_000, 8_000_000),
+        session_range=(100_000_000, 120_000_000),
     )
     test_dataset = YandexDataset(
         path,
         index_path,
-        session_range=(8_000_000, 10_000_000),
+        session_range=(120_000_000, 146_278_823),
     )
 
     train_loader = DataLoader(

@@ -7,7 +7,7 @@ defaults:
 
 
 random_state: 42
-query_doc_pairs: 120_000_000
+query_doc_pairs: 130_000_000
 batch_size: 512
 positions: 10
 

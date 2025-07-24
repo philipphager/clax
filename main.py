@@ -62,7 +62,7 @@ def main(config: DictConfig):
     model_fn = instantiate(config.model)
     model = model_fn(rngs=rngs)
 
-    trainer = Trainer(optax.adamw(1e-3), epochs=50, patience=0)
+    trainer = Trainer(optax.sgd(1e-3), epochs=50, patience=0)
 
     timer_start = perf_counter()
     train_df = trainer.train(model, train_loader, val_loader)

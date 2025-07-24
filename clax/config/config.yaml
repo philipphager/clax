@@ -10,3 +10,4 @@ query_doc_pairs: 120_000_000
 positions: 10
 
 dataset: data/wscd-2012/YandexClicks.txt
+experiment: embed-full

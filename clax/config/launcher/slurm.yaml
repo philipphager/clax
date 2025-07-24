@@ -11,5 +11,7 @@ hydra:
     timeout_min: 3600
     partition: gpu
     gres: gpu:1
+    additional_parameters:
+      nodelist: ilps-cn116,ilps-cn117,ilps-cn118
 
 dataset: /ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt

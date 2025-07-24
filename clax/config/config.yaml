@@ -1,9 +1,13 @@
 defaults:
   - _self_
   - parameter/examination: position
-  - parameter/attraction: embedding/full
-  - parameter/satisfaction: embedding/full
+  - parameter/attraction: embedding/hash
+  - parameter/satisfaction: embedding/hash
   - model: pbm
+
+
+train_batch_size: 512
+eval_batch_size: 512
 
 random_state: 42
 query_doc_pairs: 120_000_000

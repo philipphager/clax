@@ -67,8 +67,8 @@ def main(config: DictConfig):
     timer_start = perf_counter()
     train_df = trainer.train(model, train_loader, val_loader)
     timer_stop = perf_counter()
-    train_df["train_time_s"] = timer_stop - timer_start
     test_df = trainer.test(model, test_loader)
+    test_df["train_time_s"] = timer_stop - timer_start
 
     result_dir = Path("results/")
     result_dir.mkdir(exist_ok=True)

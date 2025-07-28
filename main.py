@@ -20,6 +20,19 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
+    # Set multiprocessing method before any JAX operations
+    try:
+        import multiprocessing as mp
+
+        mp.set_start_method("spawn", force=True)
+    except RuntimeError:
+        pass
+
+    # Initialize JAX distributed early
+    import jax
+
+    jax.distributed.initialize()
+
     train_dataset = instantiate(config.dataset, session_range=config.train_sessions)
     val_dataset = instantiate(config.dataset, session_range=config.val_sessions)
     test_dataset = instantiate(config.dataset, session_range=config.test_sessions)

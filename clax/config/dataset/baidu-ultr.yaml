@@ -2,7 +2,7 @@
 
 dataset:
   _target_: clax.datasets.BaiduULTRDataset
-  path: /Users/philipphager/Documents/GitHub/clax-datasets/output/baidu_ultr_embeddings
+  path: /fnwi_fs/ivi/irlab/datasets/clax-datasets/baidu_ultr_embeddings/
   max_positions: 10
 
 query_doc_pairs: 1_300_000_000

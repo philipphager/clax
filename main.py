@@ -27,19 +27,19 @@ def main(config: DictConfig):
     train_loader = DataLoader(
         train_dataset,
         batch_size=config.train_batch_size,
-        num_workers=4,
+        num_workers=1,
         collate_fn=train_dataset.collate_fn,
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=config.eval_batch_size,
-        num_workers=4,
+        num_workers=1,
         collate_fn=val_dataset.collate_fn,
     )
     test_loader = DataLoader(
         test_dataset,
         batch_size=config.eval_batch_size,
-        num_workers=4,
+        num_workers=1,
         collate_fn=test_dataset.collate_fn,
     )
 

@@ -18,7 +18,6 @@ OmegaConf.register_new_resolver("eval", eval)
 @hydra.main(version_base="1.3", config_path="clax/config/", config_name="config")
 def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
-    rngs = nnx.Rngs(config.random_state)
 
     # Set multiprocessing method before any JAX operations
     try:
@@ -32,6 +31,7 @@ def main(config: DictConfig):
     import jax
 
     jax.distributed.initialize()
+    rngs = nnx.Rngs(config.random_state)
 
     train_dataset = instantiate(config.dataset, session_range=config.train_sessions)
     val_dataset = instantiate(config.dataset, session_range=config.val_sessions)

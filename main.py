@@ -41,19 +41,19 @@ def main(config: DictConfig):
         train_dataset,
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
-        num_workers=2,
+        num_workers=8,
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=config.eval_batch_size,
         collate_fn=val_dataset.collate_fn,
-        num_workers=2,
+        num_workers=8,
     )
     test_loader = DataLoader(
         test_dataset,
         batch_size=config.eval_batch_size,
         collate_fn=test_dataset.collate_fn,
-        num_workers=2,
+        num_workers=8,
     )
 
     model_fn = instantiate(config.model)

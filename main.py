@@ -3,6 +3,8 @@ from time import perf_counter
 
 import hydra
 import optax
+
+from clax.datasets.baidu import BaiduULTRDataset
 from clax.datasets.yandex import YandexDataset
 from clax.trainer import Trainer
 from flax import nnx
@@ -18,24 +20,9 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    path = Path(config.dataset)
-    index_path = Path("data/wscd-2012/index.json")
-
-    train_dataset = YandexDataset(
-        path,
-        index_path,
-        session_range=(0, 100_000_000),
-    )
-    val_dataset = YandexDataset(
-        path,
-        index_path,
-        session_range=(100_000_000, 120_000_000),
-    )
-    test_dataset = YandexDataset(
-        path,
-        index_path,
-        session_range=(120_000_000, 146_278_823),
-    )
+    train_dataset = instantiate(config.dataset, session_range=config.train_sessions)
+    val_dataset = instantiate(config.dataset, session_range=config.val_sessions)
+    test_dataset = instantiate(config.dataset, session_range=config.test_sessions)
 
     train_loader = DataLoader(
         train_dataset,

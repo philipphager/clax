@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 import polars as pl
@@ -14,10 +14,11 @@ FileRangeTuple = Tuple[Path, int, int]
 class BaiduULTRDataset(IterableDataset):
     def __init__(
         self,
-        path: Path,
+        path: Union[Path, str],
         session_range: Tuple[int, int],
         max_positions: int = 10,
     ):
+        path = Path(path)
         files = self._find_files(path)
         self.file_ranges = self._file_ranges(files, session_range)
         self.max_positions = max_positions

@@ -1,5 +1,6 @@
 defaults:
   - _self_
+  - dataset: baidu-ultr
   - parameter/examination: position
   - parameter/attraction: embedding/hash
   - parameter/satisfaction: embedding/hash
@@ -7,12 +8,16 @@ defaults:
 
 
 random_state: 42
-query_doc_pairs: 130_000_000
+
+# To be overwritten by specific datasets:
+query_doc_pairs: ???
+train_sessions: ???
+val_sessions: ???
+test_sessions: ???
+
 train_batch_size: 512
 eval_batch_size: 512
 positions: 10
 
 compression_ratio: 1000
-
-dataset: data/wscd-2012/YandexClicks.txt
 experiment: ""

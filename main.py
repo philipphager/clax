@@ -43,6 +43,8 @@ def main(config: DictConfig):
         collate_fn=test_dataset.collate_fn,
     )
 
+    print(len(train_dataset))
+
     model_fn = instantiate(config.model)
     model = model_fn(rngs=rngs)
 

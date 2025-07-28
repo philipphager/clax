@@ -14,4 +14,3 @@ hydra:
 
 train_batch_size: 4096
 eval_batch_size: 8192
-dataset: /ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt

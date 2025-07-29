@@ -50,10 +50,9 @@ class BaiduULTRDataset(IterableDataset):
 
         for file, begin_row, end_row in file_ranges:
             n_rows = end_row - begin_row
-            df = pl.scan_parquet(file).slice(begin_row, n_rows).collect()
+            df = pl.read_parquet(file).slice(begin_row, n_rows)
 
             for row in df.iter_rows(named=True):
-
                 n = min(len(row["query_doc_ids"]), self.max_positions)
 
                 yield {

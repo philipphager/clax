@@ -51,7 +51,7 @@ class BaiduULTRDataset(IterableDataset):
 
         for file, begin_row, end_row in file_ranges:
             n_rows = end_row - begin_row
-            df = pl.scan_parquet(file).slice(begin_row, n_rows)
+            df = pl.scan_parquet(file).slice(begin_row, n_rows).collect()
 
             for query_doc_ids, clicks in zip(
                 df["query_doc_ids"].to_numpy(),

@@ -14,8 +14,8 @@ train_sessions: ???
 val_sessions: ???
 test_sessions: ???
 
-train_batch_size: 4096
-eval_batch_size: 4096
+train_batch_size: 6144
+eval_batch_size: 6144
 positions: 10
 
 compression_ratio: 1000

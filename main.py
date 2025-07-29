@@ -41,6 +41,8 @@ def main(config: DictConfig):
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
         num_workers=8,
+        pin_memory=True,
+        prefetch_factor=8,
         persistent_workers=True,
         multiprocessing_context=ctx,
     )
@@ -49,6 +51,8 @@ def main(config: DictConfig):
         batch_size=config.eval_batch_size,
         collate_fn=val_dataset.collate_fn,
         num_workers=4,
+        num_workers=8,
+        persistent_workers=True,
         multiprocessing_context=ctx,
     )
     test_loader = DataLoader(

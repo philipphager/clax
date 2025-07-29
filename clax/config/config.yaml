@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - dataset: baidu-ultr
+#  - dataset: baidu-ultr
   - parameter/examination: position
   - parameter/attraction: embedding/hash
   - parameter/satisfaction: embedding/hash

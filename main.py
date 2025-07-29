@@ -25,7 +25,6 @@ def main(config: DictConfig):
 
     path = Path("/ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt")
     index_path = Path("data/wscd-2012/index.json")
-    ctx = mp.get_context("spawn")
 
     train_dataset = YandexDataset(
         path,
@@ -51,7 +50,6 @@ def main(config: DictConfig):
         pin_memory=True,
         persistent_workers=True,
         prefetch_factor=4,
-        multiprocessing_context=ctx,
     )
     val_loader = DataLoader(
         val_dataset,
@@ -59,7 +57,6 @@ def main(config: DictConfig):
         collate_fn=val_dataset.collate_fn,
         num_workers=8,
         persistent_workers=True,
-        multiprocessing_context=ctx,
     )
     test_loader = DataLoader(
         test_dataset,
@@ -67,7 +64,6 @@ def main(config: DictConfig):
         collate_fn=test_dataset.collate_fn,
         num_workers=4,
         persistent_workers=True,
-        multiprocessing_context=ctx,
     )
 
     model_fn = instantiate(config.model)

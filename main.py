@@ -25,15 +25,15 @@ def main(config: DictConfig):
 
     train_dataset = BaiduULTRDataset(
         path=path,
-        session_range=(0, 1000),
+        session_range=(0, 100),
     )
     val_dataset = BaiduULTRDataset(
         path=path,
-        session_range=(1000, 1_500),
+        session_range=(100, 150),
     )
     test_dataset = BaiduULTRDataset(
         path=path,
-        session_range=(1_500, 2_000),
+        session_range=(150, 200),
     )
 
     train_loader = DataLoader(

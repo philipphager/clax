@@ -2,7 +2,6 @@ from pathlib import Path
 from time import perf_counter
 
 import hydra
-import jax
 import optax
 import torch.multiprocessing as mp
 from flax import nnx
@@ -11,8 +10,6 @@ from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
 from clax.datasets import BaiduULTRDataset
-from clax.datasets.dummy import DummyDataset
-from clax.datasets.yandex import YandexDataset
 from clax.trainer import Trainer
 
 OmegaConf.register_new_resolver("eval", eval)
@@ -44,7 +41,6 @@ def main(config: DictConfig):
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
         num_workers=8,
-        pin_memory=True,
         persistent_workers=True,
         multiprocessing_context=ctx,
     )

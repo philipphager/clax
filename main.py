@@ -26,13 +26,16 @@ def main(config: DictConfig):
     path = Path("/fnwi_fs/ivi/irlab/datasets/clax-datasets/baidu_ultr_embeddings/")
     ctx = mp.get_context("spawn")
 
-    train_dataset = DummyDataset(
+    train_dataset = BaiduULTRDataset(
+        path=path,
         session_range=(0, 100_000_000),
     )
-    val_dataset = DummyDataset(
+    val_dataset = BaiduULTRDataset(
+        path=path,
         session_range=(100_000_000, 120_000_000),
     )
-    test_dataset = DummyDataset(
+    test_dataset = BaiduULTRDataset(
+        path=path,
         session_range=(120_000_000, 140_000_000),
     )
 
@@ -43,8 +46,7 @@ def main(config: DictConfig):
         num_workers=8,
         pin_memory=True,
         persistent_workers=True,
-        prefetch_factor=4,
-        # multiprocessing_context=ctx,
+        multiprocessing_context=ctx,
     )
     val_loader = DataLoader(
         val_dataset,
@@ -52,7 +54,7 @@ def main(config: DictConfig):
         collate_fn=val_dataset.collate_fn,
         num_workers=1,
         persistent_workers=True,
-        # multiprocessing_context=ctx,
+        multiprocessing_context=ctx,
     )
     test_loader = DataLoader(
         test_dataset,
@@ -60,7 +62,7 @@ def main(config: DictConfig):
         collate_fn=test_dataset.collate_fn,
         num_workers=1,
         persistent_workers=True,
-        # multiprocessing_context=ctx,
+        multiprocessing_context=ctx,
     )
 
     model_fn = instantiate(config.model)

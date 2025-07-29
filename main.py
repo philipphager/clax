@@ -23,7 +23,7 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    path = Path("/fnwi_fs/ivi/irlab/datasets/clax-datasets/baidu_ultr_embeddings/")
+    path = Path("/ivi/ilps/personal/phager/clax-datasets/baidu_ultr_embeddings/")
     ctx = mp.get_context("spawn")
 
     train_dataset = BaiduULTRDataset(

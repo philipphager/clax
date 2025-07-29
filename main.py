@@ -18,24 +18,26 @@ OmegaConf.register_new_resolver("eval", eval)
 @hydra.main(version_base="1.3", config_path="clax/config/", config_name="config")
 def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
-
-    # Set multiprocessing method before any JAX operations
-    try:
-        import multiprocessing as mp
-
-        mp.set_start_method("spawn", force=True)
-    except RuntimeError:
-        pass
-
-    # Initialize JAX distributed early
-    import jax
-
-    jax.distributed.initialize()
     rngs = nnx.Rngs(config.random_state)
 
-    train_dataset = instantiate(config.dataset, session_range=config.train_sessions)
-    val_dataset = instantiate(config.dataset, session_range=config.val_sessions)
-    test_dataset = instantiate(config.dataset, session_range=config.test_sessions)
+    path = Path(config.dataset)
+    index_path = Path("data/wscd-2012/index.json")
+
+    train_dataset = YandexDataset(
+        path,
+        index_path,
+        session_range=(0, 100_000_000),
+    )
+    val_dataset = YandexDataset(
+        path,
+        index_path,
+        session_range=(100_000_000, 120_000_000),
+    )
+    test_dataset = YandexDataset(
+        path,
+        index_path,
+        session_range=(120_000_000, 140_000_000),
+    )
 
     train_loader = DataLoader(
         train_dataset,

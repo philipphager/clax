@@ -1,3 +1,5 @@
+import pandas as pd
+from itertools import batched
 from pathlib import Path
 from typing import List, Tuple, Union
 
@@ -47,13 +49,21 @@ class BaiduULTRDataset(IterableDataset):
 
     def __iter__(self):
         file_ranges = self._get_local_file_ranges()
+        batched_file_ranges = batched(file_ranges, 5)
 
-        for file, begin_row, end_row in file_ranges:
-            n_rows = end_row - begin_row
-            df = pl.scan_parquet(file).slice(begin_row, n_rows).collect()
+        for batch in batched_file_ranges:
+            dfs = []
 
-            for row in df.rows():
-                query_doc_ids, clicks = row
+            for file, begin_row, end_row in batch:
+                n_rows = end_row - begin_row
+                dfs.append(pl.scan_parquet(file).slice(begin_row, n_rows))
+
+            df = pl.concat(dfs).collect()
+
+            for query_doc_ids, clicks in zip(
+                df["query_doc_ids"].to_numpy(),
+                df["clicks"].to_numpy(),
+            ):
                 n = min(len(query_doc_ids), self.max_positions)
 
                 yield {

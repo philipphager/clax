@@ -7,7 +7,7 @@ import polars as pl
 import torch
 from torch.utils.data import IterableDataset
 
-from clax.datasets.utils import SessionCollator
+from clax.datasets.utils import SessionCollator, batched
 
 FileRangeTuple = Tuple[Path, int, int]
 
@@ -48,10 +48,17 @@ class BaiduULTRDataset(IterableDataset):
 
     def __iter__(self):
         file_ranges = self._get_local_file_ranges()
+        batched_file_ranges = batched(file_ranges, 5)
 
-        for file, begin_row, end_row in file_ranges:
-            n_rows = end_row - begin_row
-            df = pl.scan_parquet(file).slice(begin_row, n_rows).collect()
+        for file_ranges in batched_file_ranges:
+            dfs = []
+
+            for file, begin_row, end_row in file_ranges:
+                n_rows = end_row - begin_row
+                df = pl.scan_parquet(file).slice(begin_row, n_rows)
+                dfs.append(df)
+
+            df = pl.concat(dfs).collect()
 
             for query_doc_ids, clicks in zip(
                 df["query_doc_ids"].to_numpy(),

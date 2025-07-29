@@ -1,3 +1,5 @@
+import itertools
+from functools import partial
 from typing import Union, List, Dict
 
 import numpy as np
@@ -39,3 +41,9 @@ def pad(samples: List[Dict[str, np.ndarray]], feature: str, max_n, dtype: np.dty
         array[row, : sample["n"]] = sample[feature]
 
     return array
+
+
+def batched(iterable, n):
+    it = iter(iterable)
+    while batch := list(itertools.islice(it, n)):
+        yield batch

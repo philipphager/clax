@@ -20,9 +20,8 @@ class BaiduULTRDataset(Dataset):
         self.session_range = session_range
 
         path = Path(path)
-        files = self._find_files(path)
-        file_ranges = self._file_ranges(files, session_range)
-        df = self.load_data(file_ranges)
+        files = path.glob("part-*.parquet")
+        df = pl.read_parquet(files)
 
         self.query_doc_ids = df["query_doc_ids"].to_numpy()
         self.clicks = df["clicks"].to_numpy()
@@ -54,55 +53,3 @@ class BaiduULTRDataset(Dataset):
             "positions": self.positions[:n],
             "n": n,
         }
-
-    def load_data(self, file_ranges):
-        """
-        file_specs: list of tuples [(filepath, start_row, end_row), ...]
-        """
-        lazy_frames = []
-
-        for file, start_row, end_row in file_ranges:
-            n_rows = end_row - start_row
-            lazy_df = pl.scan_parquet(file).slice(start_row, n_rows)
-            lazy_frames.append(lazy_df)
-
-        return pl.concat(lazy_frames).collect()
-
-    @staticmethod
-    def _file_ranges(
-        files: List[Path],
-        session_range: Tuple[int, int],
-    ) -> List[FileRangeTuple]:
-        """
-        Determine which files should be read (and which range in each file)
-        for a given range of sessions.
-        """
-        file_ranges: List[FileRangeTuple] = []
-        session_begin, session_end = session_range
-        total_sessions = 0
-
-        for file in sorted(files):
-            df = pl.scan_parquet(file)
-            num_sessions = df.select(pl.len()).collect().item()
-
-            file_begin = total_sessions
-            file_end = total_sessions + num_sessions
-
-            overlap_begin = max(file_begin, session_begin)
-            overlap_end = min(file_end, session_end)
-
-            if overlap_begin < overlap_end:
-                start_row = overlap_begin - total_sessions
-                end_row = overlap_end - total_sessions
-                file_ranges.append((file, start_row, end_row))
-
-            if total_sessions >= session_end:
-                break
-
-            total_sessions += num_sessions
-
-        return file_ranges
-
-    @staticmethod
-    def _find_files(path: Path) -> List[Path]:
-        return path.glob("part-*.parquet")

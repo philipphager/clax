@@ -1,5 +1,4 @@
-import pandas as pd
-from itertools import batched
+import itertools
 from pathlib import Path
 from typing import List, Tuple, Union
 
@@ -11,6 +10,13 @@ from torch.utils.data import IterableDataset
 from clax.datasets.utils import SessionCollator
 
 FileRangeTuple = Tuple[Path, int, int]
+
+
+def batched(iterable, n):
+    """Batch data into lists of length n. The last batch may be shorter."""
+    it = iter(iterable)
+    while batch := list(itertools.islice(it, n)):
+        yield batch
 
 
 class BaiduULTRDataset(IterableDataset):

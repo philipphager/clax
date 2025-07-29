@@ -12,13 +12,6 @@ from clax.datasets.utils import SessionCollator
 FileRangeTuple = Tuple[Path, int, int]
 
 
-def batched(iterable, n):
-    """Batch data into lists of length n. The last batch may be shorter."""
-    it = iter(iterable)
-    while batch := list(itertools.islice(it, n)):
-        yield batch
-
-
 class BaiduULTRDataset(IterableDataset):
     def __init__(
         self,
@@ -55,16 +48,10 @@ class BaiduULTRDataset(IterableDataset):
 
     def __iter__(self):
         file_ranges = self._get_local_file_ranges()
-        batched_file_ranges = batched(file_ranges, 5)
 
-        for batch in batched_file_ranges:
-            dfs = []
-
-            for file, begin_row, end_row in batch:
-                n_rows = end_row - begin_row
-                dfs.append(pl.scan_parquet(file).slice(begin_row, n_rows))
-
-            df = pl.concat(dfs).collect()
+        for file, begin_row, end_row in file_ranges:
+            n_rows = end_row - begin_row
+            df = pl.scan_parquet(file).slice(begin_row, n_rows)
 
             for query_doc_ids, clicks in zip(
                 df["query_doc_ids"].to_numpy(),

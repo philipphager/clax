@@ -20,7 +20,7 @@ class BaiduULTRDataset(Dataset):
         self.session_range = session_range
 
         path = Path(path)
-        files = path.glob("part-*.parquet")
+        files = list(path.glob("part-*.parquet"))
         df = pl.read_parquet(files)
 
         self.query_doc_ids = df["query_doc_ids"].to_numpy()
@@ -40,6 +40,7 @@ class BaiduULTRDataset(Dataset):
         # Pre-compute reusable outputs:
         self.mask = np.ones(self.max_positions, dtype=np.bool_)
         self.positions = np.arange(1, self.max_positions + 1, dtype=np.int16)
+        print("Data loaded!")
 
     def __len__(self) -> int:
         return len(self.query_doc_ids)

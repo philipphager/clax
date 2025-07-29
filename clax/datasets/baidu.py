@@ -27,22 +27,25 @@ class BaiduULTRDataset(Dataset):
 
         if not files_to_load:
             print(f"No parquet files found in the specified range: {session_range}")
-            # Initialize empty arrays to prevent errors if no files are loaded
-            self.query_doc_ids = np.array([], dtype=np.int32)
-            self.clicks = np.array([], dtype=np.float16)
+            # Initialize an empty Polars DataFrame if no files are loaded
+            self.df = pl.DataFrame({"query_doc_ids": [], "clicks": []}).with_columns(
+                pl.Series([], dtype=pl.List(pl.Int32)).alias("query_doc_ids"),
+                pl.Series([], dtype=pl.List(pl.Float32)).alias(
+                    "clicks"
+                ),  # Polars Float32 maps to numpy float16 well
+            )
         else:
-            print(f"Loading {len(files_to_load)} parquet files...")
-            # Use scan_parquet for optimized reading of multiple files.
+            print(
+                f"Loading {len(files_to_load)} parquet files into Polars DataFrame..."
+            )
+            # Load data into a single Polars DataFrame
             # Explicitly select only the necessary columns to reduce memory footprint.
-            df = (
+            self.df = (
                 pl.scan_parquet(files_to_load)
                 .select(["query_doc_ids", "clicks"])
                 .collect()
             )
-
-            self.query_doc_ids = df["query_doc_ids"].to_numpy()
-            self.clicks = df["clicks"].to_numpy()
-            print(f"Loaded {len(self.query_doc_ids)} sessions into memory.")
+            print(f"Loaded {len(self.df)} sessions into Polars DataFrame.")
 
         self.collate_fn = SessionCollator(
             query_features={
@@ -61,14 +64,25 @@ class BaiduULTRDataset(Dataset):
         print("Data initialization complete!")
 
     def __len__(self) -> int:
-        return len(self.query_doc_ids)
+        return len(self.df)
 
     def __getitem__(self, idx):
+        # Access the row directly from the Polars DataFrame
+        # .row(idx) returns a tuple, which we then convert to NumPy arrays.
+        # This performs the NumPy conversion on a per-item basis.
+        row_data = self.df.row(idx, named=False)
+        query_doc_ids_list = row_data[0]
+        clicks_list = row_data[1]
+
+        # Convert to NumPy arrays with specified dtypes
+        query_doc_ids = np.array(query_doc_ids_list, dtype=np.int32)
+        clicks = np.array(clicks_list, dtype=np.float16)
+
         # Ensure 'n' does not exceed max_positions
-        n = min(len(self.query_doc_ids[idx]), self.max_positions)
+        n = min(len(query_doc_ids), self.max_positions)
         return {
-            "query_doc_ids": self.query_doc_ids[idx][:n],
-            "clicks": self.clicks[idx][:n],
+            "query_doc_ids": query_doc_ids[:n],
+            "clicks": clicks[:n],
             "mask": self.mask[:n],
             "positions": self.positions[:n],
             "n": n,

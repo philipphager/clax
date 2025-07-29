@@ -25,7 +25,9 @@ class RobeDEmbedding(nnx.Module):
         self.features = features
         self.robe_array_size = max(1, num_embeddings * features // compression_ratio)
         self.robe_array = nnx.Param(
-            embedding_init(rngs.params(), (self.robe_array_size, 1)).ravel()
+            embedding_init(
+                rngs.params(), (self.robe_array_size, 1), dtype=jnp.float16
+            ).ravel()
         )
         self.block_start_hash_fn = UniversalHash(
             max_output=self.robe_array_size,

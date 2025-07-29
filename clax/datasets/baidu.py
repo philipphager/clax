@@ -50,21 +50,22 @@ class BaiduULTRDataset(IterableDataset):
 
         for file, begin_row, end_row in file_ranges:
             n_rows = end_row - begin_row
-            df = pl.scan_parquet(file).slice(begin_row, n_rows).collect()
+            df = pl.scan_parquet(file).slice(begin_row, n_rows)
 
-            for query_doc_ids, clicks in zip(
-                df["query_doc_ids"].to_numpy(),
-                df["clicks"].to_numpy(),
-            ):
-                n = min(len(query_doc_ids), self.max_positions)
+            for batch_df in df.collect(streaming=True):
+                batch_query_doc_ids = batch_df["query_doc_ids"].to_numpy()
+                batch_clicks = batch_df["clicks"].to_numpy()
 
-                yield {
-                    "query_doc_ids": query_doc_ids[:n],
-                    "clicks": clicks[:n],
-                    "mask": self.mask[:n],
-                    "positions": self.positions[:n],
-                    "n": n,
-                }
+                for query_doc_ids, clicks in zip(batch_query_doc_ids, batch_clicks):
+                    n = min(len(query_doc_ids), self.max_positions)
+
+                    yield {
+                        "query_doc_ids": query_doc_ids[:n],
+                        "clicks": clicks[:n],
+                        "mask": self.mask[:n],
+                        "positions": self.positions[:n],
+                        "n": n,
+                    }
 
     def _get_local_file_ranges(self) -> List[FileRangeTuple]:
         """

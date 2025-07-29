@@ -46,6 +46,7 @@ def main(config: DictConfig):
         num_workers=8,
         pin_memory=True,
         persistent_workers=True,
+        prefetch_factor=2,
         multiprocessing_context=ctx,
     )
     val_loader = DataLoader(

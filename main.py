@@ -23,7 +23,9 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    path = Path("/fnwi_fs/ivi/irlab/datasets/clax-datasets/baidu_ultr_embeddings/")
+    path = Path(
+        "/Users/philipphager/Documents/GitHub/clax-datasets/output/baidu_ultr_embeddings"
+    )
     ctx = mp.get_context("spawn")
 
     train_dataset = BaiduULTRDataset(
@@ -44,9 +46,8 @@ def main(config: DictConfig):
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
         num_workers=8,
-        pin_memory=True,
+        # pin_memory=True,
         persistent_workers=True,
-        prefetch_factor=2,
         multiprocessing_context=ctx,
     )
     val_loader = DataLoader(

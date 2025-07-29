@@ -2,11 +2,11 @@ from pathlib import Path
 from time import perf_counter
 
 import hydra
+import jax
 import optax
 import torch.multiprocessing as mp
 from flax import nnx
 from hydra.utils import instantiate
-from jax.lib import xla_bridge
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
@@ -21,7 +21,7 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    print("XLA backend:", xla_bridge.get_backend().platform)
+    print("XLA default backend:", jax.default_backend())
 
     path = Path("/ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt")
     index_path = Path("data/wscd-2012/index.json")

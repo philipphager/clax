@@ -3,24 +3,29 @@ from typing import List, Tuple, Union
 
 import numpy as np
 import polars as pl
-import torch
-from torch.utils.data import IterableDataset
+from torch.utils.data import Dataset
 
 from clax.datasets.utils import SessionCollator
 
 FileRangeTuple = Tuple[Path, int, int]
 
 
-class BaiduULTRDataset(IterableDataset):
+class BaiduULTRDataset(Dataset):
     def __init__(
         self,
         path: Union[Path, str],
         session_range: Tuple[int, int],
         max_positions: int = 10,
     ):
+        self.session_range = session_range
+
         path = Path(path)
         files = self._find_files(path)
-        self.file_ranges = self._file_ranges(files, session_range)
+        file_ranges = self._file_ranges(files, session_range)
+        df = self.load_data(file_ranges)
+
+        self.query_doc_ids = df["query_doc_ids"].to_numpy()
+        self.clicks = df["clicks"].to_numpy()
         self.max_positions = max_positions
         self.collate_fn = SessionCollator(
             query_features={
@@ -38,48 +43,30 @@ class BaiduULTRDataset(IterableDataset):
         self.positions = np.arange(1, self.max_positions + 1, dtype=np.int16)
 
     def __len__(self) -> int:
-        total_sessions = 0
+        return len(self.query_doc_ids)
 
-        for _, begin_row, end_row in self.file_ranges:
-            total_sessions += end_row - begin_row
+    def __getitem__(self, idx):
+        n = min(len(self.query_doc_ids[idx]), self.max_positions)
+        return {
+            "query_doc_ids": self.query_doc_ids[idx][:n],
+            "clicks": self.clicks[idx][:n],
+            "mask": self.mask[:n],
+            "positions": self.positions[:n],
+            "n": n,
+        }
 
-        return total_sessions
-
-    def __iter__(self):
-        file_ranges = self._get_local_file_ranges()
-
-        for file, begin_row, end_row in file_ranges:
-            n_rows = end_row - begin_row
-            df = pl.read_parquet(file).slice(begin_row, n_rows)
-
-            for row in df.iter_rows(named=True):
-                query_doc_ids = row["query_doc_ids"]
-                clicks = row["clicks"]
-                n = min(len(query_doc_ids), self.max_positions)
-
-                yield {
-                    "query_doc_ids": query_doc_ids[:n],
-                    "clicks": clicks[:n],
-                    "mask": self.mask[:n],
-                    "positions": self.positions[:n],
-                    "n": n,
-                }
-
-    def _get_local_file_ranges(self) -> List[FileRangeTuple]:
+    def load_data(self, file_ranges):
         """
-        Select a subset of file ranges to iterate, based on the current worker process.
-        See: https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset
+        file_specs: list of tuples [(filepath, start_row, end_row), ...]
         """
-        info = torch.utils.data.get_worker_info()
+        lazy_frames = []
 
-        if info is None:
-            workers = 1
-            worker_id = 0
-        else:
-            workers = info.num_workers
-            worker_id = info.id
+        for file, start_row, end_row in file_ranges:
+            n_rows = end_row - start_row
+            lazy_df = pl.scan_parquet(file).slice(start_row, n_rows)
+            lazy_frames.append(lazy_df)
 
-        return [f for i, f in enumerate(self.file_ranges) if i % workers == worker_id]
+        return pl.concat(lazy_frames).collect()
 
     @staticmethod
     def _file_ranges(

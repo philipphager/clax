@@ -18,7 +18,7 @@ class BaiduULTRDataset(IterableDataset):
         path: Union[Path, str],
         session_range: Tuple[int, int],
         max_positions: int = 10,
-        file_batch_size: int = 10,
+        file_batch_size: int = 5,
     ):
         path = Path(path)
         files = self._find_files(path)

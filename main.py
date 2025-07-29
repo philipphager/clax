@@ -50,7 +50,6 @@ def main(config: DictConfig):
         val_dataset,
         batch_size=config.eval_batch_size,
         collate_fn=val_dataset.collate_fn,
-        num_workers=4,
         num_workers=8,
         persistent_workers=True,
         multiprocessing_context=ctx,

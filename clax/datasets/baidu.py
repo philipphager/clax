@@ -24,7 +24,7 @@ class BaiduULTRDataset(IterableDataset):
         files = self._find_files(path)
         self.file_ranges = self._file_ranges(files, session_range)
         self.max_positions = max_positions
-        self.file_batch_size = file_batch_size
+        self.file_batch_size = np.random.randint(1, 5, size=1)[0]
         self.collate_fn = SessionCollator(
             query_features={
                 "n": np.int16,

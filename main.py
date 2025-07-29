@@ -22,19 +22,23 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    path = Path("/fnwi_fs/ivi/irlab/datasets/clax-datasets/baidu_ultr_embeddings/")
+    path = Path("/ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt")
+    index_path = Path("data/wscd-2012/index.json")
     ctx = mp.get_context("spawn")
 
-    train_dataset = BaiduULTRDataset(
+    train_dataset = YandexDataset(
         path,
+        index_path,
         session_range=(0, 100_000_000),
     )
-    val_dataset = BaiduULTRDataset(
+    val_dataset = YandexDataset(
         path,
+        index_path,
         session_range=(100_000_000, 120_000_000),
     )
-    test_dataset = BaiduULTRDataset(
+    test_dataset = YandexDataset(
         path,
+        index_path,
         session_range=(120_000_000, 140_000_000),
     )
 

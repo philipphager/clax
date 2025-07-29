@@ -40,9 +40,10 @@ def main(config: DictConfig):
         train_dataset,
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
-        num_workers=10,
+        num_workers=8,
         pin_memory=True,
         persistent_workers=True,
+        prefetch_factor=4,
         # multiprocessing_context=ctx,
     )
     val_loader = DataLoader(

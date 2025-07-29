@@ -25,7 +25,7 @@ def main(config: DictConfig):
 
     train_dataset = BaiduULTRDataset(
         path=path,
-        session_range=(0, 100_000_000),
+        session_range=(0, 1_000_000_000),
     )
     val_dataset = BaiduULTRDataset(
         path=path,

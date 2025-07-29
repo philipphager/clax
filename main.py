@@ -3,16 +3,15 @@ from time import perf_counter
 
 import hydra
 import optax
-
-from clax.datasets.baidu import BaiduULTRDataset
-from clax.datasets.yandex import YandexDataset
-from clax.trainer import Trainer
+import torch.multiprocessing as mp
 from flax import nnx
 from hydra.utils import instantiate
+from jax.lib import xla_bridge
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
-import torch.multiprocessing as mp
 
+from clax.datasets.yandex import YandexDataset
+from clax.trainer import Trainer
 
 OmegaConf.register_new_resolver("eval", eval)
 
@@ -21,6 +20,8 @@ OmegaConf.register_new_resolver("eval", eval)
 def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
+
+    print("XLA backend:", xla_bridge.get_backend().platform)
 
     path = Path("/ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt")
     index_path = Path("data/wscd-2012/index.json")

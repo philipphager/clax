@@ -52,9 +52,9 @@ class BaiduULTRDataset(IterableDataset):
             n_rows = end_row - begin_row
             df = pl.read_parquet(file).slice(begin_row, n_rows)
 
-            for row in df.iter_rows(named=True):
-                query_doc_ids = row["query_doc_ids"]
-                clicks = row["clicks"]
+            for query_doc_ids, clicks in zip(
+                df["query_doc_ids"].to_numpy(), df["clicks"].to_numpy()
+            ):
                 n = min(len(query_doc_ids), self.max_positions)
 
                 yield {

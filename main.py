@@ -46,7 +46,7 @@ def main(config: DictConfig):
         train_dataset,
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
-        num_workers=4,
+        num_workers=32,
         pin_memory=True,
         persistent_workers=True,
         prefetch_factor=4,

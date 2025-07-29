@@ -50,7 +50,7 @@ class BaiduULTRDataset(IterableDataset):
 
         for file, begin_row, end_row in file_ranges:
             n_rows = end_row - begin_row
-            df = pl.scan_parquet(file).slice(begin_row, n_rows)
+            df = pl.scan_parquet(file).slice(begin_row, n_rows).collect()
 
             for row in df.iter_rows(named=True):
 

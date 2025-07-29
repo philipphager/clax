@@ -11,6 +11,8 @@ from flax import nnx
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
+import torch.multiprocessing as mp
+
 
 OmegaConf.register_new_resolver("eval", eval)
 
@@ -21,6 +23,7 @@ def main(config: DictConfig):
     rngs = nnx.Rngs(config.random_state)
 
     path = Path("/fnwi_fs/ivi/irlab/datasets/clax-datasets/baidu_ultr_embeddings/")
+    ctx = mp.get_context("spawn")
 
     train_dataset = BaiduULTRDataset(
         path,
@@ -40,18 +43,21 @@ def main(config: DictConfig):
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
         num_workers=8,
+        multiprocessing_context=ctx,
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=config.eval_batch_size,
         collate_fn=val_dataset.collate_fn,
         num_workers=8,
+        multiprocessing_context=ctx,
     )
     test_loader = DataLoader(
         test_dataset,
         batch_size=config.eval_batch_size,
         collate_fn=test_dataset.collate_fn,
         num_workers=8,
+        multiprocessing_context=ctx,
     )
 
     model_fn = instantiate(config.model)

@@ -20,7 +20,7 @@ class BaiduULTRDataset(Dataset):
         self.session_range = session_range
 
         path = Path(path)
-        files = list(path.glob("part-*.parquet"))
+        files = list(path.glob("part-*.parquet"))[session_range[0] : session_range[1]]
         df = pl.read_parquet(files)
 
         self.query_doc_ids = df["query_doc_ids"].to_numpy()

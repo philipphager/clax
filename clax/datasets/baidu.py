@@ -50,7 +50,8 @@ class BaiduULTRDataset(IterableDataset):
 
     def __iter__(self):
         file_ranges = self._get_local_file_ranges()
-        batched_file_ranges = batched(file_ranges, self.file_batch_size)
+        info = torch.utils.data.get_worker_info()
+        batched_file_ranges = batched(file_ranges, info.id + 1)
 
         for file_ranges in batched_file_ranges:
             dfs = []

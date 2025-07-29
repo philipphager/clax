@@ -1,9 +1,8 @@
 defaults:
   - _self_
-#  - dataset: baidu-ultr
   - parameter/examination: position
-  - parameter/attraction: embedding/hash
-  - parameter/satisfaction: embedding/hash
+  - parameter/attraction: embedding/full
+  - parameter/satisfaction: embedding/full
   - model: pbm
 
 

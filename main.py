@@ -43,7 +43,7 @@ def main(config: DictConfig):
         # num_workers=8,
         # prefetch_factor=16,
         # persistent_workers=True,
-        multiprocessing_context=ctx,
+        # multiprocessing_context=ctx,
     )
     val_loader = DataLoader(
         val_dataset,

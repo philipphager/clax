@@ -10,6 +10,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
+from clax.datasets import BaiduULTRDataset
 from clax.datasets.yandex import YandexDataset
 from clax.trainer import Trainer
 
@@ -21,24 +22,19 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    print("XLA default backend:", jax.default_backend())
+    path = Path("/fnwi_fs/ivi/irlab/datasets/clax-datasets/baidu_ultr_embeddings/")
+    ctx = mp.get_context("spawn")
 
-    path = Path("/ivi/ilps/datasets/yandex/relevance_prediction/YandexClicks.txt")
-    index_path = Path("data/wscd-2012/index.json")
-
-    train_dataset = YandexDataset(
+    train_dataset = BaiduULTRDataset(
         path,
-        index_path,
         session_range=(0, 100_000_000),
     )
-    val_dataset = YandexDataset(
+    val_dataset = BaiduULTRDataset(
         path,
-        index_path,
         session_range=(100_000_000, 120_000_000),
     )
-    test_dataset = YandexDataset(
+    test_dataset = BaiduULTRDataset(
         path,
-        index_path,
         session_range=(120_000_000, 140_000_000),
     )
 
@@ -46,16 +42,18 @@ def main(config: DictConfig):
         train_dataset,
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
-        num_workers=4,
+        num_workers=8,
         pin_memory=True,
         persistent_workers=True,
+        multiprocessing_context=ctx,
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=config.eval_batch_size,
         collate_fn=val_dataset.collate_fn,
-        num_workers=4,
+        num_workers=8,
         persistent_workers=True,
+        multiprocessing_context=ctx,
     )
     test_loader = DataLoader(
         test_dataset,
@@ -63,6 +61,7 @@ def main(config: DictConfig):
         collate_fn=test_dataset.collate_fn,
         num_workers=4,
         persistent_workers=True,
+        multiprocessing_context=ctx,
     )
 
     model_fn = instantiate(config.model)

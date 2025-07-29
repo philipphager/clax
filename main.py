@@ -43,7 +43,7 @@ def main(config: DictConfig):
         num_workers=1,
         pin_memory=True,
         persistent_workers=True,
-        multiprocessing_context=ctx,
+        # multiprocessing_context=ctx,
     )
     val_loader = DataLoader(
         val_dataset,
@@ -51,7 +51,7 @@ def main(config: DictConfig):
         collate_fn=val_dataset.collate_fn,
         num_workers=1,
         persistent_workers=True,
-        multiprocessing_context=ctx,
+        # multiprocessing_context=ctx,
     )
     test_loader = DataLoader(
         test_dataset,
@@ -59,7 +59,7 @@ def main(config: DictConfig):
         collate_fn=test_dataset.collate_fn,
         num_workers=1,
         persistent_workers=True,
-        multiprocessing_context=ctx,
+        # multiprocessing_context=ctx,
     )
 
     model_fn = instantiate(config.model)

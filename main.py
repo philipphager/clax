@@ -11,6 +11,7 @@ from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
 from clax.datasets import BaiduULTRDataset
+from clax.datasets.dummy import DummyDataset
 from clax.datasets.yandex import YandexDataset
 from clax.trainer import Trainer
 
@@ -25,16 +26,13 @@ def main(config: DictConfig):
     path = Path("/fnwi_fs/ivi/irlab/datasets/clax-datasets/baidu_ultr_embeddings/")
     ctx = mp.get_context("spawn")
 
-    train_dataset = BaiduULTRDataset(
-        path,
+    train_dataset = DummyDataset(
         session_range=(0, 100_000_000),
     )
-    val_dataset = BaiduULTRDataset(
-        path,
+    val_dataset = DummyDataset(
         session_range=(100_000_000, 120_000_000),
     )
-    test_dataset = BaiduULTRDataset(
-        path,
+    test_dataset = DummyDataset(
         session_range=(120_000_000, 140_000_000),
     )
 
@@ -42,7 +40,7 @@ def main(config: DictConfig):
         train_dataset,
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
-        num_workers=16,
+        num_workers=8,
         pin_memory=True,
         persistent_workers=True,
         multiprocessing_context=ctx,

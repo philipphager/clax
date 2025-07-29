@@ -1,21 +1,21 @@
 defaults:
   - _self_
   - parameter/examination: position
-  - parameter/attraction: embedding/full
-  - parameter/satisfaction: embedding/full
+  - parameter/attraction: embedding/hash
+  - parameter/satisfaction: embedding/hash
   - model: pbm
 
 
 random_state: 42
 
 # To be overwritten by specific datasets:
-query_doc_pairs: 120_000_000
+query_doc_pairs: 130_000_000
 train_sessions: ???
 val_sessions: ???
 test_sessions: ???
 
-train_batch_size: 512
-eval_batch_size: 512
+train_batch_size: 16000
+eval_batch_size: 16000
 positions: 10
 
 compression_ratio: 1000

@@ -18,11 +18,13 @@ class BaiduULTRDataset(IterableDataset):
         path: Union[Path, str],
         session_range: Tuple[int, int],
         max_positions: int = 10,
+        file_batch_size: int = 10,
     ):
         path = Path(path)
         files = self._find_files(path)
         self.file_ranges = self._file_ranges(files, session_range)
         self.max_positions = max_positions
+        self.file_batch_size = file_batch_size
         self.collate_fn = SessionCollator(
             query_features={
                 "n": np.int16,
@@ -48,7 +50,7 @@ class BaiduULTRDataset(IterableDataset):
 
     def __iter__(self):
         file_ranges = self._get_local_file_ranges()
-        batched_file_ranges = batched(file_ranges, 5)
+        batched_file_ranges = batched(file_ranges, self.file_batch_size)
 
         for file_ranges in batched_file_ranges:
             dfs = []

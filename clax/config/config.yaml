@@ -1,8 +1,8 @@
 defaults:
   - _self_
   - parameter/examination: position
-  - parameter/attraction: embedding/hash
-  - parameter/satisfaction: embedding/hash
+  - parameter/attraction: embedding/robe-d
+  - parameter/satisfaction: embedding/robe-d
   - model: pbm
 
 

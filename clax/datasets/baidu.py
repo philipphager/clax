@@ -53,24 +53,26 @@ class BaiduULTRDataset(IterableDataset):
         batched_file_ranges = batched(file_ranges, self.file_batch_size)
 
         for file_ranges in batched_file_ranges:
-            dfs = []
-
+            # Create a list of lazy frames
+            lazy_dfs = []
             for file, begin_row, end_row in file_ranges:
                 n_rows = end_row - begin_row
-                df = pl.scan_parquet(file).slice(begin_row, n_rows)
-                dfs.append(df)
+                lazy_df = pl.scan_parquet(file).slice(begin_row, n_rows)
+                lazy_dfs.append(lazy_df)
 
-            df = pl.concat(dfs).collect()
+            # Use a single lazy plan for the entire batch of files
+            lazy_combined_df = pl.concat(lazy_dfs, rechunk=False)
 
-            for query_doc_ids, clicks in zip(
-                df["query_doc_ids"].to_numpy(),
-                df["clicks"].to_numpy(),
-            ):
+            # Collect and iterate over the data
+            df_iterator = lazy_combined_df.select(
+                pl.col("query_doc_ids"), pl.col("clicks")
+            ).iter_rows()
+
+            for query_doc_ids, clicks in df_iterator:
                 n = min(len(query_doc_ids), self.max_positions)
-
                 yield {
-                    "query_doc_ids": query_doc_ids[:n],
-                    "clicks": clicks[:n],
+                    "query_doc_ids": np.array(query_doc_ids[:n], dtype=np.int32),
+                    "clicks": np.array(clicks[:n], dtype=np.float16),
                     "mask": self.mask[:n],
                     "positions": self.positions[:n],
                     "n": n,

@@ -1,6 +1,5 @@
 from pathlib import Path
 from time import perf_counter
-import tracemalloc
 
 import hydra
 import optax
@@ -22,18 +21,20 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    path = Path("/ivi/ilps/personal/phager/clax-datasets/baidu_ultr_embeddings/")
+    path = Path(
+        "/Users/philipphager/Documents/GitHub/clax-datasets/output/baidu_ultr_embeddings"
+    )
     ctx = mp.get_context("spawn")
 
-    train_dataset = BaiduULTRDataset(
+    train_dataset = DummyDataset(
         path=path,
         session_range=(0, 1_000_000_000),
     )
-    val_dataset = BaiduULTRDataset(
+    val_dataset = DummyDataset(
         path=path,
         session_range=(1_000_000_000, 1_100_000_000),
     )
-    test_dataset = BaiduULTRDataset(
+    test_dataset = DummyDataset(
         path=path,
         session_range=(1_100_000_000, 1_200_000_000),
     )

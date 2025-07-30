@@ -43,7 +43,7 @@ def main(config: DictConfig):
         train_dataset,
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
-        num_workers=6,
+        num_workers=1,
         persistent_workers=True,
         multiprocessing_context=ctx,
     )

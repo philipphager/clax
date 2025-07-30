@@ -1,32 +1,26 @@
-import itertools
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 import numpy as np
-import polars as pl
+import pyarrow.dataset as ds
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import IterableDataset
 
-from clax.datasets.utils import SessionCollator
-
+from .utils import SessionCollator
 
 FileRangeTuple = Tuple[Path, int, int]
 
 
-class BaiduULTRDataset(Dataset):
+class BaiduULTRDataset(IterableDataset):
     def __init__(
         self,
-        path: Union[Path, str],
+        path: Path,
         session_range: Tuple[int, int],
         max_positions: int = 10,
     ):
-        self.session_range = session_range
-
-        path = Path(path)
         files = self._find_files(path)
-        file_ranges = self._file_ranges(files, session_range)
-        self.df = self.load_data(file_ranges)
-
+        self.file_ranges = self._file_ranges(files, session_range)
+        self.session_range = session_range
         self.max_positions = max_positions
         self.collate_fn = SessionCollator(
             query_features={
@@ -44,32 +38,50 @@ class BaiduULTRDataset(Dataset):
         self.positions = np.arange(1, self.max_positions + 1, dtype=np.int16)
 
     def __len__(self) -> int:
-        return len(self.df)
+        total_sessions = 0
 
-    def __getitem__(self, idx):
-        row = self.df.item(idx)
-        n = len(row["query_doc_ids"])
+        for _, begin_row, end_row in self.file_ranges:
+            total_sessions += end_row - begin_row
 
-        yield {
-            "query_doc_ids": row["query_doc_ids"][:n],
-            "clicks": row["clicks"][:n],
-            "mask": self.mask[:n],
-            "positions": self.positions[:n],
-            "n": n,
-        }
+        return total_sessions
 
-    def load_data(self, file_ranges):
+    def __iter__(self):
+        file_ranges = self._get_local_file_ranges()
+
+        for file, begin_row, end_row in file_ranges:
+            n_rows = end_row - begin_row
+            dataset = ds.dataset(file)
+            scanner = dataset.scanner(batch_size=100)
+
+            for batch in scanner.to_batches():
+                for row in batch.to_pylist():
+                    query_doc_ids = row["query_doc_ids"]
+                    clicks = row["clicks"]
+                    n = min(len(query_doc_ids), self.max_positions)
+
+                    yield {
+                        "query_doc_ids": query_doc_ids[:n],
+                        "clicks": clicks[:n],
+                        "mask": self.mask[:n],
+                        "positions": self.positions[:n],
+                        "n": n,
+                    }
+
+    def _get_local_file_ranges(self) -> List[FileRangeTuple]:
         """
-        file_specs: list of tuples [(filepath, start_row, end_row), ...]
+        Select a subset of file ranges to iterate, based on the current worker process.
+        See: https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset
         """
-        frames = []
+        info = torch.utils.data.get_worker_info()
 
-        for file, start_row, end_row in file_ranges:
-            n_rows = end_row - start_row
-            lazy_df = pl.read_parquet(file).slice(start_row, n_rows)
-            frames.append(lazy_df)
+        if info is None:
+            workers = 1
+            worker_id = 0
+        else:
+            workers = info.num_workers
+            worker_id = info.id
 
-        return pl.concat(frames)
+        return [f for i, f in enumerate(self.file_ranges) if i % workers == worker_id]
 
     @staticmethod
     def _file_ranges(
@@ -85,8 +97,8 @@ class BaiduULTRDataset(Dataset):
         total_sessions = 0
 
         for file in sorted(files):
-            df = pl.scan_parquet(file)
-            num_sessions = df.select(pl.len()).collect().item()
+            dataset = ds.dataset(file)
+            num_sessions = dataset.count_rows()
 
             file_begin = total_sessions
             file_end = total_sessions + num_sessions
@@ -108,4 +120,4 @@ class BaiduULTRDataset(Dataset):
 
     @staticmethod
     def _find_files(path: Path) -> List[Path]:
-        return path.glob("part-*.parquet")
+        return list(path.glob("part-*.parquet"))

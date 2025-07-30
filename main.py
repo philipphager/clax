@@ -28,15 +28,15 @@ def main(config: DictConfig):
 
     train_dataset = DummyDataset(
         path=path,
-        session_range=(0, 1_000_000_000),
+        session_range=(0, 100_000_000),
     )
     val_dataset = DummyDataset(
         path=path,
-        session_range=(1_000_000_000, 1_100_000_000),
+        session_range=(100_000_000, 110_000_000),
     )
     test_dataset = DummyDataset(
         path=path,
-        session_range=(1_100_000_000, 1_200_000_000),
+        session_range=(110_000_000, 120_000_000),
     )
 
     train_loader = DataLoader(

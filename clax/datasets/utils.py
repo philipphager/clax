@@ -41,9 +41,3 @@ def pad(samples: List[Dict[str, np.ndarray]], feature: str, max_n, dtype: np.dty
         array[row, : sample["n"]] = sample[feature]
 
     return array
-
-
-def batched(iterable, n):
-    it = iter(iterable)
-    while batch := list(itertools.islice(it, n)):
-        yield batch

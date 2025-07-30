@@ -1,1 +1,1 @@
-from .yandex import YandexDataset
+from .parquet import ParquetDataset

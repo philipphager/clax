@@ -1,12 +1,12 @@
 from typing import Tuple
 
 import numpy as np
-from torch.utils.data import IterableDataset
+from torch.utils.data import Dataset
 
 from clax.datasets.utils import SessionCollator
 
 
-class DummyDataset(IterableDataset):
+class DummyDataset(Dataset):
     def __init__(
         self,
         session_range: Tuple[int, int],
@@ -42,13 +42,11 @@ class DummyDataset(IterableDataset):
     def __len__(self) -> int:
         return self.session_range[1] - self.session_range[0]
 
-    def __iter__(self):
-        n_sessions = self.session_range[1] - self.session_range[0]
-        for i in range(n_sessions):
-            yield {
-                "query_doc_ids": self.query_doc_ids[i % 1000],
-                "clicks": np.ones_like(self.positions, dtype=np.float16),
-                "positions": self.positions,
-                "mask": np.ones_like(self.positions, dtype=np.bool_),
-                "n": 10,
-            }
+    def __iter__(self, idx):
+        return {
+            "query_doc_ids": self.query_doc_ids[idx],
+            "clicks": self.clicks[idx],
+            "positions": self.positions,
+            "mask": np.ones_like(self.positions, dtype=np.bool_),
+            "n": self.max_positions,
+        }

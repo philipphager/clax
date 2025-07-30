@@ -75,7 +75,6 @@ def main(config: DictConfig):
     current, peak = tracemalloc.get_traced_memory()
     print(f"2 Current memory usage: {current / 1024 / 1024:.1f} MB")
     print(f"2 Peak memory usage: {peak / 1024 / 1024:.1f} MB")
-    return
 
     model_fn = instantiate(config.model)
     model = model_fn(rngs=rngs)

@@ -1,12 +1,13 @@
+import itertools
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
-import pyarrow.dataset as ds
+import polars as pl
 import torch
 from torch.utils.data import IterableDataset
 
-from .utils import SessionCollator
+from clax.datasets.utils import SessionCollator, batched
 
 FileRangeTuple = Tuple[Path, int, int]
 
@@ -14,14 +15,16 @@ FileRangeTuple = Tuple[Path, int, int]
 class BaiduULTRDataset(IterableDataset):
     def __init__(
         self,
-        path: Path,
+        path: Union[Path, str],
         session_range: Tuple[int, int],
         max_positions: int = 10,
+        file_batch_size: int = 4,
     ):
+        path = Path(path)
         files = self._find_files(path)
         self.file_ranges = self._file_ranges(files, session_range)
-        self.session_range = session_range
         self.max_positions = max_positions
+        self.file_batch_size = file_batch_size
         self.collate_fn = SessionCollator(
             query_features={
                 "n": np.int16,
@@ -47,25 +50,31 @@ class BaiduULTRDataset(IterableDataset):
 
     def __iter__(self):
         file_ranges = self._get_local_file_ranges()
+        batched_file_ranges = batched(file_ranges, self.file_batch_size)
 
-        for file, begin_row, end_row in file_ranges:
-            n_rows = end_row - begin_row
-            dataset = ds.dataset(file)
-            scanner = dataset.scanner(batch_size=100)
+        for file_ranges in batched_file_ranges:
+            dfs = []
 
-            for batch in scanner.to_batches():
-                for row in batch.to_pylist():
-                    query_doc_ids = row["query_doc_ids"]
-                    clicks = row["clicks"]
-                    n = min(len(query_doc_ids), self.max_positions)
+            for file, begin_row, end_row in file_ranges:
+                n_rows = end_row - begin_row
+                df = pl.scan_parquet(file).slice(begin_row, n_rows)
+                dfs.append(df)
 
-                    yield {
-                        "query_doc_ids": query_doc_ids[:n],
-                        "clicks": clicks[:n],
-                        "mask": self.mask[:n],
-                        "positions": self.positions[:n],
-                        "n": n,
-                    }
+            df = pl.concat(dfs).collect()
+
+            for query_doc_ids, clicks in zip(
+                df["query_doc_ids"].to_numpy(),
+                df["clicks"].to_numpy(),
+            ):
+                n = min(len(query_doc_ids), self.max_positions)
+
+                yield {
+                    "query_doc_ids": query_doc_ids[:n],
+                    "clicks": clicks[:n],
+                    "mask": self.mask[:n],
+                    "positions": self.positions[:n],
+                    "n": n,
+                }
 
     def _get_local_file_ranges(self) -> List[FileRangeTuple]:
         """
@@ -97,8 +106,8 @@ class BaiduULTRDataset(IterableDataset):
         total_sessions = 0
 
         for file in sorted(files):
-            dataset = ds.dataset(file)
-            num_sessions = dataset.count_rows()
+            df = pl.scan_parquet(file)
+            num_sessions = df.select(pl.len()).collect().item()
 
             file_begin = total_sessions
             file_end = total_sessions + num_sessions

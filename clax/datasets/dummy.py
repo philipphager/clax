@@ -11,6 +11,8 @@ class DummyDataset(IterableDataset):
         self,
         session_range: Tuple[int, int],
         max_positions: int = 10,
+        max_query_doc_id: int = 120_000_000,
+        **kwargs,
     ):
         self.session_range = session_range
         self.max_positions = max_positions
@@ -28,7 +30,14 @@ class DummyDataset(IterableDataset):
         # Pre-compute reusable outputs:
         self.mask = np.ones(self.max_positions, dtype=np.bool_)
         self.positions = np.arange(1, self.max_positions + 1, dtype=np.int16)
-        self.query_doc_ids = np.random.randint(0, 120_000_000, (1000, 10))
+
+        n_sessions = self.session_range[1] - self.session_range[0]
+        self.query_doc_ids = np.random.randint(
+            max_query_doc_id, size=(n_sessions, max_positions), dtype=np.int32
+        )
+        self.clicks = np.random.randint(
+            2, size=(n_sessions, max_positions), dtype=np.bool_
+        )
 
     def __len__(self) -> int:
         return self.session_range[1] - self.session_range[0]

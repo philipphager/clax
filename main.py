@@ -1,5 +1,6 @@
 from pathlib import Path
 from time import perf_counter
+import tracemalloc
 
 import hydra
 import optax
@@ -10,6 +11,7 @@ from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
 from clax.datasets import BaiduULTRDataset
+from clax.datasets.dummy import DummyDataset
 from clax.trainer import Trainer
 
 OmegaConf.register_new_resolver("eval", eval)
@@ -23,18 +25,24 @@ def main(config: DictConfig):
     path = Path("/ivi/ilps/personal/phager/clax-datasets/baidu_ultr_embeddings/")
     ctx = mp.get_context("spawn")
 
-    train_dataset = BaiduULTRDataset(
+    tracemalloc.start()
+
+    train_dataset = DummyDataset(
         path=path,
-        session_range=(0, 1_000_000_000),
+        session_range=(0, 1_200_000_000),
     )
-    val_dataset = BaiduULTRDataset(
+    val_dataset = DummyDataset(
         path=path,
         session_range=(100_000_000, 120_000_000),
     )
-    test_dataset = BaiduULTRDataset(
+    test_dataset = DummyDataset(
         path=path,
         session_range=(120_000_000, 140_000_000),
     )
+
+    current, peak = tracemalloc.get_traced_memory()
+    print(f"1 Current memory usage: {current / 1024 / 1024:.1f} MB")
+    print(f"1 Peak memory usage: {peak / 1024 / 1024:.1f} MB")
 
     train_loader = DataLoader(
         train_dataset,
@@ -59,6 +67,11 @@ def main(config: DictConfig):
         num_workers=4,
         multiprocessing_context=ctx,
     )
+
+    current, peak = tracemalloc.get_traced_memory()
+    print(f"2 Current memory usage: {current / 1024 / 1024:.1f} MB")
+    print(f"2 Peak memory usage: {peak / 1024 / 1024:.1f} MB")
+    return
 
     model_fn = instantiate(config.model)
     model = model_fn(rngs=rngs)

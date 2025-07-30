@@ -42,7 +42,7 @@ class DummyDataset(Dataset):
     def __len__(self) -> int:
         return self.session_range[1] - self.session_range[0]
 
-    def __iter__(self, idx):
+    def __getitem__(self, idx):
         return {
             "query_doc_ids": self.query_doc_ids[idx],
             "clicks": self.clicks[idx],

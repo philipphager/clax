@@ -9,7 +9,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
-from clax.datasets.baidu import ParquetDataset
+from clax.datasets import ParquetDataset
 from clax.trainer import Trainer
 
 OmegaConf.register_new_resolver("eval", eval)
@@ -20,20 +20,19 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    path = Path("/ivi/ilps/personal/phager/clax-datasets/baidu_ultr_embeddings/")
-    ctx = mp.get_context("spawn")
+    path = Path("clax-datasets/yandex")
 
     train_dataset = ParquetDataset(
-        path=path,
-        session_range=(0, 1_000_000_000),
+        source=path,
+        session_range=(0, 100_000_000),
     )
     val_dataset = ParquetDataset(
-        path=path,
-        session_range=(1_000_000_000, 1_100_000_000),
+        source=path,
+        session_range=(100_000_000, 120_000_000),
     )
     test_dataset = ParquetDataset(
-        path=path,
-        session_range=(1_100_000_000, 1_200_000_000),
+        source=path,
+        session_range=(120_000_000, 140_000_000),
     )
 
     train_loader = DataLoader(
@@ -42,7 +41,6 @@ def main(config: DictConfig):
         collate_fn=train_dataset.collate_fn,
         num_workers=8,
         persistent_workers=True,
-        multiprocessing_context=ctx,
     )
     val_loader = DataLoader(
         val_dataset,
@@ -50,14 +48,12 @@ def main(config: DictConfig):
         collate_fn=val_dataset.collate_fn,
         num_workers=8,
         persistent_workers=True,
-        multiprocessing_context=ctx,
     )
     test_loader = DataLoader(
         test_dataset,
         batch_size=config.eval_batch_size,
         collate_fn=test_dataset.collate_fn,
         num_workers=4,
-        multiprocessing_context=ctx,
     )
 
     model_fn = instantiate(config.model)

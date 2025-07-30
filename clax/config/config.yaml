@@ -9,13 +9,13 @@ defaults:
 random_state: 42
 
 # To be overwritten by specific datasets:
-query_doc_pairs: 1_200_000_000
+query_doc_pairs: 120_000_000
 train_sessions: ???
 val_sessions: ???
 test_sessions: ???
 
-train_batch_size: 8192
-eval_batch_size: 8192
+train_batch_size: 512
+eval_batch_size: 512
 positions: 10
 
 compression_ratio: 1000

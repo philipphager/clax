@@ -25,15 +25,15 @@ def main(config: DictConfig):
 
     train_dataset = ParquetDataset(
         path=path,
-        session_range=(0, 10_000_000),
+        session_range=(0, 1_000_000_000),
     )
     val_dataset = ParquetDataset(
         path=path,
-        session_range=(10_000_000, 12_000_000),
+        session_range=(1_000_000_000, 1_100_000_000),
     )
     test_dataset = ParquetDataset(
         path=path,
-        session_range=(12_000_000, 14_000_000),
+        session_range=(1_100_000_000, 1_200_000_000),
     )
 
     train_loader = DataLoader(

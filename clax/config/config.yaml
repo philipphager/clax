@@ -9,7 +9,7 @@ defaults:
 random_state: 42
 
 # To be overwritten by specific datasets:
-query_doc_pairs: 130_000_000
+query_doc_pairs: 1_200_000_000
 train_sessions: ???
 val_sessions: ???
 test_sessions: ???

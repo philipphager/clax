@@ -25,16 +25,10 @@ def main(config: DictConfig):
     path = Path("/ivi/ilps/personal/phager/clax-datasets/baidu_ultr_embeddings/")
     ctx = mp.get_context("spawn")
 
-    tracemalloc.start()
-
     train_dataset = BaiduULTRDataset(
         path=path,
         session_range=(0, 1_000_000_000),
     )
-    current, peak = tracemalloc.get_traced_memory()
-    print(f"0 Current memory usage: {current / 1024 / 1024:.1f} MB")
-    print(f"0 Peak memory usage: {peak / 1024 / 1024:.1f} MB")
-
     val_dataset = BaiduULTRDataset(
         path=path,
         session_range=(1_000_000_000, 1_100_000_000),
@@ -43,10 +37,6 @@ def main(config: DictConfig):
         path=path,
         session_range=(1_100_000_000, 1_200_000_000),
     )
-
-    current, peak = tracemalloc.get_traced_memory()
-    print(f"1 Current memory usage: {current / 1024 / 1024:.1f} MB")
-    print(f"1 Peak memory usage: {peak / 1024 / 1024:.1f} MB")
 
     train_loader = DataLoader(
         train_dataset,
@@ -72,10 +62,6 @@ def main(config: DictConfig):
         num_workers=4,
         multiprocessing_context=ctx,
     )
-
-    current, peak = tracemalloc.get_traced_memory()
-    print(f"2 Current memory usage: {current / 1024 / 1024:.1f} MB")
-    print(f"2 Peak memory usage: {peak / 1024 / 1024:.1f} MB")
 
     model_fn = instantiate(config.model)
     model = model_fn(rngs=rngs)

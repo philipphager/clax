@@ -59,11 +59,11 @@ class ParquetDataset(IterableDataset):
     def __iter__(self):
         file_ranges = self._get_local_file_ranges()
 
-        for file_path, begin_row, end_row in file_ranges:
-            parquet_file = pq.ParquetFile(file_path)
+        for path, begin_row, end_row in file_ranges:
+            file = pq.ParquetFile(path)
             rows_processed = 0
 
-            for batch in parquet_file.iter_batches():
+            for batch in file.iter_batches():
                 batch_size = len(batch)
                 overlap_begin = max(0, begin_row - rows_processed)
                 overlap_end = min(batch_size, end_row - rows_processed)

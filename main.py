@@ -9,8 +9,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
-from clax.datasets import BaiduULTRDataset
-from clax.datasets.dummy import DummyDataset
+from clax.datasets.baidu import ParquetDataset
 from clax.trainer import Trainer
 
 OmegaConf.register_new_resolver("eval", eval)
@@ -24,15 +23,15 @@ def main(config: DictConfig):
     path = Path("/ivi/ilps/personal/phager/clax-datasets/baidu_ultr_embeddings/")
     ctx = mp.get_context("spawn")
 
-    train_dataset = BaiduULTRDataset(
+    train_dataset = ParquetDataset(
         path=path,
         session_range=(0, 10_000_000),
     )
-    val_dataset = BaiduULTRDataset(
+    val_dataset = ParquetDataset(
         path=path,
         session_range=(10_000_000, 12_000_000),
     )
-    test_dataset = BaiduULTRDataset(
+    test_dataset = ParquetDataset(
         path=path,
         session_range=(12_000_000, 14_000_000),
     )

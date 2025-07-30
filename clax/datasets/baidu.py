@@ -62,14 +62,14 @@ class BaiduULTRDataset(Dataset):
         """
         file_specs: list of tuples [(filepath, start_row, end_row), ...]
         """
-        lazy_frames = []
+        frames = []
 
         for file, start_row, end_row in file_ranges:
             n_rows = end_row - start_row
-            lazy_df = pl.scan_parquet(file).slice(start_row, n_rows)
-            lazy_frames.append(lazy_df)
+            lazy_df = pl.read_parquet(file).slice(start_row, n_rows)
+            frames.append(lazy_df)
 
-        return pl.concat(lazy_frames).collect()
+        return pl.concat(frames)
 
     @staticmethod
     def _file_ranges(

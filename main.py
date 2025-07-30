@@ -27,17 +27,21 @@ def main(config: DictConfig):
 
     tracemalloc.start()
 
-    train_dataset = DummyDataset(
+    train_dataset = BaiduULTRDataset(
         path=path,
-        session_range=(0, 1_200_000_000),
+        session_range=(0, 1_000_000_000),
     )
-    val_dataset = DummyDataset(
+    current, peak = tracemalloc.get_traced_memory()
+    print(f"0 Current memory usage: {current / 1024 / 1024:.1f} MB")
+    print(f"0 Peak memory usage: {peak / 1024 / 1024:.1f} MB")
+
+    val_dataset = BaiduULTRDataset(
         path=path,
-        session_range=(100_000_000, 120_000_000),
+        session_range=(1_000_000_000, 1_100_000_000),
     )
-    test_dataset = DummyDataset(
+    test_dataset = BaiduULTRDataset(
         path=path,
-        session_range=(120_000_000, 140_000_000),
+        session_range=(1_100_000_000, 1_200_000_000),
     )
 
     current, peak = tracemalloc.get_traced_memory()

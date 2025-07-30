@@ -26,15 +26,15 @@ def main(config: DictConfig):
     )
     ctx = mp.get_context("spawn")
 
-    train_dataset = DummyDataset(
+    train_dataset = BaiduULTRDataset(
         path=path,
         session_range=(0, 10_000_000),
     )
-    val_dataset = DummyDataset(
+    val_dataset = BaiduULTRDataset(
         path=path,
         session_range=(10_000_000, 12_000_000),
     )
-    test_dataset = DummyDataset(
+    test_dataset = BaiduULTRDataset(
         path=path,
         session_range=(12_000_000, 14_000_000),
     )

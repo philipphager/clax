@@ -7,7 +7,7 @@ import pyarrow.parquet as pq
 import torch
 from torch.utils.data import IterableDataset
 
-from clax_datasets.utils import SessionCollator
+from clax.datasets.utils import SessionCollator
 
 FileRangeTuple = Tuple[Path, int, int]
 
@@ -58,7 +58,6 @@ class ParquetDataset(IterableDataset):
 
     def __iter__(self):
         file_ranges = self._get_local_file_ranges()
-        print(f"Init with file ranges: {file_ranges}")
 
         for file_path, begin_row, end_row in file_ranges:
             parquet_file = pq.ParquetFile(file_path)

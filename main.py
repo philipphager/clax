@@ -28,22 +28,22 @@ def main(config: DictConfig):
 
     train_dataset = DummyDataset(
         path=path,
-        session_range=(0, 100_000_000),
+        session_range=(0, 10_000_000),
     )
     val_dataset = DummyDataset(
         path=path,
-        session_range=(100_000_000, 110_000_000),
+        session_range=(10_000_000, 12_000_000),
     )
     test_dataset = DummyDataset(
         path=path,
-        session_range=(110_000_000, 120_000_000),
+        session_range=(12_000_000, 14_000_000),
     )
 
     train_loader = DataLoader(
         train_dataset,
         batch_size=config.train_batch_size,
         collate_fn=train_dataset.collate_fn,
-        num_workers=8,
+        num_workers=6,
         persistent_workers=True,
         multiprocessing_context=ctx,
     )

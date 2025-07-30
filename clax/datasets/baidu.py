@@ -15,7 +15,7 @@ FileRangeTuple = Tuple[Path, int, int]
 class ParquetDataset(IterableDataset):
     def __init__(
         self,
-        path: Union[List[Union[Path, str]], Union[Path, str]],
+        source: Union[List[Union[Path, str]], Union[Path, str]],
         session_range: Tuple[int, int],
         max_positions: int = 10,
         file_glob: str = "*.parquet",
@@ -30,7 +30,7 @@ class ParquetDataset(IterableDataset):
         workers, ensuring each worker processes a unique subset of the files and
         session ranges.
         """
-        files = self._find_files(path, file_glob)
+        files = self._find_files(source, file_glob)
         self.file_ranges = self._file_ranges(files, session_range)
         self.max_positions = max_positions
         self.collate_fn = SessionCollator(
@@ -131,7 +131,7 @@ class ParquetDataset(IterableDataset):
 
     @staticmethod
     def _find_files(
-        paths: Union[List[Path], Path, str],
+        source: Union[List[Path], Path, str],
         file_glob: Optional[str] = None,
     ) -> List[Path]:
         """
@@ -139,17 +139,17 @@ class ParquetDataset(IterableDataset):
         the method searches for files with glob(file_glob). The resulting list of
         paths is sorted alphabetically.
         """
-        if isinstance(paths, list):
-            out_paths = [Path(p) for p in paths]
+        if isinstance(source, list):
+            paths = [Path(p) for p in source]
         else:
-            path = Path(paths)
-            out_paths = list(path.glob(file_glob)) if path.is_dir() else [paths]
+            path = Path(source)
+            paths = list(path.glob(file_glob)) if path.is_dir() else [path]
 
-        for path in out_paths:
+        for path in paths:
             if not path.exists():
                 raise FileNotFoundError(f"No such file: '{path}'")
 
-        return sorted(out_paths)
+        return sorted(paths)
 
     @staticmethod
     def _file_ranges(

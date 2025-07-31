@@ -3,16 +3,12 @@ from time import perf_counter
 
 import hydra
 import optax
-import torch.multiprocessing as mp
 from flax import nnx
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
-from clax.datasets import ParquetDataset
 from clax.trainer import Trainer
-
-OmegaConf.register_new_resolver("eval", eval)
 
 
 @hydra.main(version_base="1.3", config_path="clax/config/", config_name="config")
@@ -20,20 +16,9 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
-    path = Path("clax-datasets/yandex")
-
-    train_dataset = ParquetDataset(
-        source=path,
-        session_range=(0, 100_000_000),
-    )
-    val_dataset = ParquetDataset(
-        source=path,
-        session_range=(100_000_000, 120_000_000),
-    )
-    test_dataset = ParquetDataset(
-        source=path,
-        session_range=(120_000_000, 140_000_000),
-    )
+    train_dataset = instantiate(config.dataset, session_range=config.train_sessions)
+    val_dataset = instantiate(config.dataset, session_range=config.val_sessions)
+    test_dataset = instantiate(config.dataset, session_range=config.test_sessions)
 
     train_loader = DataLoader(
         train_dataset,

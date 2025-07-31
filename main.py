@@ -1,3 +1,4 @@
+import pandas as pd
 from pathlib import Path
 from time import perf_counter
 
@@ -16,9 +17,26 @@ def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)
 
+    filter_query_ids = None
     train_dataset = instantiate(config.dataset, session_range=config.train_sessions)
-    val_dataset = instantiate(config.dataset, session_range=config.val_sessions)
-    test_dataset = instantiate(config.dataset, session_range=config.test_sessions)
+
+    if config.eval_train_queries_only:
+        filter_query_ids = train_dataset.unique_query_ids()
+        print(
+            f"Filtering val/test datasets to {len(filter_query_ids):_} "
+            f"unique train queries"
+        )
+
+    val_dataset = instantiate(
+        config.dataset,
+        session_range=config.val_sessions,
+        filter_query_ids=filter_query_ids,
+    )
+    test_dataset = instantiate(
+        config.dataset,
+        session_range=config.test_sessions,
+        filter_query_ids=filter_query_ids,
+    )
 
     train_loader = DataLoader(
         train_dataset,

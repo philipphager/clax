@@ -12,8 +12,11 @@ random_state: 42
 # To be overwritten by specific datasets:
 dataset_dir: clax-datasets
 query_doc_pairs: ???
-total_sessions: ???
+train_sessions: ???
+val_sessions: ???
+test_sessions: ???
 
+eval_train_queries_only: False
 train_batch_size: 512
 eval_batch_size: 512
 positions: 10

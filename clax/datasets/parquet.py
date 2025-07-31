@@ -206,3 +206,36 @@ class ParquetDataset(IterableDataset):
             total_sessions += num_sessions
 
         return file_ranges
+
+    def unique_query_ids(self) -> Set[int]:
+        file_ranges = self.file_ranges
+        unique_query_ids = set()
+
+        for path, begin_row, end_row in file_ranges:
+            file = pq.ParquetFile(path)
+            has_query_id = "query_id" in file.schema_arrow.names
+            rows_processed = 0
+
+            if self.filter_query_ids and not has_query_id:
+                raise ValueError(
+                    "A set of query ids was provided for filtering sessions, "
+                    "but the file does not contain a 'query_id' column."
+                )
+
+            for batch in file.iter_batches():
+                batch_size = len(batch)
+                overlap_begin = max(0, begin_row - rows_processed)
+                overlap_end = min(batch_size, end_row - rows_processed)
+
+                if overlap_begin < overlap_end:
+                    query_ids = batch["query_id"].to_numpy(zero_copy_only=False)
+                    unique_query_ids.update(query_ids[overlap_begin:overlap_end])
+
+                rows_processed += batch_size
+
+                if rows_processed >= end_row:
+                    # Reached the end of the current file range that should be parsed,
+                    # Break to skip to the next file.
+                    break
+
+        return unique_query_ids

@@ -1,0 +1,12 @@
+# @package _global_
+
+dataset:
+  _target_: clax.datasets.ParquetDataset
+  source: "${dataset_dir}/yandex"
+  max_positions: 10
+
+query_doc_pairs: 130_000_000
+
+train_sessions: [0, 102_395_177] # 70%
+val_sessions: [102_395_177, 124_337_000] # 15%
+test_sessions: [124_337_000, 146_278_823] # 15%

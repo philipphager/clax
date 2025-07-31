@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Optional, Any
 
@@ -13,15 +14,18 @@ class MetricState(Variable):
     pass
 
 
-class Metric(Object):
-    def reset(self) -> None:
-        raise NotImplementedError("Must override `reset()` method.")
+class Metric(Object, ABC):
+    @abstractmethod
+    def reset(self):
+        pass
 
-    def update(self, **kwargs) -> None:
-        raise NotImplementedError("Must override `update()` method.")
+    @abstractmethod
+    def update(self, **kwargs):
+        pass
 
+    @abstractmethod
     def compute(self):
-        raise NotImplementedError("Must override `compute()` method.")
+        pass
 
 
 class MultiMetric(Metric):
@@ -74,18 +78,22 @@ class Average(Metric):
         self.count.value += 1 if isinstance(values, (int, float)) else values.size
 
     def compute(self) -> Array:
-        return self.total.value / self.count.value
+        return self.total.value / self.count.value.clip(1)
 
 
-class RankBasedAverage(Metric):
-    def __init__(self, positions: int = 10):
-        self.positions = positions
+class RankBasedAverage(Metric, ABC):
+    def __init__(self, max_positions: int = 100):
+        self.max_positions = max_positions
         self.values_per_rank = nnx.metrics.MetricState(
-            jnp.zeros(self.positions, dtype=jnp.float32)
+            jnp.zeros(self.max_positions, dtype=jnp.float32)
         )
         self.counts_per_rank = nnx.metrics.MetricState(
-            jnp.zeros(self.positions, dtype=jnp.int32)
+            jnp.zeros(self.max_positions, dtype=jnp.int32)
         )
+
+    @abstractmethod
+    def update(self, **kwargs):
+        pass
 
     def update_values(
         self,
@@ -93,23 +101,37 @@ class RankBasedAverage(Metric):
         *,
         where: Optional[Array] = None,
     ):
-        if where is None:
-            where = jnp.ones_like(values)
+        n_batch, n_positions = values.shape
 
-        self.values_per_rank.value += values.sum(axis=0, where=where)
-        self.counts_per_rank.value += where.sum(axis=0)
+        if where is None:
+            where = jnp.ones((n_batch, n_positions))
+
+        self.values_per_rank.value = self.values_per_rank.value.at[:n_positions].add(
+            values.sum(axis=0, where=where)
+        )
+        self.counts_per_rank.value = self.counts_per_rank.value.at[:n_positions].add(
+            where.sum(axis=0)
+        )
 
     def reset(self):
-        self.values_per_rank.value = jnp.zeros(self.positions, dtype=jnp.float32)
-        self.counts_per_rank.value = jnp.zeros(self.positions, dtype=jnp.float32)
+        self.values_per_rank.value = jnp.zeros(self.max_positions, dtype=jnp.float32)
+        self.counts_per_rank.value = jnp.zeros(self.max_positions, dtype=jnp.int32)
 
     def compute(self):
-        value = self.values_per_rank.value.sum()
-        count = self.counts_per_rank.value.sum()
+        # Ignore positions with no observations:
+        where = self.counts_per_rank.value > 0
+
+        value = self.values_per_rank.value[where].sum()
+        count = self.counts_per_rank.value[where].sum()
         return value / count.clip(min=1)
 
     def compute_per_rank(self):
-        return self.values_per_rank.value / self.counts_per_rank.value.clip(min=1)
+        # Do not return positions with no observations:
+        where = self.counts_per_rank.value > 0
+
+        values = self.values_per_rank.value[where]
+        counts = self.counts_per_rank.value[where]
+        return values / counts.clip(min=1)
 
 
 class LogLikelihood(RankBasedAverage):
@@ -145,7 +167,7 @@ class ConditionalPerplexity(RankBasedAverage):
         super().update_values(log_likelihood, where=where)
 
     def compute(self):
-        # Avg. cond. perplexity is calculated over all ranks
+        # Avg. cond. perplexity is the mean over ranks:
         return self.compute_per_rank().mean()
 
     def compute_per_rank(self):
@@ -169,7 +191,7 @@ class Perplexity(RankBasedAverage):
         super().update_values(log_likelihood, where=where)
 
     def compute(self):
-        # Avg. perplexity is calculated over all ranks
+        # Avg. perplexity is the mean over ranks:
         return self.compute_per_rank().mean()
 
     def compute_per_rank(self):

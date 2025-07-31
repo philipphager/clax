@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Tuple, Union, Optional
+from typing import List, Tuple, Union, Optional, Set
 
 import numpy as np
 import pyarrow.dataset as ds
@@ -19,6 +19,7 @@ class ParquetDataset(IterableDataset):
         session_range: Tuple[int, int],
         max_positions: int = 10,
         file_glob: str = "*.parquet",
+        filter_query_ids: Optional[Set[int]] = None,
     ):
         """
         A PyTorch IterableDataset for CLAX datasets.
@@ -33,6 +34,7 @@ class ParquetDataset(IterableDataset):
         files = self._find_files(source, file_glob)
         self.file_ranges = self._file_ranges(files, session_range)
         self.max_positions = max_positions
+        self.filter_query_ids = filter_query_ids
         self.collate_fn = SessionCollator(
             query_features={
                 "n": np.int16,
@@ -61,6 +63,7 @@ class ParquetDataset(IterableDataset):
 
         for path, begin_row, end_row in file_ranges:
             file = pq.ParquetFile(path)
+            has_query_id = "query_id" in file.schema_arrow.names
             rows_processed = 0
 
             for batch in file.iter_batches():
@@ -73,8 +76,22 @@ class ParquetDataset(IterableDataset):
                         zero_copy_only=False
                     )
                     clicks_batch = batch["clicks"].to_numpy(zero_copy_only=False)
+                    skip_query_ids = None
+
+                    if self.filter_query_ids:
+                        assert has_query_id, (
+                            "A set of query ids was provided for filtering sessions, "
+                            "but the dataset does not contain a 'query_id' column."
+                        )
+                        skip_query_ids = [
+                            q not in self.filter_query_ids
+                            for q in batch["query_id"].to_pylist()
+                        ]
 
                     for i in range(overlap_begin, overlap_end):
+                        if skip_query_ids is not None and skip_query_ids[i]:
+                            continue
+
                         query_doc_ids = query_doc_ids_batch[i]
                         clicks = clicks_batch[i]
                         n = min(len(query_doc_ids), self.max_positions)

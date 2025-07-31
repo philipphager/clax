@@ -63,9 +63,9 @@ class ParquetDataset(IterableDataset):
 
         for path, begin_row, end_row in file_ranges:
             file = pq.ParquetFile(path)
+            has_query_id = "query_id" in file.schema_arrow.names
             rows_processed = 0
 
-            has_query_id = "query_id" in file.schema_arrow.names
             if self.filter_query_ids and not has_query_id:
                 raise ValueError(
                     "A set of query ids was provided for filtering sessions, "
@@ -82,11 +82,11 @@ class ParquetDataset(IterableDataset):
                         zero_copy_only=False
                     )
                     clicks_batch = batch["clicks"].to_numpy(zero_copy_only=False)
-
-                    query_ids = None
-
-                    if self.filter_query_ids:
-                        query_ids = batch["query_id"].to_numpy(zero_copy_only=False)
+                    query_ids = (
+                        batch["query_id"].to_numpy(zero_copy_only=False)
+                        if self.filter_query_ids
+                        else None
+                    )
 
                     for i in range(overlap_begin, overlap_end):
                         if (

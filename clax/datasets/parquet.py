@@ -186,8 +186,8 @@ class ParquetDataset(IterableDataset):
         total_sessions = 0
 
         for file in sorted(files):
-            dataset = ds.dataset(file)
-            num_sessions = dataset.count_rows()
+            file_metadata = pq.read_metadata(file)
+            num_sessions = file_metadata.num_rows
 
             file_begin = total_sessions
             file_end = total_sessions + num_sessions

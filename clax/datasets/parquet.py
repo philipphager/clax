@@ -63,8 +63,14 @@ class ParquetDataset(IterableDataset):
 
         for path, begin_row, end_row in file_ranges:
             file = pq.ParquetFile(path)
-            has_query_id = "query_id" in file.schema_arrow.names
             rows_processed = 0
+
+            has_query_id = "query_id" in file.schema_arrow.names
+            if self.filter_query_ids and not has_query_id:
+                raise ValueError(
+                    "A set of query ids was provided for filtering sessions, "
+                    "but the file does not contain a 'query_id' column."
+                )
 
             for batch in file.iter_batches():
                 batch_size = len(batch)
@@ -76,20 +82,18 @@ class ParquetDataset(IterableDataset):
                         zero_copy_only=False
                     )
                     clicks_batch = batch["clicks"].to_numpy(zero_copy_only=False)
-                    skip_query_ids = None
+
+                    query_ids = None
 
                     if self.filter_query_ids:
-                        assert has_query_id, (
-                            "A set of query ids was provided for filtering sessions, "
-                            "but the dataset does not contain a 'query_id' column."
-                        )
-                        skip_query_ids = [
-                            q not in self.filter_query_ids
-                            for q in batch["query_id"].to_pylist()
-                        ]
+                        query_ids = batch["query_id"].to_numpy(zero_copy_only=False)
 
                     for i in range(overlap_begin, overlap_end):
-                        if skip_query_ids is not None and skip_query_ids[i]:
+                        if (
+                            self.filter_query_ids
+                            and query_ids[i] not in self.filter_query_ids
+                        ):
+                            # Skip user session as its query_id is not in the provided set.
                             continue
 
                         query_doc_ids = query_doc_ids_batch[i]

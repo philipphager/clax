@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - dataset/baidu-ultr
+  - dataset/yandex
   - parameter/examination: position
   - parameter/attraction: embedding/robe-d
   - parameter/satisfaction: embedding/robe-d

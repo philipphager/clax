@@ -38,13 +38,13 @@ class MixtureModel(ClickModel):
 
     def _get_posterior_log_probs(self, batch: Dict) -> Array:
         prior_log_probs = self._get_prior_log_probs()
-        session_loss_per_model = self._get_session_loss_per_model(batch)
+        session_loss_per_model = self._get_session_nll_per_model(batch)
         return -self.inverse_temperature * session_loss_per_model + prior_log_probs
 
     def _get_prior_log_probs(self) -> Array:
         return jax.nn.log_softmax(self.model_prior_logits.value)
 
-    def _get_session_loss_per_model(self, batch: Dict) -> Array:
+    def _get_session_nll_per_model(self, batch: Dict) -> Array:
         n_batch = batch["clicks"].shape[0]
         session_loss_per_model = jnp.zeros((n_batch, self.num_models))
 
@@ -95,7 +95,7 @@ class MixtureModel(ClickModel):
         return click_log_probs
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
-        session_ll_per_model = -self._get_session_loss_per_model(batch)
+        session_ll_per_model = -self._get_session_nll_per_model(batch)
         prior_log_probs = self._get_prior_log_probs()
 
         # Compute log-posterior for each model given the observed sessions,

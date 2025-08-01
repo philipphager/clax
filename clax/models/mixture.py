@@ -50,7 +50,7 @@ class MixtureModel(ClickModel):
 
         for i, model in enumerate(self.models):
             nll = model.compute_loss(batch, aggregate=False)
-            session_loss = jnp.sum(nll, axis=-1)
+            session_loss = jnp.sum(nll, where=batch["mask"], axis=-1)
             session_loss_per_model = session_loss_per_model.at[:, i].set(session_loss)
 
         return session_loss_per_model

@@ -68,7 +68,7 @@ class ClickChainModel(nnx.Module):
         self.continuation_click_satisfied = GlobalParameter(rngs=rngs)
         self.continuation_click_not_satisfied = GlobalParameter(rngs=rngs)
 
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
         return binary_cross_entropy(
@@ -76,6 +76,7 @@ class ClickChainModel(nnx.Module):
             y_true,
             where=batch["mask"],
             log_probs=True,
+            aggregate=aggregate,
         )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:

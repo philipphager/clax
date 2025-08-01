@@ -41,7 +41,7 @@ class GlobalCTRModel(nnx.Module):
         super().__init__()
         self.ctr = GlobalParameter(rngs=rngs)
 
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
         return binary_cross_entropy(
@@ -49,6 +49,7 @@ class GlobalCTRModel(nnx.Module):
             y_true,
             where=batch["mask"],
             log_probs=True,
+            aggregate=aggregate,
         )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
@@ -96,7 +97,7 @@ class RankCTRModel(nnx.Module):
         exam_config = examination_config or default_examination_config(positions)
         self.ctr = build_parameter(exam_config, rngs=rngs)
 
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
         return binary_cross_entropy(
@@ -104,6 +105,7 @@ class RankCTRModel(nnx.Module):
             y_true,
             where=batch["mask"],
             log_probs=True,
+            aggregate=aggregate,
         )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
@@ -148,7 +150,7 @@ class DocumentCTRModel(nnx.Module):
         attr_config = attraction_config or default_attraction_config(query_doc_pairs)
         self.ctr = build_parameter(attr_config, rngs=rngs)
 
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
         return binary_cross_entropy(
@@ -156,6 +158,7 @@ class DocumentCTRModel(nnx.Module):
             y_true,
             where=batch["mask"],
             log_probs=True,
+            aggregate=aggregate,
         )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:
@@ -165,7 +168,7 @@ class DocumentCTRModel(nnx.Module):
     def predict_clicks(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
-    def sample_clicks(self, batch: Dict, rngs: nnx.Rngs) -> Array:
+    def sample(self, batch: Dict, rngs: nnx.Rngs) -> Array:
         click_probs = self.ctr.prob(batch)
         clicks = batch["mask"] & jax.random.bernoulli(rngs(), click_probs)
         return CTRModelOutput(clicks=clicks)
@@ -208,7 +211,7 @@ class DocumentRankCTRModel(nnx.Module):
             rngs=rngs,
         )
 
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
         return binary_cross_entropy(
@@ -216,6 +219,7 @@ class DocumentRankCTRModel(nnx.Module):
             y_true,
             where=batch["mask"],
             log_probs=True,
+            aggregate=aggregate,
         )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:

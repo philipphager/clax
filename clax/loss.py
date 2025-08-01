@@ -1,6 +1,7 @@
 import jax.numpy as jnp
-from clax.utils.math import log1mexp
 from jax import Array
+
+from clax.utils.math import log1mexp
 
 
 def binary_cross_entropy(
@@ -8,6 +9,7 @@ def binary_cross_entropy(
     y_true: Array,
     where: Array,
     log_probs: bool = False,
+    aggregate: bool = True,
 ):
     if log_probs:
         p_click = y_predict
@@ -17,4 +19,9 @@ def binary_cross_entropy(
         p_no_click = jnp.log1p(-1.0 * y_predict)
 
     loss = -y_true * p_click - (1 - y_true) * p_no_click
-    return loss.mean(where=where, axis=-1)
+
+    if aggregate:
+        return loss.mean(where=where, axis=-1)
+    else:
+        loss = jnp.where(where, loss, 0)
+        return loss

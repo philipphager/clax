@@ -50,7 +50,7 @@ class CascadeModel(nnx.Module):
         attr_config = attraction_config or default_attraction_config(query_doc_pairs)
         self.attraction = build_parameter(attr_config, rngs)
 
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
 
@@ -59,6 +59,7 @@ class CascadeModel(nnx.Module):
             y_true,
             where=batch["mask"],
             log_probs=True,
+            aggregate=aggregate,
         )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:

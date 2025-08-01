@@ -69,7 +69,7 @@ class DynamicBayesianNetwork(nnx.Module):
         self.name = "SDBN" if fix_continuation else "DBN"
         self.continuation = GlobalParameter(rngs=rngs)
 
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
         return binary_cross_entropy(
@@ -77,6 +77,7 @@ class DynamicBayesianNetwork(nnx.Module):
             y_true,
             where=batch["mask"],
             log_probs=True,
+            aggregate=aggregate,
         )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:

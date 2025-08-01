@@ -58,7 +58,7 @@ class UserBrowsingModel(nnx.Module):
         self.examination = build_parameter(exam_config, rngs)
         self.attraction = build_parameter(attr_config, rngs)
 
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
         return binary_cross_entropy(
@@ -66,6 +66,7 @@ class UserBrowsingModel(nnx.Module):
             y_true,
             where=batch["mask"],
             log_probs=True,
+            aggregate=aggregate,
         )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:

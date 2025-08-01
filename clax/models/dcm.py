@@ -68,7 +68,7 @@ class DependentClickModel(nnx.Module):
         self.attraction = build_parameter(attr_config, rngs)
         self.continuation = build_parameter(cont_config, rngs)
 
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
         y_predict = self.predict_conditional_clicks(batch)
         return binary_cross_entropy(
@@ -76,6 +76,7 @@ class DependentClickModel(nnx.Module):
             y_true,
             where=batch["mask"],
             log_probs=True,
+            aggregate=aggregate,
         )
 
     def predict_conditional_clicks(self, batch: Dict) -> Array:

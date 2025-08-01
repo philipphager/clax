@@ -7,7 +7,7 @@ from jax import Array
 
 class ClickModel(nnx.Module, ABC):
     @abstractmethod
-    def compute_loss(self, batch: Dict):
+    def compute_loss(self, batch: Dict, aggregate: bool = True):
         pass
 
     @abstractmethod

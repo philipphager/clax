@@ -23,7 +23,7 @@ class EmbeddingParameterConfig(ParameterConfig):
     use_feature: str
     parameters: int
     embedding_features: int = 1
-    add_baseline: bool = False
+    add_baseline: bool = True
     has_padding: bool = True
     embedding_fn: Callable = FullEmbedding
     baseline_init: Initializer = initializers.ones

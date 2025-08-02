@@ -9,6 +9,8 @@ from clax.parameters import (
     EmbeddingParameterConfig,
     ParameterConfig,
     FullEmbedding,
+    init_parameter,
+    Parameter,
 )
 from clax.parameters.defaults import (
     default_examination_config,
@@ -89,13 +91,18 @@ class RankCTRModel(nnx.Module):
     def __init__(
         self,
         positions: Optional[int] = None,
-        examination_config: Optional[ParameterConfig] = None,
+        ctr: Optional[Parameter | ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        exam_config = examination_config or default_examination_config(positions)
-        self.ctr = build_parameter(exam_config, rngs=rngs)
+        self.ctr = init_parameter(
+            "ctr",
+            ctr,
+            default_config_fn=default_examination_config,
+            default_config_args={"positions": positions},
+            rngs=rngs,
+        )
 
     def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]
@@ -142,13 +149,18 @@ class DocumentCTRModel(nnx.Module):
     def __init__(
         self,
         query_doc_pairs: Optional[int] = None,
-        attraction_config: Optional[ParameterConfig] = None,
+        ctr: Optional[Parameter | ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
-        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
-        self.ctr = build_parameter(attr_config, rngs=rngs)
+        self.ctr = init_parameter(
+            "ctr",
+            ctr,
+            default_config_fn=default_attraction_config,
+            default_config_args={"query_doc_pairs": query_doc_pairs},
+            rngs=rngs,
+        )
 
     def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]

@@ -2,13 +2,14 @@ from typing import Dict, Optional
 
 import jax
 import jax.numpy as jnp
-from clax.loss import binary_cross_entropy
-from clax.parameters import ParameterConfig, build_parameter
-from clax.parameters.defaults import default_attraction_config
-from clax.utils.math import logits_to_log_probs, logits_to_complement_log_probs
 from flax import nnx
 from flax import struct
 from jax import Array
+
+from clax.loss import binary_cross_entropy
+from clax.parameters import ParameterConfig, init_parameter, Parameter
+from clax.parameters.defaults import default_attraction_config
+from clax.utils.math import logits_to_log_probs, logits_to_complement_log_probs
 
 
 @struct.dataclass
@@ -41,14 +42,19 @@ class CascadeModel(nnx.Module):
     def __init__(
         self,
         query_doc_pairs: Optional[int] = None,
-        attraction_config: Optional[ParameterConfig] = None,
+        attraction: Optional[Parameter | ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
 
-        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
-        self.attraction = build_parameter(attr_config, rngs)
+        self.attraction = init_parameter(
+            "attraction",
+            attraction,
+            default_config_fn=default_attraction_config,
+            default_config_args={"query_doc_pairs": query_doc_pairs},
+            rngs=rngs,
+        )
 
     def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]

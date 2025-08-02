@@ -7,6 +7,8 @@ from clax.parameters import (
     ParameterConfig,
     build_parameter,
     GlobalParameter,
+    init_parameter,
+    Parameter,
 )
 from clax.parameters.defaults import default_attraction_config
 from clax.utils.math import (
@@ -52,16 +54,19 @@ class ClickChainModel(nnx.Module):
     def __init__(
         self,
         query_doc_pairs: Optional[int] = None,
-        attraction_config: Optional[ParameterConfig] = None,
+        attraction: Optional[Parameter | ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
 
-        # The CCM models attraction and satisfaction as the same variable:
-        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
-        self.attraction = build_parameter(attr_config, rngs)
-
+        self.attraction = init_parameter(
+            "attraction",
+            attraction,
+            default_config_fn=default_attraction_config,
+            default_config_args={"query_doc_pairs": query_doc_pairs},
+            rngs=rngs,
+        )
         # Continuation are global variables that don't depend on features.
         # These might be configurable in future versions if useful:
         self.continuation_exam_no_click = GlobalParameter(rngs=rngs)

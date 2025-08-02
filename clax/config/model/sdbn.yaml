@@ -1,5 +1,5 @@
 _target_: clax.models.DynamicBayesianNetwork
 _partial_: true
-attraction_config: ${parameter.attraction}
-satisfaction_config: ${parameter.satisfaction}
+attraction: ${parameter.attraction}
+satisfaction: ${parameter.satisfaction}
 fix_continuation: True

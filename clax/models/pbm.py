@@ -2,16 +2,17 @@ from typing import Dict, Optional
 
 import jax
 import jax.numpy as jnp
+from flax import nnx
+from flax import struct
+from jax import Array
+
 from clax.loss import binary_cross_entropy
 from clax.models.base import ClickModel
-from clax.parameters import ParameterConfig, build_parameter
+from clax.parameters import ParameterConfig, Parameter, init_parameter
 from clax.parameters.defaults import (
     default_examination_config,
     default_attraction_config,
 )
-from flax import nnx
-from flax import struct
-from jax import Array
 
 
 @struct.dataclass
@@ -28,17 +29,27 @@ class PositionBasedModel(ClickModel):
         self,
         positions: Optional[int] = None,
         query_doc_pairs: Optional[int] = None,
-        examination_config: Optional[ParameterConfig] = None,
-        attraction_config: Optional[ParameterConfig] = None,
+        examination: Optional[Parameter | ParameterConfig] = None,
+        attraction: Optional[Parameter | ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
 
-        exam_config = examination_config or default_examination_config(positions)
-        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
-        self.examination = build_parameter(exam_config, rngs)
-        self.attraction = build_parameter(attr_config, rngs)
+        self.examination = init_parameter(
+            "examination",
+            examination,
+            default_config_fn=default_examination_config,
+            default_config_args={"positions": positions},
+            rngs=rngs,
+        )
+        self.attraction = init_parameter(
+            "attraction",
+            attraction,
+            default_config_fn=default_attraction_config,
+            default_config_args={"query_doc_pairs": query_doc_pairs},
+            rngs=rngs,
+        )
 
     def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]

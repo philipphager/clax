@@ -1,4 +1,4 @@
 _target_: clax.models.PositionBasedModel
 _partial_: true
-examination_config: ${parameter.examination}
-attraction_config: ${parameter.attraction}
+examination: ${parameter.examination}
+attraction: ${parameter.attraction}

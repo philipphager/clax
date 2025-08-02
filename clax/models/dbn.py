@@ -7,6 +7,8 @@ from clax.parameters import (
     ParameterConfig,
     build_parameter,
     GlobalParameter,
+    init_parameter,
+    Parameter,
 )
 from clax.parameters.defaults import (
     default_attraction_config,
@@ -52,18 +54,28 @@ class DynamicBayesianNetwork(nnx.Module):
     def __init__(
         self,
         query_doc_pairs: Optional[int] = None,
-        attraction_config: Optional[ParameterConfig] = None,
-        satisfaction_config: Optional[ParameterConfig] = None,
+        attraction: Optional[Parameter | ParameterConfig] = None,
+        satisfaction: Optional[Parameter | ParameterConfig] = None,
         fix_continuation: bool = False,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
 
-        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
-        sat_config = satisfaction_config or default_satisfaction_config(query_doc_pairs)
-        self.attraction = build_parameter(attr_config, rngs)
-        self.satisfaction = build_parameter(sat_config, rngs)
+        self.attraction = init_parameter(
+            "attraction",
+            attraction,
+            default_config_fn=default_attraction_config,
+            default_config_args={"query_doc_pairs": query_doc_pairs},
+            rngs=rngs,
+        )
+        self.satisfaction = init_parameter(
+            "satisfaction",
+            satisfaction,
+            default_config_fn=default_satisfaction_config,
+            default_config_args={"query_doc_pairs": query_doc_pairs},
+            rngs=rngs,
+        )
 
         self.fix_continuation = fix_continuation
         self.name = "SDBN" if fix_continuation else "DBN"

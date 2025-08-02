@@ -3,7 +3,7 @@ from typing import Dict, Optional
 import jax.numpy as jnp
 import jax.random
 from clax.loss import binary_cross_entropy
-from clax.parameters import ParameterConfig, build_parameter
+from clax.parameters import ParameterConfig, build_parameter, init_parameter, Parameter
 from clax.parameters.defaults import (
     default_continuation_config,
     default_attraction_config,
@@ -56,17 +56,27 @@ class DependentClickModel(nnx.Module):
         self,
         positions: Optional[int] = None,
         query_doc_pairs: Optional[int] = None,
-        attraction_config: Optional[ParameterConfig] = None,
-        continuation_config: Optional[ParameterConfig] = None,
+        attraction: Optional[Parameter | ParameterConfig] = None,
+        continuation: Optional[Parameter | ParameterConfig] = None,
         *,
         rngs: nnx.Rngs,
     ):
         super().__init__()
 
-        attr_config = attraction_config or default_attraction_config(query_doc_pairs)
-        cont_config = continuation_config or default_continuation_config(positions)
-        self.attraction = build_parameter(attr_config, rngs)
-        self.continuation = build_parameter(cont_config, rngs)
+        self.attraction = init_parameter(
+            "attraction",
+            attraction,
+            default_config_fn=default_attraction_config,
+            default_config_args={"query_doc_pairs": query_doc_pairs},
+            rngs=rngs,
+        )
+        self.continuation = init_parameter(
+            "continuation",
+            continuation,
+            default_config_fn=default_continuation_config,
+            default_config_args={"positions": positions},
+            rngs=rngs,
+        )
 
     def compute_loss(self, batch: Dict, aggregate: bool = True):
         y_true = batch["clicks"]

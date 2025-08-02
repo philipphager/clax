@@ -37,11 +37,13 @@ class MixtureModel(ClickModel):
         return loss
 
     def _get_posterior_log_probs(self, batch: Dict) -> Array:
+        """Compute the unnormalized log posterior"""
         prior_log_probs = self._get_prior_log_probs()
         session_loss_per_model = self._get_session_nll_per_model(batch)
         return -self.inverse_temperature * session_loss_per_model + prior_log_probs
 
     def _get_prior_log_probs(self) -> Array:
+        """Compute a learnable log prior probability"""
         return jax.nn.log_softmax(self.model_prior_logits.value)
 
     def _get_session_nll_per_model(self, batch: Dict) -> Array:

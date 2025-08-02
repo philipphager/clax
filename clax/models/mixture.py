@@ -98,15 +98,15 @@ class MixtureModel(ClickModel):
         session_ll_per_model = -self._get_session_nll_per_model(batch)
         prior_log_probs = self._get_prior_log_probs()
 
-        # Compute log-posterior for each model given the observed sessions,
+        # Compute log-posterior for each model given observed sessions:
         posterior_log_probs = jax.nn.log_softmax(
             prior_log_probs + session_ll_per_model, axis=-1
         )
 
-        # Shape: (batch, model) -> (batch, 1, models)
+        # Shape: (batch, models) -> (batch, 1, models)
         posterior_log_probs = jnp.expand_dims(posterior_log_probs, axis=1)
 
-        # Shape: (batch, positions, model)
+        # Shape: (batch, positions, models)
         click_log_probs_per_model = jnp.stack(
             [model.predict_conditional_clicks(batch) for model in self.models],
             axis=-1,

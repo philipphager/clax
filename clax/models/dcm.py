@@ -97,26 +97,14 @@ class DependentClickModel(nnx.Module):
         n_batch, n_positions = clicks.shape
         exam_log_probs = jnp.zeros((n_batch, n_positions))
 
-        # Compute examination probabilities based on observed clicks:
+        # Compute examination probabilities based on click history:
         for idx in range(n_positions - 1):
-            # Current examination probability
-            current_exam = exam_log_probs[:, idx]
-            attr_prob = log_probs["attr"][:, idx]
-
-            # For clicked documents: next examination = continuation probability
             exam_after_click = log_probs["cont"][:, idx]
-
-            # For non-clicked documents: use Bayes' rule
-            # P(E_{r+1} | C_r = 0) = P(E_r) * (1 - α_r) / P(C_r = 0)
-            # where P(C_r = 0) = 1 - P(E_r) * α_r
-            click_prob_log = current_exam + attr_prob  # log P(C_r = 1)
-            no_click_prob_log = log1mexp(click_prob_log)  # log P(C_r = 0)
-
-            # P(E_{r+1} | C_r = 0) = P(E_r) * (1 - α_r) / P(C_r = 0)
-            exam_after_no_click = (
-                current_exam + log_probs["non_attr"][:, idx] - no_click_prob_log
+            exam_after_no_click = self._log_examination_after_no_click(
+                current_exam_log_prob=exam_log_probs[:, idx],
+                attraction_log_prob=log_probs["attr"][:, idx],
+                non_attraction_log_prob=log_probs["non_attr"][:, idx],
             )
-
             exam_log_probs = exam_log_probs.at[:, idx + 1].set(
                 jnp.where(
                     clicks[:, idx],

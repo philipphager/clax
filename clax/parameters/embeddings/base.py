@@ -45,10 +45,9 @@ class EmbeddingParameter(Parameter):
             config.parameters + 1 if config.has_padding else config.parameters
         )
         self.baseline = nnx.Param(config.baseline_init(rngs.params(), (1,)))
-        self.embeddings = config.embedding_fn(
+        self.embeddings = nnx.Embed(
             num_embeddings=num_embeddings,
             features=config.embedding_features,
-            embedding_init=config.embedding_init,
             rngs=rngs,
         )
 

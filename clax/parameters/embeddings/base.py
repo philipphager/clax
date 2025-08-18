@@ -23,7 +23,7 @@ class EmbeddingParameterConfig(ParameterConfig):
     use_feature: str
     parameters: int
     embedding_features: int = 1
-    add_baseline: bool = True
+    add_baseline: bool = False
     has_padding: bool = True
     embedding_fn: Callable = FullEmbedding
     baseline_init: Initializer = initializers.ones
@@ -48,7 +48,7 @@ class EmbeddingParameter(Parameter):
         self.embeddings = config.embedding_fn(
             num_embeddings=num_embeddings,
             features=config.embedding_features,
-            embedding_init=config.embedding_init,
+            # embedding_init=config.embedding_init,
             rngs=rngs,
         )
 

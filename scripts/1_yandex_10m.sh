@@ -7,7 +7,7 @@ python main.py -m \
   train_sessions=[0,10_000_000] \
   val_sessions=[10_000_000,15_000_000] \
   test_sessions=[15_000_000,20_000_000] \
-  eval_train_queries_only=True \
+  min_train_sessions_per_eval_query=10 \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \
   random_state=1 \
@@ -20,7 +20,7 @@ python main.py -m \
   train_sessions=[10_000_000,20_000_000] \
   val_sessions=[20_000_000,25_000_000] \
   test_sessions=[25_000_000,30_000_000] \
-  eval_train_queries_only=True \
+  min_train_sessions_per_eval_query=10 \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \
   random_state=2 \
@@ -33,7 +33,7 @@ python main.py -m \
   train_sessions=[20_000_000,30_000_000] \
   val_sessions=[30_000_000,35_000_000] \
   test_sessions=[35_000_000,40_000_000] \
-  eval_train_queries_only=True \
+  min_train_sessions_per_eval_query=10 \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \
   random_state=3 \

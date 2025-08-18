@@ -16,7 +16,7 @@ train_sessions: ???
 val_sessions: ???
 test_sessions: ???
 
-min_train_sessions_per_eval_query: 10
+min_train_sessions_per_eval_query: 0
 train_batch_size: 512
 eval_batch_size: 512
 positions: 10

@@ -20,11 +20,13 @@ def main(config: DictConfig):
     filter_query_ids = None
     train_dataset = instantiate(config.dataset, session_range=config.train_sessions)
 
-    if config.eval_train_queries_only:
-        filter_query_ids = train_dataset.unique_query_ids()
+    if config.min_train_sessions_per_eval_query > 0:
+        filter_query_ids = train_dataset.unique_query_ids(
+            min_sessions=config.min_train_sessions_per_eval_query
+        )
         print(
-            f"Filtering val/test datasets to {len(filter_query_ids):_} "
-            f"unique train queries"
+            f"Filtering val/test datasets to {len(filter_query_ids):_} unique train "
+            f"queries with at least {config.min_train_sessions_per_eval_query} sessions."
         )
 
     val_dataset = instantiate(

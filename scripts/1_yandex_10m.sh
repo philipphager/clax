@@ -4,9 +4,9 @@ python main.py -m \
   experiment=1-yandex-10m/1/ \
   model='glob(*)' \
   dataset=yandex \
-  train_sessions=[0,10_000_000] \
-  val_sessions=[10_000_000,15_000_000] \
-  test_sessions=[15_000_000,20_000_000] \
+  train_sessions=[0,1_000_000] \
+  val_sessions=[1_000_000,2_000_000] \
+  test_sessions=[2_000_000,3_000_000] \
   min_train_sessions_per_eval_query=10 \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \

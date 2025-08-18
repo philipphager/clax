@@ -48,7 +48,7 @@ class EmbeddingParameter(Parameter):
         self.embeddings = config.embedding_fn(
             num_embeddings=num_embeddings,
             features=config.embedding_features,
-            embedding_init=config.embedding_init,
+            # embedding_init=config.embedding_init,
             rngs=rngs,
         )
 

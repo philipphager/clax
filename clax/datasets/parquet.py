@@ -1,3 +1,4 @@
+from collections import Counter
 from pathlib import Path
 from typing import List, Tuple, Union, Optional, Set
 
@@ -207,11 +208,10 @@ class ParquetDataset(IterableDataset):
 
         return file_ranges
 
-    def unique_query_ids(self) -> Set[int]:
-        file_ranges = self.file_ranges
-        unique_query_ids = set()
+    def unique_query_ids(self, min_sessions: int = 1) -> Set[int]:
+        query_counter = Counter()
 
-        for path, begin_row, end_row in file_ranges:
+        for path, begin_row, end_row in self.file_ranges:
             file = pq.ParquetFile(path)
             has_query_id = "query_id" in file.schema_arrow.names
             rows_processed = 0
@@ -229,7 +229,7 @@ class ParquetDataset(IterableDataset):
 
                 if overlap_begin < overlap_end:
                     query_ids = batch["query_id"].to_numpy(zero_copy_only=False)
-                    unique_query_ids.update(query_ids[overlap_begin:overlap_end])
+                    query_counter.update(query_ids[overlap_begin:overlap_end])
 
                 rows_processed += batch_size
 
@@ -238,4 +238,8 @@ class ParquetDataset(IterableDataset):
                     # Break to skip to the next file.
                     break
 
-        return unique_query_ids
+        return {
+            query_id
+            for query_id, count in query_counter.items()
+            if count >= min_sessions
+        }

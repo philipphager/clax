@@ -1,8 +1,8 @@
-import math
 from enum import Enum
 from typing import Union
 
 import jax.numpy as jnp
+import math
 from flax import nnx
 from flax.typing import Initializer
 

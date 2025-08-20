@@ -5,8 +5,8 @@ dataset:
   source: "${dataset_dir}/yandex"
   max_positions: 10
 
-query_doc_pairs: 130_000_000
+query_doc_pairs: 346_711_929
 
-train_sessions: [0, 100_000_000]
-val_sessions: [100_000_000, 123_000_000]
-test_sessions: [123_000_000, 146_000_000]
+train_sessions: [0,102_200_000] # 70%
+val_sessions: [102_200_000,124_100_000] # 15%
+test_sessions: [124_100_000,146_000_000] # 15%

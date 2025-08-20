@@ -1,4 +1,5 @@
 import glob
+import os
 
 import hydra
 import polars as pl
@@ -8,7 +9,8 @@ from omegaconf import DictConfig
 @hydra.main(version_base="1.3", config_path="clax/config/", config_name="config")
 def main(config: DictConfig):
     unique_ids = set()
-    files = glob.glob("/ivi/ilps/personal/phager/clax-datasets/baidu-ultr/*.parquet")
+    print(f"Current working directory: {os.getcwd()}")
+    files = glob.glob("/ivi/ilps/personal/phager/clax-datasets/baidu-ultr/*")
 
     print(f"Processing {len(files)} files...")
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 python main.py -m \
-  experiment=2-yandex-embeddings/full/1/ \
+  experiment=2-yandex-embeddings/full/ \
   model='glob(*)' \
   dataset=yandex \
   parameter/attraction=embedding/full \
@@ -10,7 +10,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/1/ \
+  experiment=2-yandex-embeddings/hash/ \
   model='glob(*)' \
   dataset=yandex \
   parameter/attraction=embedding/hash \
@@ -20,7 +20,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/1/ \
+  experiment=2-yandex-embeddings/qr/ \
   model='glob(*)' \
   dataset=yandex \
   parameter/attraction=embedding/qr \

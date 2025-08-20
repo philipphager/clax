@@ -8,7 +8,7 @@ def main(config: DictConfig):
     unique_count = (
         pl.scan_parquet("/ivi/ilps/personal/phager/clax-datasets/baidu-ultr/*.parquet")
         .select(pl.col("query_doc_ids").list.explode().unique().len())
-        .collect(streaming=True)  # Enable streaming mode
+        .collect(engine="streaming")  # Enable streaming mode
         .item()
     )
     print(unique_count)

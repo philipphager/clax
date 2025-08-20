@@ -21,6 +21,7 @@ multirun/
 *.csv
 *.txt
 *.parquet
+clax-datasets/
 
 # OS
 .DS_Store

@@ -2,7 +2,7 @@ import glob
 import os
 
 import hydra
-import polars as pl
+import pandas as pd
 from omegaconf import DictConfig
 
 
@@ -15,12 +15,9 @@ def main(config: DictConfig):
     print(f"Processing {len(files)} files...")
 
     for file in files:
-        df = pl.read_parquet(file)
-        file_ids = (
-            df.select(pl.col("query_doc_ids").list.explode()).to_series().to_list()
-        )
+        df = pd.read_parquet(file, columns=["query_doc_ids"])
+        unique_ids.update(df["query_doc_ids"].explode().to_list())
 
-        unique_ids.update(file_ids)
         print(
             f"Processed {file}: {len(df)} rows, running total: {len(unique_ids)} unique IDs"
         )

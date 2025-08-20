@@ -10,3 +10,4 @@ from .dbn import DynamicBayesianNetwork
 from .dcm import DependentClickModel
 from .pbm import PositionBasedModel
 from .ubm import UserBrowsingModel
+from .mixture import MixtureModel

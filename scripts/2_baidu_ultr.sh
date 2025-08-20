@@ -8,4 +8,5 @@
 #SBATCH --mail-type=BEGIN,END
 #SBATCH --mail-user=p.k.hager@uva.nl
 
+export PYTHONUNBUFFERED=TRUE
 python count.py

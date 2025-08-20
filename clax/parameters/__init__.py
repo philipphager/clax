@@ -2,7 +2,6 @@ from typing import Optional, Callable, Dict, Union
 
 from flax import nnx
 
-from .base import GlobalParameter, GlobalParameterConfig
 from .base import Parameter, ParameterConfig
 from .deep import DeepParameter, DeepParameterConfig
 from .embeddings import (
@@ -13,6 +12,7 @@ from .embeddings import (
     QREmbedding,
     RobeDEmbedding,
 )
+from .globals import GlobalParameter, GlobalParameterConfig
 from .linear import LinearParameter, LinearParameterConfig
 
 

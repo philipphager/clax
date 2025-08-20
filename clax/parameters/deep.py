@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from typing import Dict, Callable
 
-from clax.parameters import ParameterConfig, Parameter
 from flax import nnx
 from flax.nnx import rnglib
 from jax import Array
+
+from clax.parameters import ParameterConfig, Parameter
 
 
 @dataclass

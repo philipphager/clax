@@ -8,4 +8,4 @@
 #SBATCH --mail-type=BEGIN,END
 #SBATCH --mail-user=p.k.hager@uva.nl
 
-python count.py -m dataset=baidu-ultr
+python count.py

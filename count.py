@@ -15,12 +15,9 @@ def main(config: DictConfig):
     print(f"Processing {len(files)} files...")
 
     for file in files:
+        print(f"Processing {file}: running total: {len(unique_ids)} unique IDs")
         df = pd.read_parquet(file, columns=["query_doc_ids"])
         unique_ids.update(df["query_doc_ids"].explode().to_list())
-
-        print(
-            f"Processed {file}: {len(df)} rows, running total: {len(unique_ids)} unique IDs"
-        )
 
     print(len(unique_ids))
 

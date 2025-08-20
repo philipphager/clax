@@ -10,7 +10,7 @@ from omegaconf import DictConfig
 def main(config: DictConfig):
     unique_ids = set()
     print(f"Current working directory: {os.getcwd()}")
-    files = glob.glob("/ivi/ilps/personal/phager/clax-datasets/baidu-ultr/*")
+    files = sorted(glob.glob("/ivi/ilps/personal/phager/clax-datasets/baidu-ultr/*"))
 
     print(f"Processing {len(files)} files...")
 

@@ -8,7 +8,7 @@ from omegaconf import DictConfig
 @hydra.main(version_base="1.3", config_path="clax/config/", config_name="config")
 def main(config: DictConfig):
     unique_ids = set()
-    files = glob.glob("clax-datasets/baidu-ultr/*.parquet")
+    files = glob.glob("/ivi/ilps/personal/phager/clax-datasets/baidu-ultr/*.parquet")
 
     print(f"Processing {len(files)} files...")
 

@@ -2,8 +2,12 @@ from typing import Dict, Optional
 
 import jax.numpy as jnp
 import jax.random
+from flax import nnx
+from flax import struct
+from jax import Array
+
 from clax.loss import binary_cross_entropy
-from clax.parameters import ParameterConfig, build_parameter, init_parameter, Parameter
+from clax.parameters import ParameterConfig, init_parameter, Parameter
 from clax.parameters.defaults import (
     default_continuation_config,
     default_attraction_config,
@@ -13,9 +17,6 @@ from clax.utils.math import (
     logits_to_complement_log_probs,
     log1mexp,
 )
-from flax import nnx
-from flax import struct
-from jax import Array
 
 
 @struct.dataclass

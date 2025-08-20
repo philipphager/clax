@@ -2,6 +2,10 @@ from typing import Dict, Callable, Optional
 
 import jax
 import jax.numpy as jnp
+from flax import nnx
+from flax import struct
+from jax import Array
+
 from clax.loss import binary_cross_entropy
 from clax.parameters import (
     GlobalParameter,
@@ -16,9 +20,6 @@ from clax.parameters.defaults import (
     default_examination_config,
     default_attraction_config,
 )
-from flax import nnx
-from flax import struct
-from jax import Array
 
 
 @struct.dataclass

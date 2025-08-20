@@ -1,3 +1,4 @@
+#!/bin/sh
 #SBATCH --job-name=counter
 #SBATCH --time=32:00:00
 #SBATCH --nodes=1
@@ -6,6 +7,5 @@
 #SBATCH --partition cpu
 #SBATCH --mail-type=BEGIN,END
 #SBATCH --mail-user=p.k.hager@uva.nl
-
 
 python count.py -m dataset=baidu-ultr

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-
-python main.py -m \
-  experiment=2-yandex-embeddings/full/ \
-  model='glob(*)' \
-  dataset=yandex \
-  parameter/attraction=embedding/full \
-  parameter/satisfaction=embedding/full \
-  random_state=1 \
-  $@
+#
+#python main.py -m \
+#  experiment=2-yandex-embeddings/full/ \
+#  model='glob(*)' \
+#  dataset=yandex \
+#  parameter/attraction=embedding/full \
+#  parameter/satisfaction=embedding/full \
+#  random_state=1 \
+#  $@
 
 python main.py -m \
   experiment=2-yandex-embeddings/hash/ \

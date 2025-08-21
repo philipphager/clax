@@ -1,0 +1,2 @@
+model,test_loss,test_ll,test_ppl,test_cond_ppl,train_time_s
+DCM,0.31010368,-0.310099,1.3913664,1.3827524,425.8268533507362

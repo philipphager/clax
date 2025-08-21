@@ -18,7 +18,6 @@ multirun/
 .idea/
 
 # Data
-*.csv
 *.txt
 *.parquet
 clax-datasets/

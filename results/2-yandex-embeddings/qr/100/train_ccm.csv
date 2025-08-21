@@ -1,0 +1,3 @@
+epoch,model,train_loss,val_loss,val_ll,val_ppl,val_cond_ppl,has_improved,should_stop
+0,CCM,0.28646418,0.2772907,-0.27728787,1.3613753,1.3366698,True,False
+1,CCM,0.2845279,0.2777194,-0.27771643,1.361637,1.3372568,False,True

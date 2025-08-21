@@ -1,0 +1,2 @@
+model,test_loss,test_ll,test_ppl,test_cond_ppl,train_time_s
+PBM,0.26094994,-0.26095745,1.3104006,1.3104006,102.74144296906888

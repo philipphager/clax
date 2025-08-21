@@ -1,0 +1,2 @@
+model,test_loss,test_ll,test_ppl,test_cond_ppl,train_time_s
+DCTR,0.30376345,-0.30375853,1.3729368,1.3729368,253.51451334008016

@@ -1,0 +1,2 @@
+model,test_loss,test_ll,test_ppl,test_cond_ppl,train_time_s
+GCTR,0.3700498,-0.3700454,1.5259196,1.5259196,65.61936407600297

@@ -1,0 +1,2 @@
+model,test_loss,test_ll,test_ppl,test_cond_ppl,train_time_s
+SDBN,0.29617304,-0.29616803,1.3625672,1.3613276,284.8986246759305

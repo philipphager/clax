@@ -8,8 +8,8 @@ from flax.typing import Initializer
 
 
 class Combination(str, Enum):
-    MULTIPLICATION = "multiplication"
     ADDITION = "addition"
+    MULTIPLICATION = "multiplication"
     CONCATENATION = "concatenation"
 
 
@@ -21,7 +21,7 @@ class QREmbedding(nnx.Module):
         embedding_init: Initializer,
         compression_ratio: int = 1_000,
         *,
-        qr_combination: Union[Combination, str] = Combination.MULTIPLICATION,
+        qr_combination: Union[Combination, str] = Combination.ADDITION,
         rngs: nnx.Rngs,
     ):
         self.compression_ratio = compression_ratio

@@ -159,8 +159,6 @@ python main.py -m \
   random_state=3 \
   $@
 
-
-
 python main.py -m \
   experiment=2-yandex-embeddings/qr/10/1 \
   model='glob(*)' \

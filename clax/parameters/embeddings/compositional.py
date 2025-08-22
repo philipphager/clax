@@ -3,8 +3,11 @@ from typing import Union
 
 import jax.numpy as jnp
 import math
+import numpy as np
 from flax import nnx
 from flax.typing import Initializer
+
+from clax.parameters.embeddings.utils import UniversalHash
 
 
 class Combination(str, Enum):
@@ -26,6 +29,12 @@ class QREmbedding(nnx.Module):
     ):
         self.compression_ratio = compression_ratio
         self.num_quotient_embeddings = math.ceil(num_embeddings / compression_ratio)
+
+        self.shuffle_fn = UniversalHash(
+            max_output=num_embeddings,
+            num_args=1,
+            rngs=rngs,
+        )
         self.quotient_embedding = nnx.Embed(
             num_embeddings=self.num_quotient_embeddings,
             features=features,
@@ -52,6 +61,9 @@ class QREmbedding(nnx.Module):
             raise ValueError(f"Unknown combination type: {qr_combination}")
 
     def __call__(self, idx):
+        # Applying a hash function with low collision prob. to shuffle indices:
+        idx = self.shuffle_fn(idx)
+
         quotient_idx = idx // self.compression_ratio
         remainder_idx = idx % self.compression_ratio
 

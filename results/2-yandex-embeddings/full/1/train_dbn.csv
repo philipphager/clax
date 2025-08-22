@@ -1,3 +1,0 @@
-epoch,model,train_loss,val_loss,val_ll,val_ppl,val_cond_ppl,has_improved,should_stop
-0,DBN,0.27260503,0.26308432,-0.2630819,1.3379122,1.3154527,True,False
-1,DBN,0.26286268,0.26358372,-0.2635807,1.3384229,1.3160787,False,True

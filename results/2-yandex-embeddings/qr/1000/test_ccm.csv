@@ -1,2 +1,0 @@
-model,test_loss,test_ll,test_ppl,test_cond_ppl,train_time_s
-CCM,0.27786034,-0.2778572,1.3650454,1.338628,290.36239402601495

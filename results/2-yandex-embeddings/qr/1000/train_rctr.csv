@@ -1,3 +1,0 @@
-epoch,model,train_loss,val_loss,val_ll,val_ppl,val_cond_ppl,has_improved,should_stop
-0,RCTR,0.32313168,0.307044,-0.307043,1.3785185,1.3785185,True,False
-1,RCTR,0.31534818,0.307044,-0.307043,1.3785185,1.3785185,False,True

@@ -1,3 +1,0 @@
-epoch,model,train_loss,val_loss,val_ll,val_ppl,val_cond_ppl,has_improved,should_stop
-0,UBM,0.28560182,0.27532712,-0.27532533,1.3643211,1.335864,True,False
-1,UBM,0.28236085,0.27567545,-0.2756736,1.3648872,1.3366141,False,True

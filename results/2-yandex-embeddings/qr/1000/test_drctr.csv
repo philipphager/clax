@@ -1,2 +1,0 @@
-model,test_loss,test_ll,test_ppl,test_cond_ppl,train_time_s
-DRCTR,0.3181845,-0.31817797,1.3921955,1.3921955,267.4534144550562

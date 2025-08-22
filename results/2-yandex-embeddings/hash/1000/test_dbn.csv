@@ -1,2 +1,0 @@
-model,test_loss,test_ll,test_ppl,test_cond_ppl,train_time_s
-DBN,0.26682815,-0.2668252,1.3449191,1.3216094,685.521823822055

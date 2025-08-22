@@ -24,7 +24,7 @@ class QREmbedding(nnx.Module):
         embedding_init: Initializer,
         compression_ratio: int = 1_000,
         *,
-        qr_combination: Union[Combination, str] = Combination.ADDITION,
+        qr_combination: Union[Combination, str] = Combination.MULTIPLICATION,
         rngs: nnx.Rngs,
     ):
         self.compression_ratio = compression_ratio

@@ -3,7 +3,6 @@ from typing import Union
 
 import jax.numpy as jnp
 import math
-import numpy as np
 from flax import nnx
 from flax.typing import Initializer
 
@@ -23,18 +22,15 @@ class QREmbedding(nnx.Module):
         features: int,
         embedding_init: Initializer,
         compression_ratio: int = 1_000,
+        shuffle_indices: bool = True,
         *,
         qr_combination: Union[Combination, str] = Combination.MULTIPLICATION,
         rngs: nnx.Rngs,
     ):
         self.compression_ratio = compression_ratio
         self.num_quotient_embeddings = math.ceil(num_embeddings / compression_ratio)
+        self.shuffle_indices = shuffle_indices
 
-        self.shuffle_fn = UniversalHash(
-            max_output=num_embeddings,
-            num_args=1,
-            rngs=rngs,
-        )
         self.quotient_embedding = nnx.Embed(
             num_embeddings=self.num_quotient_embeddings,
             features=features,
@@ -47,6 +43,15 @@ class QREmbedding(nnx.Module):
             embedding_init=embedding_init,
             rngs=rngs,
         )
+
+        if self.shuffle_indices:
+            self.shuffle_fn = UniversalHash(
+                max_output=num_embeddings,
+                num_args=1,
+                rngs=rngs,
+            )
+        else:
+            self.shuffle_fn = lambda x: x
 
         if qr_combination == Combination.MULTIPLICATION:
             self.combine_fn = lambda q, r: q * r

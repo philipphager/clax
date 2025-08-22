@@ -12,6 +12,9 @@ python main.py -m \
   dataset=yandex \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \
+  train_sessions: [0,80_000_000] \
+  val_sessions: [80_000_000,90_000_000] \
+  test_sessions: [90_000_000,100_000_000] \
   random_state=1 \
   $@
 
@@ -21,6 +24,9 @@ python main.py -m \
   dataset=yandex \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \
+  train_sessions: [20_000_000,100_000_000] \
+  val_sessions: [100_000_000,110_000_000] \
+  test_sessions: [110_000_000,120_000_000] \
   random_state=2 \
   $@
 
@@ -30,6 +36,9 @@ python main.py -m \
   dataset=yandex \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \
+  train_sessions: [40_000_000,120_000_000] \
+  val_sessions: [120_000_000,130_000_000] \
+  test_sessions: [130_000_000,140_000_000] \
   random_state=3 \
   $@
 
@@ -40,6 +49,9 @@ python main.py -m \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
   compression_ratio=10 \
+  train_sessions: [0,80_000_000] \
+  val_sessions: [80_000_000,90_000_000] \
+  test_sessions: [90_000_000,100_000_000] \
   random_state=1 \
   $@
 
@@ -50,6 +62,9 @@ python main.py -m \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
   compression_ratio=10 \
+  train_sessions: [20_000_000,100_000_000] \
+  val_sessions: [100_000_000,110_000_000] \
+  test_sessions: [110_000_000,120_000_000] \
   random_state=2 \
   $@
 
@@ -60,6 +75,9 @@ python main.py -m \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
   compression_ratio=10 \
+  train_sessions: [40_000_000,120_000_000] \
+  val_sessions: [120_000_000,130_000_000] \
+  test_sessions: [130_000_000,140_000_000] \
   random_state=3 \
   $@
 
@@ -70,6 +88,9 @@ python main.py -m \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
   compression_ratio=100 \
+  train_sessions: [0,80_000_000] \
+  val_sessions: [80_000_000,90_000_000] \
+  test_sessions: [90_000_000,100_000_000] \
   random_state=1 \
   $@
 
@@ -80,6 +101,9 @@ python main.py -m \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
   compression_ratio=100 \
+  train_sessions: [20_000_000,100_000_000] \
+  val_sessions: [100_000_000,110_000_000] \
+  test_sessions: [110_000_000,120_000_000] \
   random_state=2 \
   $@
 
@@ -90,6 +114,9 @@ python main.py -m \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
   compression_ratio=100 \
+  train_sessions: [40_000_000,120_000_000] \
+  val_sessions: [120_000_000,130_000_000] \
+  test_sessions: [130_000_000,140_000_000] \
   random_state=3 \
   $@
 
@@ -100,6 +127,9 @@ python main.py -m \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
   compression_ratio=1000 \
+  train_sessions: [0,80_000_000] \
+  val_sessions: [80_000_000,90_000_000] \
+  test_sessions: [90_000_000,100_000_000] \
   random_state=1 \
   $@
 
@@ -110,6 +140,9 @@ python main.py -m \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
   compression_ratio=1000 \
+  train_sessions: [20_000_000,100_000_000] \
+  val_sessions: [100_000_000,110_000_000] \
+  test_sessions: [110_000_000,120_000_000] \
   random_state=2 \
   $@
 
@@ -120,6 +153,9 @@ python main.py -m \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
   compression_ratio=1000 \
+  train_sessions: [40_000_000,120_000_000] \
+  val_sessions: [120_000_000,130_000_000] \
+  test_sessions: [130_000_000,140_000_000] \
   random_state=3 \
   $@
 
@@ -132,6 +168,9 @@ python main.py -m \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
   compression_ratio=10 \
+  train_sessions: [0,80_000_000] \
+  val_sessions: [80_000_000,90_000_000] \
+  test_sessions: [90_000_000,100_000_000] \
   random_state=1 \
   $@
 
@@ -142,6 +181,9 @@ python main.py -m \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
   compression_ratio=10 \
+  train_sessions: [20_000_000,100_000_000] \
+  val_sessions: [100_000_000,110_000_000] \
+  test_sessions: [110_000_000,120_000_000] \
   random_state=2 \
   $@
 
@@ -152,6 +194,9 @@ python main.py -m \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
   compression_ratio=10 \
+  train_sessions: [40_000_000,120_000_000] \
+  val_sessions: [120_000_000,130_000_000] \
+  test_sessions: [130_000_000,140_000_000] \
   random_state=3 \
   $@
 
@@ -162,6 +207,9 @@ python main.py -m \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
   compression_ratio=100 \
+  train_sessions: [0,80_000_000] \
+  val_sessions: [80_000_000,90_000_000] \
+  test_sessions: [90_000_000,100_000_000] \
   random_state=1 \
   $@
 
@@ -172,6 +220,9 @@ python main.py -m \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
   compression_ratio=100 \
+  train_sessions: [20_000_000,100_000_000] \
+  val_sessions: [100_000_000,110_000_000] \
+  test_sessions: [110_000_000,120_000_000] \
   random_state=2 \
   $@
 
@@ -182,6 +233,9 @@ python main.py -m \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
   compression_ratio=100 \
+  train_sessions: [40_000_000,120_000_000] \
+  val_sessions: [120_000_000,130_000_000] \
+  test_sessions: [130_000_000,140_000_000] \
   random_state=3 \
   $@
 
@@ -192,6 +246,9 @@ python main.py -m \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
   compression_ratio=1000 \
+  train_sessions: [0,80_000_000] \
+  val_sessions: [80_000_000,90_000_000] \
+  test_sessions: [90_000_000,100_000_000] \
   random_state=1 \
   $@
 
@@ -202,6 +259,9 @@ python main.py -m \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
   compression_ratio=1000 \
+  train_sessions: [20_000_000,100_000_000] \
+  val_sessions: [100_000_000,110_000_000] \
+  test_sessions: [110_000_000,120_000_000] \
   random_state=2 \
   $@
 
@@ -212,5 +272,8 @@ python main.py -m \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
   compression_ratio=1000 \
+  train_sessions: [40_000_000,120_000_000] \
+  val_sessions: [120_000_000,130_000_000] \
+  test_sessions: [130_000_000,140_000_000] \
   random_state=3 \
   $@

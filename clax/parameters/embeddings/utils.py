@@ -23,16 +23,21 @@ class UniversalHash(nnx.Module):
         large_prime: int = EIGHT_MERSENNE_PRIME,
     ):
         super().__init__()
-        self.large_prime = jnp.int64(large_prime)
-        self.max_output = jnp.int64(max_output)
+        # Store everything as int64 to handle large values (3B+ embeddings)
+        # Use numpy first to avoid JAX's int32 coercion during conversion
+        import numpy as np
+
+        self.large_prime = jnp.asarray(np.int64(large_prime))
+        self.max_output = jnp.asarray(np.int64(max_output))
         self.num_args = num_args
 
+        # Generate coefficients as int64 from the start
         self.coefficients = jax.random.randint(
             rngs(),
             shape=(self.num_args + 1,),
             minval=1,
             maxval=large_prime,
-            dtype=jnp.int64,
+            dtype=jnp.int64,  # Explicitly use int64
         )
         self.coefficients = self.coefficients.at[0].set(
             jax.random.randint(
@@ -40,7 +45,7 @@ class UniversalHash(nnx.Module):
                 shape=(),
                 minval=0,
                 maxval=large_prime,
-                dtype=jnp.int64,
+                dtype=jnp.int64,  # Explicitly use int64
             )
         )
 
@@ -49,11 +54,16 @@ class UniversalHash(nnx.Module):
             len(hash_inputs) == self.num_args
         ), f"UniversalHash expects {self.num_args} arguments, but got {len(hash_inputs)}"
 
+        # Start with constant term, already int64 from initialization
         result = self.coefficients[0]
 
         for i, hash_input in enumerate(hash_inputs):
+            # Cast input to int64 and apply modular arithmetic to prevent overflow
             input_val = jnp.int64(hash_input)
+            # Apply mod after each multiplication to keep intermediate values manageable
             term = (self.coefficients[i + 1] * input_val) % self.large_prime
             result = (result + term) % self.large_prime
 
+        # Final modulo with max_output (now int64) and return as int64
+        # Don't cast back to int32 since max_output can be > int32 range
         return result % self.max_output

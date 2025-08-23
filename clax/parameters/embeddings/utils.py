@@ -1,4 +1,5 @@
 import jax
+import jax.numpy as jnp
 from flax import nnx
 
 EIGHT_MERSENNE_PRIME = 2**31 - 1
@@ -47,10 +48,10 @@ class UniversalHash(nnx.Module):
         ), f"UniversalHash expects {self.num_args} arguments, but got {len(hash_inputs)}"
 
         # Start with constant term in range [0, P):
-        result = self.coefficients[0]
+        result = jnp.int64(self.coefficients[0])
 
         for i, hash_input in enumerate(hash_inputs):
             # Multiply a term in range [1, P) to each provided input:
             result += self.coefficients[i + 1] * hash_input
 
-        return (result % self.large_prime) % self.max_output
+        return jnp.int32(result % self.max_output)

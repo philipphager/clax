@@ -1,9 +1,13 @@
+import warnings
+
 import jax
 import jax.numpy as jnp
 import numpy as np
 from flax import nnx
+from jax import config
 
 EIGHT_MERSENNE_PRIME = 2**31 - 1
+INT32_MAX = 2**31 - 1
 
 
 class UniversalHash(nnx.Module):
@@ -24,6 +28,14 @@ class UniversalHash(nnx.Module):
         large_prime: int = EIGHT_MERSENNE_PRIME,
     ):
         super().__init__()
+
+        if max_output > INT32_MAX and not config.x64_enabled:
+            warnings.warn(
+                f"UniversalHash: max_output ({max_output}) is too large for int32. "
+                "Automatically enabling JAX 64-bit mode (jax_enable_x64=True)."
+            )
+            config.update("jax_enable_x64", True)
+
         self.large_prime = large_prime
         self.max_output = jnp.asarray(np.array(max_output, dtype=np.int64))
         self.num_args = num_args

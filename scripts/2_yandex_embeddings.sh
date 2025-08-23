@@ -239,7 +239,7 @@
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/2/1 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -252,7 +252,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/2/2 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -265,7 +265,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/2/3 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -278,7 +278,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/5/1 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -291,7 +291,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/5/2 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -304,7 +304,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/5/3 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -317,7 +317,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/10/1 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -330,7 +330,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/10/2 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -343,7 +343,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/10/3 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -356,7 +356,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/100/1 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -369,7 +369,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/100/2 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -382,7 +382,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/100/3 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -395,7 +395,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/1000/1 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -408,7 +408,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/1000/2 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -421,7 +421,7 @@ python main.py -m \
 
 python main.py -m \
   experiment=2-yandex-embeddings/qr/1000/3 \
-  model='glob(*)' \
+  model=drctr \
   dataset=yandex \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \

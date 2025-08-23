@@ -51,6 +51,7 @@ class UniversalHash(nnx.Module):
             shape=(self.num_args + 1,),
             minval=1,
             maxval=self.large_prime,
+            dtype=self.dtype,
         )
         self.coefficients = self.coefficients.at[0].set(
             jax.random.randint(
@@ -58,9 +59,9 @@ class UniversalHash(nnx.Module):
                 shape=(),
                 minval=0,
                 maxval=self.large_prime,
+                dtype=self.dtype,
             )
         )
-        self.coefficients = self.coefficients.astype(self.dtype)
 
     def __call__(self, *hash_inputs):
         assert (

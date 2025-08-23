@@ -64,6 +64,11 @@ class UniversalHash(nnx.Module):
         )
 
     def __call__(self, *hash_inputs):
+        """
+        Perform universal hashing in a numerically stable way:
+        hash(x) = ((w_0 + w_1 * x_1 + ... + w_n * x_n) % prime) % output
+        using additive and multiplicative modulo rules for numerical stability.
+        """
         assert (
             len(hash_inputs) == self.num_args
         ), f"UniversalHash expects {self.num_args} arguments, but got {len(hash_inputs)}"
@@ -73,11 +78,8 @@ class UniversalHash(nnx.Module):
         for i, hash_input in enumerate(hash_inputs):
             coeff = self.coefficients[i + 1]
             inp = hash_input.astype(jnp.int64)
-
-            # Reduce each input modulo the prime for numerical stability
             inp = inp % self.large_prime
 
-            # Perform multiplication and add to result in a numerically stable way
             term = (coeff * inp) % self.large_prime
             result = (result + term) % self.large_prime
 

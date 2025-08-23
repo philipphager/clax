@@ -1,7 +1,7 @@
 import jax
 from flax import nnx
 
-EIGHT_MERSENNE_PRIME = 2**13 - 1
+EIGHT_MERSENNE_PRIME = 2**5 - 1
 
 
 class UniversalHash(nnx.Module):

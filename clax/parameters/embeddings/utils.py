@@ -7,6 +7,7 @@ from flax import nnx
 from jax import config
 
 EIGHT_MERSENNE_PRIME = 2**31 - 1
+NINTH_MERSENNE_PRIME = 2**61 - 1
 INT32_MAX = 2**31 - 1
 
 
@@ -25,22 +26,24 @@ class UniversalHash(nnx.Module):
         num_args: int,
         *,
         rngs: nnx.Rngs,
-        large_prime: int = EIGHT_MERSENNE_PRIME,
     ):
         super().__init__()
 
         self.dtype = jnp.int32
+        self.large_prime = EIGHT_MERSENNE_PRIME
 
-        if max_output > INT32_MAX and not config.x64_enabled:
-            warnings.warn(
-                f"UniversalHash: max_output ({max_output}) is too large for int32. "
-                "Automatically enabling JAX 64-bit mode (jax_enable_x64=True)."
-            )
-            config.update("jax_enable_x64", True)
+        if max_output > INT32_MAX:
             self.dtype = np.int64
+            self.large_prime = NINTH_MERSENNE_PRIME
+
+            if not config.x64_enabled:
+                warnings.warn(
+                    f"UniversalHash: max_output ({max_output}) is too large for int32. "
+                    "Automatically enabling JAX 64-bit mode (jax_enable_x64=True)."
+                )
+                config.update("jax_enable_x64", True)
 
         self.max_output = jnp.asarray(np.array(max_output), dtype=self.dtype)
-        self.large_prime = large_prime
         self.num_args = num_args
 
         self.coefficients = jax.random.randint(
@@ -57,19 +60,24 @@ class UniversalHash(nnx.Module):
                 maxval=self.large_prime,
             )
         )
+        self.coefficients = self.coefficients.astype(self.dtype)
 
     def __call__(self, *hash_inputs):
         assert (
             len(hash_inputs) == self.num_args
         ), f"UniversalHash expects {self.num_args} arguments, but got {len(hash_inputs)}"
 
-        # Start with constant term in range [0, P):
-        result = self.coefficients[0].astype(self.dtype)
+        result = self.coefficients[0].astype(jnp.int64)
 
         for i, hash_input in enumerate(hash_inputs):
-            # Cast inputs to 64-bit BEFORE multiplication to prevent overflow
-            coeff = self.coefficients[i + 1].astype(self.dtype)
-            inp = hash_input.astype(self.dtype)
-            result += coeff * inp
+            coeff = self.coefficients[i + 1]
+            inp = hash_input.astype(jnp.int64)
 
-        return (result % self.large_prime) % self.max_output
+            # Reduce each input modulo the prime for numerical stability
+            inp = inp % self.large_prime
+
+            # Perform multiplication and add to result in a numerically stable way
+            term = (coeff * inp) % self.large_prime
+            result = (result + term) % self.large_prime
+
+        return (result % self.max_output).astype(self.dtype)

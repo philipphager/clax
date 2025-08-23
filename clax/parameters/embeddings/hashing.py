@@ -1,3 +1,4 @@
+import numpy as np
 import jax.numpy as jnp
 import math
 from flax import nnx
@@ -19,7 +20,7 @@ class HashEmbedding(nnx.Module):
         num_embeddings: int,
         features: int,
         embedding_init: Initializer,
-        compression_ratio: int = 1_000,
+        compression_ratio: int = 10,
         *,
         rngs: nnx.Rngs,
     ):

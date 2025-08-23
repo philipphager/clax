@@ -21,7 +21,7 @@ class QREmbedding(nnx.Module):
         num_embeddings: int,
         features: int,
         embedding_init: Initializer,
-        compression_ratio: int = 1_000,
+        compression_ratio: int = 10,
         shuffle_indices: bool = True,
         *,
         qr_combination: Union[Combination, str] = Combination.MULTIPLICATION,

@@ -2,8 +2,8 @@ defaults:
   - _self_
   - dataset: yandex
   - parameter/examination: position
-  - parameter/attraction: embedding/qr
-  - parameter/satisfaction: embedding/qr
+  - parameter/attraction: embedding/hash
+  - parameter/satisfaction: embedding/hash
   - model: pbm
 
 

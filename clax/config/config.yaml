@@ -2,8 +2,8 @@ defaults:
   - _self_
   - dataset: yandex
   - parameter/examination: position
-  - parameter/attraction: embedding/robe-d
-  - parameter/satisfaction: embedding/robe-d
+  - parameter/attraction: embedding/qr
+  - parameter/satisfaction: embedding/qr
   - model: pbm
 
 
@@ -21,5 +21,5 @@ train_batch_size: 512
 eval_batch_size: 512
 positions: 10
 
-compression_ratio: 1000
+compression_ratio: 10
 experiment: ""

@@ -29,7 +29,6 @@ class UniversalHash(nnx.Module):
         self.large_prime = jnp.int64(large_prime)
         self.max_output = jnp.int64(max_output)
         self.num_args = num_args
-        self.dtype = jnp.int64 if self.max_output > INT32_MAX_VALUE else jnp.int32
 
         if not jax.config.x64_enabled:
             warnings.warn(
@@ -73,5 +72,7 @@ class UniversalHash(nnx.Module):
 
         # Linearly scale value to output size to avoid modulo bias:
         return jnp.floor(
-            hash_value / self.large_prime.astype(jnp.float32) * self.max_output
-        ).astype(dtype=self.dtype)
+            hash_value.astype(jnp.float64)
+            / self.large_prime.astype(jnp.float64)
+            * self.max_output
+        ).astype(jnp.int64)

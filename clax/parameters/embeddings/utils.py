@@ -24,7 +24,7 @@ class UniversalHash(nnx.Module):
     ):
         super().__init__()
         self.large_prime = large_prime
-        self.max_output = jnp.asarray(max_output, dtype=jnp.int64)
+        self.max_output = jnp.array(max_output, dtype=jnp.int64)
         self.num_args = num_args
 
         self.coefficients = jax.random.randint(

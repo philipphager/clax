@@ -29,15 +29,18 @@ class UniversalHash(nnx.Module):
     ):
         super().__init__()
 
+        self.dtype = jnp.int32
+
         if max_output > INT32_MAX and not config.x64_enabled:
             warnings.warn(
                 f"UniversalHash: max_output ({max_output}) is too large for int32. "
                 "Automatically enabling JAX 64-bit mode (jax_enable_x64=True)."
             )
             config.update("jax_enable_x64", True)
+            self.dtype = np.int64
 
+        self.max_output = jnp.asarray(np.array(max_output), dtype=self.dtype)
         self.large_prime = large_prime
-        self.max_output = jnp.asarray(np.array(max_output, dtype=np.int64))
         self.num_args = num_args
 
         self.coefficients = jax.random.randint(
@@ -61,12 +64,12 @@ class UniversalHash(nnx.Module):
         ), f"UniversalHash expects {self.num_args} arguments, but got {len(hash_inputs)}"
 
         # Start with constant term in range [0, P):
-        result = self.coefficients[0].astype(jnp.int64)
+        result = self.coefficients[0].astype(self.dtype)
 
         for i, hash_input in enumerate(hash_inputs):
             # Cast inputs to 64-bit BEFORE multiplication to prevent overflow
-            coeff = self.coefficients[i + 1].astype(jnp.int64)
-            inp = hash_input.astype(jnp.int64)
+            coeff = self.coefficients[i + 1].astype(self.dtype)
+            inp = hash_input.astype(self.dtype)
             result += coeff * inp
 
         return (result % self.large_prime) % self.max_output

@@ -55,6 +55,12 @@ class UniversalHash(nnx.Module):
         )
 
     def __call__(self, *hash_inputs):
+        """
+        Perform universal hashing:
+        hash(x) = ((w_0 + w_1 * x_1 + ... + w_n * x_n) % prime) % output
+        We replace the final % output with linear scaling to avoid modulo bias.
+        """
+
         assert (
             len(hash_inputs) == self.num_args
         ), f"UniversalHash expects {self.num_args} arguments, but got {len(hash_inputs)}"

@@ -17,30 +17,30 @@
 #  test_sessions=[90_000_000,100_000_000] \
 #  random_state=1 \
 #  $@
-
-python main.py -m \
-  experiment=2-yandex-embeddings/full/2 \
-  model='glob(*)' \
-  dataset=yandex \
-  parameter/attraction=embedding/full \
-  parameter/satisfaction=embedding/full \
-  train_sessions=[20_000_000,100_000_000] \
-  val_sessions=[100_000_000,110_000_000] \
-  test_sessions=[110_000_000,120_000_000] \
-  random_state=2 \
-  $@
-
-python main.py -m \
-  experiment=2-yandex-embeddings/full/3 \
-  model='glob(*)' \
-  dataset=yandex \
-  parameter/attraction=embedding/full \
-  parameter/satisfaction=embedding/full \
-  train_sessions=[40_000_000,120_000_000] \
-  val_sessions=[120_000_000,130_000_000] \
-  test_sessions=[130_000_000,140_000_000] \
-  random_state=3 \
-  $@
+#
+#python main.py -m \
+#  experiment=2-yandex-embeddings/full/2 \
+#  model='glob(*)' \
+#  dataset=yandex \
+#  parameter/attraction=embedding/full \
+#  parameter/satisfaction=embedding/full \
+#  train_sessions=[20_000_000,100_000_000] \
+#  val_sessions=[100_000_000,110_000_000] \
+#  test_sessions=[110_000_000,120_000_000] \
+#  random_state=2 \
+#  $@
+#
+#python main.py -m \
+#  experiment=2-yandex-embeddings/full/3 \
+#  model='glob(*)' \
+#  dataset=yandex \
+#  parameter/attraction=embedding/full \
+#  parameter/satisfaction=embedding/full \
+#  train_sessions=[40_000_000,120_000_000] \
+#  val_sessions=[120_000_000,130_000_000] \
+#  test_sessions=[130_000_000,140_000_000] \
+#  random_state=3 \
+#  $@
 
 python main.py -m \
   experiment=2-yandex-embeddings/hash/2/1 \

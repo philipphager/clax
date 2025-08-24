@@ -92,7 +92,7 @@ def collate_fn(samples: List):
 @hydra.main(version_base="1.3", config_path="clax/config/", config_name="config")
 def main(config: DictConfig):
     train_clicks = load_dataset(
-        "philipphager/baidu-ultr_baidu-mlm-ctr",
+        "philipphager/baidu-ultr_uva-mlm-ctr",
         name="clicks",
         split="train",
         cache_dir="/ivi/ilps/personal/phager/huggingface/",
@@ -100,7 +100,7 @@ def main(config: DictConfig):
     ).with_format("numpy")
 
     test_clicks = load_dataset(
-        "philipphager/baidu-ultr_baidu-mlm-ctr",
+        "philipphager/baidu-ultr_uva-mlm-ctr",
         name="clicks",
         split="test",
         cache_dir="/ivi/ilps/personal/phager/huggingface/",

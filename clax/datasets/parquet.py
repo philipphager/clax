@@ -1,26 +1,21 @@
+from abc import ABC, abstractmethod
 from collections import Counter
 from pathlib import Path
-from typing import List, Tuple, Union, Optional, Set
+from typing import List, Tuple, Dict, Any, Generator, Set
 
-import numpy as np
-import pyarrow.dataset as ds
 import pyarrow.parquet as pq
 import torch
+from pyarrow import RecordBatch
 from torch.utils.data import IterableDataset
-
-from clax.datasets.utils import SessionCollator
 
 FileRangeTuple = Tuple[Path, int, int]
 
 
-class ParquetDataset(IterableDataset):
+class BaseParquetDataset(IterableDataset, ABC):
     def __init__(
         self,
-        source: Union[List[Union[Path, str]], Union[Path, str]],
+        files: List[Path],
         session_range: Tuple[int, int],
-        max_positions: int = 10,
-        file_glob: str = "*.parquet",
-        filter_query_ids: Optional[Set[int]] = None,
     ):
         """
         A PyTorch IterableDataset for CLAX datasets.
@@ -32,24 +27,16 @@ class ParquetDataset(IterableDataset):
         workers, ensuring each worker processes a unique subset of the files and
         session ranges.
         """
-        files = self._find_files(source, file_glob)
         self.file_ranges = self._file_ranges(files, session_range)
-        self.max_positions = max_positions
-        self.filter_query_ids = filter_query_ids
-        self.collate_fn = SessionCollator(
-            query_features={
-                "n": np.int16,
-            },
-            doc_features={
-                "query_doc_ids": np.int32,
-                "positions": np.int16,
-                "mask": np.bool_,
-                "clicks": np.float16,
-            },
-        )
-        # Pre-compute reusable outputs:
-        self.mask = np.ones(self.max_positions, dtype=np.bool_)
-        self.positions = np.arange(1, self.max_positions + 1, dtype=np.int16)
+
+    @abstractmethod
+    def _parse_batch(
+        self,
+        batch: RecordBatch,
+        begin_idx: int,
+        end_idx: int,
+    ) -> Generator[Dict[str, Any], None, None]:
+        pass
 
     def __len__(self) -> int:
         total_sessions = 0
@@ -64,14 +51,7 @@ class ParquetDataset(IterableDataset):
 
         for path, begin_row, end_row in file_ranges:
             file = pq.ParquetFile(path)
-            has_query_id = "query_id" in file.schema_arrow.names
             rows_processed = 0
-
-            if self.filter_query_ids and not has_query_id:
-                raise ValueError(
-                    "A set of query ids was provided for filtering sessions, "
-                    "but the file does not contain a 'query_id' column."
-                )
 
             for batch in file.iter_batches():
                 batch_size = len(batch)
@@ -79,35 +59,7 @@ class ParquetDataset(IterableDataset):
                 overlap_end = min(batch_size, end_row - rows_processed)
 
                 if overlap_begin < overlap_end:
-                    query_doc_ids_batch = batch["query_doc_ids"].to_numpy(
-                        zero_copy_only=False
-                    )
-                    clicks_batch = batch["clicks"].to_numpy(zero_copy_only=False)
-                    query_ids = (
-                        batch["query_id"].to_numpy(zero_copy_only=False)
-                        if self.filter_query_ids
-                        else None
-                    )
-
-                    for i in range(overlap_begin, overlap_end):
-                        if (
-                            self.filter_query_ids
-                            and query_ids[i] not in self.filter_query_ids
-                        ):
-                            # Skip user session as its query_id is not in the provided set.
-                            continue
-
-                        query_doc_ids = query_doc_ids_batch[i]
-                        clicks = clicks_batch[i]
-                        n = min(len(query_doc_ids), self.max_positions)
-
-                        yield {
-                            "query_doc_ids": query_doc_ids[:n],
-                            "clicks": clicks[:n],
-                            "mask": self.mask[:n],
-                            "positions": self.positions[:n],
-                            "n": n,
-                        }
+                    yield from self._parse_batch(batch, overlap_begin, overlap_end)
 
                 rows_processed += batch_size
 
@@ -150,31 +102,11 @@ class ParquetDataset(IterableDataset):
             )
             end_row = begin_row + worker_rows + (1 if worker_id < remainder else 0)
             return [(file_path, begin_row, end_row)]
-
-    @staticmethod
-    def _find_files(
-        source: Union[List[Path], Path, str],
-        file_glob: Optional[str] = None,
-    ) -> List[Path]:
-        """
-        Finds and validates a paths to parquet files. If a directory is submitted,
-        the method searches for files with glob(file_glob). The resulting list of
-        paths is sorted alphabetically.
-        """
-        if isinstance(source, list):
-            paths = [Path(p) for p in source]
         else:
-            path = Path(source)
-            paths = list(path.glob(file_glob)) if path.is_dir() else [path]
+            return []
 
-        for path in paths:
-            if not path.exists():
-                raise FileNotFoundError(f"No such file: '{path}'")
-
-        return sorted(paths)
-
-    @staticmethod
     def _file_ranges(
+        self,
         files: List[Path],
         session_range: Tuple[int, int],
     ) -> List[FileRangeTuple]:
@@ -208,19 +140,20 @@ class ParquetDataset(IterableDataset):
 
         return file_ranges
 
-    def unique_query_ids(self, min_sessions: int = 1) -> Set[int]:
+    def _get_unique_query_ids(
+        self,
+        min_sessions: int,
+        query_column: str,
+    ) -> Set[int]:
         query_counter = Counter()
 
         for path, begin_row, end_row in self.file_ranges:
-            file = pq.ParquetFile(path)
-            has_query_id = "query_id" in file.schema_arrow.names
             rows_processed = 0
+            file = pq.ParquetFile(path)
 
-            if self.filter_query_ids and not has_query_id:
-                raise ValueError(
-                    "A set of query ids was provided for filtering sessions, "
-                    "but the file does not contain a 'query_id' column."
-                )
+            assert (
+                query_column in file.schema_arrow.names
+            ), f"Query id '{query_column}' not found in parquet file."
 
             for batch in file.iter_batches():
                 batch_size = len(batch)

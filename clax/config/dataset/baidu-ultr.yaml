@@ -1,9 +1,8 @@
 # @package _global_
 
 dataset:
-  _target_: clax.datasets.ParquetDataset
-  source: "${dataset_dir}/baidu-ultr"
-  max_positions: 10
+  _target_: clax.datasets.BaiduUltrDataset
+  dataset_dir: "${dataset_dir}/baidu-ultr"
 
 query_doc_pairs: 2_147_483_647 # Int32 max value (hashed query_doc_ids)
 

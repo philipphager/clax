@@ -1,5 +1,3 @@
-import itertools
-from functools import partial
 from typing import Union, List, Dict
 
 import numpy as np
@@ -31,13 +29,25 @@ class SessionCollator:
 
 
 def pad(samples: List[Dict[str, np.ndarray]], feature: str, max_n, dtype: np.dtype):
+    """
+    Pads a list of features to the same length (max_n).
+
+    Handles 1D features (e.g., clicks) resulting in a 2D padded array
+    and 2D document features (e.g., embeddings) resulting in a 3D padded array.
+    """
     batch_size = len(samples)
 
-    # Allocate empty 2D array with correct datatype:
-    array = np.zeros((batch_size, max_n), dtype=dtype)
+    # 1. Inspect the first sample's feature to get the shape of individual items.
+    # For a 1D (docs,) array, this will be ().
+    # For a 2D (docs, features) array, this will be (features,).
+    first_item = samples[0][feature]
+    feature_shape = first_item.shape[1:]
 
-    # Fill the array with the feature values:
+    padded_shape = (batch_size, max_n) + feature_shape
+    array = np.zeros(padded_shape, dtype=dtype)
+
     for row, sample in enumerate(samples):
-        array[row, : sample["n"]] = sample[feature]
+        n = min(len(sample[feature]), max_n)
+        array[row, :n] = sample[feature][:max_n]
 
     return array

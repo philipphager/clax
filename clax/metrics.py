@@ -1,13 +1,14 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Optional, Any
+from typing import Optional, Any, Callable
 
 import jax.numpy as jnp
-from clax.utils.math import log1mexp
 from flax import nnx
 from flax.nnx.object import Object
 from flax.nnx.variablelib import Variable
 from jax import Array
+
+from clax.utils.math import log1mexp
 
 
 class MetricState(Variable):
@@ -60,7 +61,7 @@ class MultiMetric(Metric):
 
 
 class Average(Metric):
-    def __init__(self, argname: str):
+    def __init__(self, argname: str = "values"):
         self.argname = argname
         self.total = MetricState(jnp.array(0, dtype=jnp.float32))
         self.count = MetricState(jnp.array(0, dtype=jnp.int32))
@@ -196,3 +197,41 @@ class Perplexity(RankBasedAverage):
 
     def compute_per_rank(self):
         return 2 ** -super().compute_per_rank()
+
+
+class RaxMetric(Average):
+    def __init__(self, metric_fn: Callable, top_n: Optional[int] = None):
+        super().__init__()
+        self.metric_fn = metric_fn
+        self.top_n = top_n
+
+    def update(
+        self,
+        *,
+        scores: Array,
+        labels: Array,
+        where: Optional[Array] = None,
+        **kwargs,
+    ):
+        values = self.metric_fn(
+            scores=scores,
+            labels=labels,
+            where=where,
+            topn=self.top_n,
+            reduce_fn=reduce_per_query,
+        )
+        super().update(values=values)
+
+
+def reduce_per_query(loss: Array, where: Array) -> Array:
+    loss = loss.reshape(len(loss), -1)
+    where = where.reshape(len(where), -1)
+
+    # Adopt Rax safe_reduce as jnp.mean can return NaN if all inputs are 0,
+    # which happens easily for pairwise loss functions without any valid pair.
+    # Replace NaNs with 0 after reduce, but propagate if the loss already contains NaNs:
+    is_input_valid = jnp.logical_not(jnp.any(jnp.isnan(loss)))
+    output = jnp.mean(loss, where=where, axis=1)
+    output = jnp.where(jnp.isnan(output) & is_input_valid, 0.0, output)
+
+    return output

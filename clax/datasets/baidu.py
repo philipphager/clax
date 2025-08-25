@@ -64,7 +64,7 @@ class BaiduUltrDataset(BaseParquetDataset):
             }
 
 
-class BaiduUltrUvADataset(BaseParquetDataset):
+class BaiduUltrFeatureClickDataset(BaseParquetDataset):
     def __init__(
         self,
         dataset_dir: Union[Path, str],
@@ -113,6 +113,57 @@ class BaiduUltrUvADataset(BaseParquetDataset):
                 "query_doc_features": np.array(list(query_doc_features[idx])),
                 "clicks": clicks[idx],
                 "positions": positions[idx],
+                "mask": self.mask[:n],
+                "n": n,
+            }
+
+
+class BaiduUltrFeatureAnnotationDataset(BaseParquetDataset):
+    def __init__(
+        self,
+        dataset_dir: Union[Path, str],
+        session_range: Tuple[int, int],
+        file_glob: str = "annotations.parquet",
+        **kwargs,
+    ):
+        files = list(sorted(Path(dataset_dir).glob(file_glob)))
+        super().__init__(files, session_range)
+
+        self.mask = np.ones(120, dtype=np.bool_)
+        self.collate_fn = SessionCollator(
+            query_features={
+                "n": np.int16,
+            },
+            doc_features={
+                "query_doc_features": np.float32,
+                "mask": np.bool_,
+                "labels": np.float16,
+            },
+        )
+
+    def get_unique_query_ids(
+        self,
+        min_sessions: int = 0,
+    ) -> Set[int]:
+        raise NotImplementedError(
+            "The Baidu-ULTR dataset does not support counting query ids."
+        )
+
+    def _parse_batch(
+        self,
+        batch: RecordBatch,
+        begin_idx: int,
+        end_idx: int,
+    ) -> Generator[Dict[str, Any]]:
+        query_doc_features = batch["features"].to_numpy(zero_copy_only=False)
+        labels = batch["labels"].to_numpy(zero_copy_only=False)
+
+        for idx in range(begin_idx, end_idx):
+            n = len(labels[idx])
+
+            yield {
+                "query_doc_features": np.array(list(query_doc_features[idx])),
+                "labels": labels[idx],
                 "mask": self.mask[:n],
                 "n": n,
             }

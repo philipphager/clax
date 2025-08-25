@@ -1,2 +1,6 @@
-from .baidu import BaiduUltrDataset, BaiduUltrUvADataset
+from .baidu import (
+    BaiduUltrDataset,
+    BaiduUltrFeatureClickDataset,
+    BaiduUltrFeatureAnnotationDataset,
+)
 from .yandex import YandexDataset

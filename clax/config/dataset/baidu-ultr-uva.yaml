@@ -1,0 +1,11 @@
+# @package _global_
+
+dataset:
+  _target_: clax.datasets.BaiduUltrFeatureClickDataset
+  dataset_dir: "${dataset_dir}/baidu-ultr-uva"
+
+positions: 22
+query_doc_features: 12
+train_sessions: [ 0, 1_000_000 ]
+val_sessions: [ 1_000_000, 1_500_000 ]
+test_sessions: [ 1_500_000, 2_000_000 ]

@@ -69,12 +69,13 @@ class BaiduUltrFeatureClickDataset(BaseParquetDataset):
         self,
         dataset_dir: Union[Path, str],
         session_range: Tuple[int, int],
+        max_positions: int = 10,
         file_glob: str = "part-*-split-*.parquet",
         **kwargs,
     ):
         files = list(sorted(Path(dataset_dir).glob(file_glob)))
         super().__init__(files, session_range)
-
+        self.max_positions = max_positions
         self.mask = np.ones(30, dtype=np.bool_)
         self.collate_fn = SessionCollator(
             query_features={
@@ -107,12 +108,12 @@ class BaiduUltrFeatureClickDataset(BaseParquetDataset):
         clicks = batch["clicks"].to_numpy(zero_copy_only=False)
 
         for idx in range(begin_idx, end_idx):
-            n = len(positions[idx])
+            n = (positions[idx] <= self.max_positions).sum()
 
             yield {
-                "query_doc_features": np.array(list(query_doc_features[idx])),
-                "clicks": clicks[idx],
-                "positions": positions[idx],
+                "query_doc_features": np.array(list(query_doc_features[idx]))[:n],
+                "clicks": clicks[idx][:n],
+                "positions": positions[idx][:n],
                 "mask": self.mask[:n],
                 "n": n,
             }

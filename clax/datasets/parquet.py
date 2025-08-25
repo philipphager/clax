@@ -27,6 +27,7 @@ class BaseParquetDataset(IterableDataset, ABC):
         workers, ensuring each worker processes a unique subset of the files and
         session ranges.
         """
+        assert len(files) > 0, "No parquet files found to load."
         self.file_ranges = self._file_ranges(files, session_range)
 
     @abstractmethod

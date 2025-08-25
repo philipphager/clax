@@ -1,4 +1,3 @@
-import pandas as pd
 from pathlib import Path
 from time import perf_counter
 
@@ -21,7 +20,7 @@ def main(config: DictConfig):
     train_dataset = instantiate(config.dataset, session_range=config.train_sessions)
 
     if config.min_train_sessions_per_eval_query > 0:
-        filter_query_ids = train_dataset.unique_query_ids(
+        filter_query_ids = train_dataset.get_unique_query_ids(
             min_sessions=config.min_train_sessions_per_eval_query
         )
         print(

@@ -1,0 +1,3 @@
+_target_: clax.parameters.LinearParameterConfig
+use_feature: "query_doc_features"
+features: "${query_doc_features}"

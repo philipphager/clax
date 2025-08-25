@@ -1,10 +1,10 @@
 defaults:
   - _self_
-  - dataset: baidu-ultr-uva
+  - dataset: yandex
   - parameter/examination: position
-  - parameter/attraction: deep
+  - parameter/attraction: embedding/hash
   - parameter/satisfaction: embedding/hash
-  - model: ubm
+  - model: pbm
 
 
 random_state: 42
@@ -12,7 +12,6 @@ random_state: 42
 # To be overwritten by specific datasets:
 dataset_dir: clax-datasets
 query_doc_pairs: ???
-query_doc_features: ???
 train_sessions: ???
 val_sessions: ???
 test_sessions: ???
@@ -22,5 +21,5 @@ train_batch_size: 512
 eval_batch_size: 512
 positions: 10
 
-compression_ratio: 1000
+compression_ratio: 10
 experiment: ""

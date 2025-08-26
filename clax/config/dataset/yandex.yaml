@@ -3,7 +3,7 @@
 dataset:
   _target_: clax.datasets.YandexDataset
   dataset_dir: "${dataset_dir}/yandex"
-  max_positions: 10
+  max_positions: "${positions}"
 
 query_doc_pairs: 346_711_929
 positions: 10

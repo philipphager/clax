@@ -1,18 +1,18 @@
 defaults:
   - _self_
-  - dataset: yandex
+  - dataset: baidu-ultr
   - parameter/examination: position
-  - parameter/attraction: embedding/full
-  - parameter/satisfaction: embedding/full
+  - parameter/attraction: embedding/hash
+  - parameter/satisfaction: embedding/hash
   - model: pbm
 
 random_state: 42
 dataset_dir: /Users/philipphager/Documents/GitHub/clix/clax-datasets
 result_dir: /Users/philipphager/Documents/GitHub/clix/results
-experiment: "2-yandex-compression"
+experiment: "3-baidu-ultr-embeddings"
 
-# Configure for the hashing trick / QR embeddings:
-compression_ratio: 1
+# Compress the number embeddings using the hashing trick:
+compression_ratio: 10
 
 # Configure based on available hardware:
 train_batch_size: 512
@@ -24,14 +24,14 @@ learning_rate: 0.003
 epochs: 100
 early_stopping_patience: 0
 
-# Overwritten by the selected Yandex dataset config:
-query_doc_pairs: 346_711_929
+# Overwritten by the selected Baidu-ULTR dataset config:
+query_doc_pairs: 2_147_483_647
 positions: 10
 
-# Select dataset ranges in [0, 146_278_823], overwritten in main.sh:
-train_sessions: [ 0,10_000_000 ]
-val_sessions: [ 10_000_000,15_000_000 ]
-test_sessions: [ 15_000_000,20_000_000 ]
+# Select dataset ranges in [0, 1_210_257_130], overwritten in main.sh:
+train_sessions: [0, 800_000_000]
+val_sessions: [800_000_000, 1_000_000_000]
+test_sessions: [1_000_000_000, 1_210_257_130]
 
 # Add clax base configs (so that you can select them in the defaults list):
 hydra:

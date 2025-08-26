@@ -3,9 +3,7 @@
 dataset:
   _target_: clax.datasets.BaiduUltrDataset
   dataset_dir: "${dataset_dir}/baidu-ultr"
+  max_positions: "${positions}"
 
 query_doc_pairs: 2_147_483_647 # Int32 max value (hashed query_doc_ids)
-
-train_sessions: [0, 847_179_990] # 70%
-val_sessions: [847_179_990, 1_028_718_560] # 15%
-test_sessions: [1_028_718_560, 1_210_257_130] # 15%
+positions: 22 # Max available positions

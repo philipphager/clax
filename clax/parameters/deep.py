@@ -37,27 +37,25 @@ class DeepParameter(Parameter):
         modules = []
         features = config.features
 
-        identity = lambda x: x
         self.input_norm = (
             config.input_norm(features, rngs=rngs)
             if config.input_norm is not None
-            else identity
-        )
-        norm = (
-            config.norm(config.hidden_units, rngs=rngs)
-            if config.norm is not None
-            else identity
+            else lambda x: x
         )
 
         for _ in range(config.layers):
+            modules.append(nnx.Linear(features, config.hidden_units, rngs=rngs))
+
+            if config.norm is not None:
+                modules.append(config.norm(config.hidden_units, rngs=rngs))
+
             modules.extend(
                 [
-                    nnx.Linear(features, config.hidden_units, rngs=rngs),
-                    norm,
                     config.activation_fn,
                     nnx.Dropout(rate=config.dropout, rngs=rngs),
                 ]
             )
+
             features = config.hidden_units
 
         modules.append(nnx.Linear(features, 1, rngs=rngs))

@@ -80,6 +80,9 @@ def main(config: DictConfig):
         num_workers=1,
     )
 
+    result_dir = Path(f"results/{config.experiment}")
+    result_dir.mkdir(exist_ok=True, parents=True)
+
     model_fn = instantiate(config.model)
     model = model_fn(rngs=rngs)
 
@@ -88,15 +91,13 @@ def main(config: DictConfig):
     timer_start = perf_counter()
     train_df = trainer.train(model, train_loader, val_loader)
     timer_stop = perf_counter()
-    test_df = trainer.test(model, test_loader)
-    test_rel_df = trainer.test_relevance(model, test_relevance_loader)
-    test_df["train_time_s"] = timer_stop - timer_start
-
-    result_dir = Path(f"results/{config.experiment}")
-    result_dir.mkdir(exist_ok=True, parents=True)
-
     train_df.to_csv(result_dir / f"train_{model.name.lower()}.csv", index=False)
+
+    test_df = trainer.test(model, test_loader)
+    test_df["train_time_s"] = timer_stop - timer_start
     test_df.to_csv(result_dir / f"test_{model.name.lower()}.csv", index=False)
+
+    test_rel_df = trainer.test_relevance(model, test_relevance_loader)
     test_rel_df.to_csv(result_dir / f"test_rel_{model.name.lower()}.csv", index=False)
 
 

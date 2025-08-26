@@ -102,7 +102,7 @@ class BaiduUltrFeatureClickDataset(BaseParquetDataset):
         batch: RecordBatch,
         begin_idx: int,
         end_idx: int,
-    ) -> Generator[Dict[str, Any]]:
+    ) -> Generator[Dict[str, Any], None, None]:
         query_doc_features = batch["features"].to_numpy(zero_copy_only=False)
         positions = batch["positions"].to_numpy(zero_copy_only=False)
         clicks = batch["clicks"].to_numpy(zero_copy_only=False)

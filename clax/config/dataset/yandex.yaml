@@ -6,7 +6,4 @@ dataset:
   max_positions: 10
 
 query_doc_pairs: 346_711_929
-
-train_sessions: [0,1_000_000] # 70%
-val_sessions: [1_000_000,2_000_000] # 15%
-test_sessions: [2_000_000,3_000_000] # 15%
+positions: 10

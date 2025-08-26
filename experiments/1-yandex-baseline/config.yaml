@@ -1,0 +1,39 @@
+defaults:
+  - _self_
+  - dataset: yandex
+  - parameter/examination: position
+  - parameter/attraction: embedding/full
+  - parameter/satisfaction: embedding/full
+  - model: pbm
+
+random_state: 42
+dataset_dir: /Users/philipphager/Documents/GitHub/clix/clax-datasets
+result_dir: /Users/philipphager/Documents/GitHub/clix/results
+experiment: "1-yandex-baseline"
+
+# Configure based on available hardware:
+train_batch_size: 512
+eval_batch_size: 512
+num_workers: 8
+
+# Configure training:
+learning_rate: 0.003
+epochs: 100
+early_stopping_patience: 0
+
+# Overwritten by the selected Yandex dataset config:
+query_doc_pairs: 346_711_929
+positions: 10
+
+# Select dataset ranges in [0, 146_278_823], overwritten in main.sh:
+train_sessions: [ 0,10_000_000 ]
+val_sessions: [ 10_000_000,15_000_000 ]
+test_sessions: [ 15_000_000,20_000_000 ]
+
+# Optionally, val/test only on queries that occurred at least n times during training:
+min_train_sessions_per_eval_query: 10
+
+# Add clax base configs (so that you can select them in the defaults list):
+hydra:
+  searchpath:
+    - pkg://clax.config

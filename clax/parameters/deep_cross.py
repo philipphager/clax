@@ -56,23 +56,22 @@ class DeepCrossParameter(Parameter):
         self.logit_layer = nnx.Linear(logit_units, 1, rngs=rngs)
 
     def _get_deep_model(self, config: DeepCrossParameterConfig, rngs):
-        norm = (
-            config.norm(config.hidden_units, rngs=rngs)
-            if config.norm is not None
-            else lambda x: x
-        )
         modules = []
         features = config.features
 
         for _ in range(config.deep_layers):
+            modules.append(nnx.Linear(features, config.hidden_units, rngs=rngs))
+
+            if config.norm is not None:
+                modules.append(config.norm(config.hidden_units, rngs=rngs))
+
             modules.extend(
                 [
-                    nnx.Linear(features, config.hidden_units, rngs=rngs),
-                    norm,
                     config.activation_fn,
                     nnx.Dropout(rate=config.dropout, rngs=rngs),
                 ]
             )
+
             features = config.hidden_units
 
         return nnx.Sequential(*modules)

@@ -4,6 +4,7 @@ from flax import nnx
 
 from .base import Parameter, ParameterConfig
 from .deep import DeepParameter, DeepParameterConfig
+from .deep_cross import DeepCrossParameter, DeepCrossParameterConfig
 from .embeddings import (
     EmbeddingParameter,
     EmbeddingParameterConfig,
@@ -51,5 +52,7 @@ def build_parameter(config: ParameterConfig, rngs: nnx.Rngs) -> Parameter:
         return LinearParameter(config, rngs=rngs)
     elif isinstance(config, DeepParameterConfig):
         return DeepParameter(config, rngs=rngs)
+    elif isinstance(config, DeepCrossParameterConfig):
+        return DeepCrossParameter(config, rngs=rngs)
     else:
         raise ValueError(f"Unknown parameter config type: {type(config)}")

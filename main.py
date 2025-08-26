@@ -8,6 +8,15 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
+from clax.datasets import BaiduUltrFeatureAnnotationDataset
+from clax.models import (
+    PositionBasedModel,
+    DocumentCTRModel,
+)
+from clax.parameters import (
+    DeepParameter,
+    DeepParameterConfig,
+)
 from clax.trainer import Trainer
 
 
@@ -18,6 +27,11 @@ def main(config: DictConfig):
 
     filter_query_ids = None
     train_dataset = instantiate(config.dataset, session_range=config.train_sessions)
+
+    relevance_dataset = BaiduUltrFeatureAnnotationDataset(
+        config.dataset.dataset_dir,
+        session_range=[0, 1_000_000],
+    )
 
     if config.min_train_sessions_per_eval_query > 0:
         filter_query_ids = train_dataset.unique_query_ids(
@@ -59,6 +73,12 @@ def main(config: DictConfig):
         collate_fn=test_dataset.collate_fn,
         num_workers=4,
     )
+    test_relevance_loader = DataLoader(
+        relevance_dataset,
+        batch_size=config.eval_batch_size,
+        collate_fn=relevance_dataset.collate_fn,
+        num_workers=1,
+    )
 
     model_fn = instantiate(config.model)
     model = model_fn(rngs=rngs)
@@ -69,6 +89,7 @@ def main(config: DictConfig):
     train_df = trainer.train(model, train_loader, val_loader)
     timer_stop = perf_counter()
     test_df = trainer.test(model, test_loader)
+    test_rel_df = trainer.test_relevance(model, test_relevance_loader)
     test_df["train_time_s"] = timer_stop - timer_start
 
     result_dir = Path(f"results/{config.experiment}")
@@ -76,6 +97,7 @@ def main(config: DictConfig):
 
     train_df.to_csv(result_dir / f"train_{model.name.lower()}.csv", index=False)
     test_df.to_csv(result_dir / f"test_{model.name.lower()}.csv", index=False)
+    test_rel_df.to_csv(result_dir / f"test_rel_{model.name.lower()}.csv", index=False)
 
 
 if __name__ == "__main__":

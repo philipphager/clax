@@ -1,18 +1,22 @@
 from functools import partial
 
 import pandas as pd
+import rax
+from flax import nnx
+from flax.training.early_stopping import EarlyStopping
+from optax._src.base import GradientTransformation
+from progress_table import ProgressTable
+from torch.utils.data import DataLoader
+
 from clax.metrics import (
     LogLikelihood,
     Perplexity,
     ConditionalPerplexity,
     Average,
     MultiMetric,
+    RaxMetric,
 )
-from flax import nnx
-from flax.training.early_stopping import EarlyStopping
-from optax._src.base import GradientTransformation
-from progress_table import ProgressTable
-from torch.utils.data import DataLoader
+from clax.models.base import ClickModel
 
 
 class Trainer:
@@ -33,6 +37,13 @@ class Trainer:
             "ll": LogLikelihood(),
             "ppl": Perplexity(),
             "cond_ppl": ConditionalPerplexity(),
+        }
+        self.ranking_metrics = {
+            "dcg@10": RaxMetric(rax.dcg_metric, top_n=10),
+            "dcg@5": RaxMetric(rax.dcg_metric, top_n=5),
+            "dcg@3": RaxMetric(rax.dcg_metric, top_n=3),
+            "dcg@1": RaxMetric(rax.dcg_metric, top_n=1),
+            "mrr@10": RaxMetric(rax.mrr_metric, top_n=10),
         }
 
     def train(
@@ -132,6 +143,34 @@ class Trainer:
         logger.close()
         return logger.to_df()
 
+    def test_relevance(
+        self,
+        model: nnx.Module,
+        test_loader: DataLoader,
+    ) -> pd.DataFrame:
+        metrics = MultiMetric(**self.ranking_metrics)
+        model.eval()
+        logger = ProgressTable(
+            columns=[
+                "model",
+                *metrics.compute(prefix="test_").keys(),
+            ],
+            pbar_embedded=False,
+            pbar_show_percents=True,
+            pbar_style="angled alt red blue",
+        )
+        logger.update("model", model.name)
+
+        for batch in logger(test_loader, description="Test"):
+            self._test_relevance_step(model, metrics, batch)
+
+        results = metrics.compute(prefix="test_")
+        metrics.reset()
+
+        logger.update_from_dict(results)
+        logger.close()
+        return logger.to_df()
+
     @partial(nnx.jit, static_argnums=(0))
     def _train_step(
         self,
@@ -163,5 +202,19 @@ class Trainer:
             log_probs=log_probs,
             conditional_log_probs=conditional_log_probs,
             clicks=batch["clicks"],
+            where=batch["mask"],
+        )
+
+    @partial(nnx.jit, static_argnums=(0))
+    def _test_relevance_step(
+        self,
+        model: ClickModel,
+        metrics: nnx.MultiMetric,
+        batch,
+    ):
+        scores = model.predict_relevance(batch)
+        metrics.update(
+            scores=scores,
+            labels=batch["labels"],
             where=batch["mask"],
         )

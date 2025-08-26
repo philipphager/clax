@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Callable
+from typing import Dict, Callable, Optional
 
 from flax import nnx
 from flax.nnx import rnglib
@@ -16,6 +16,8 @@ class DeepParameterConfig(ParameterConfig):
     layers: int = 2
     dropout: float = 0.0
     activation_fn: Callable = nnx.elu
+    norm: Optional[Callable] = nnx.LayerNorm
+    input_norm: Optional[Callable] = nnx.LayerNorm
 
 
 class DeepParameter(Parameter):
@@ -35,10 +37,23 @@ class DeepParameter(Parameter):
         modules = []
         features = config.features
 
+        identity = lambda x: x
+        self.input_norm = (
+            config.input_norm(features, rngs=rngs)
+            if config.input_norm is not None
+            else identity
+        )
+        norm = (
+            config.norm(config.hidden_units, rngs=rngs)
+            if config.norm is not None
+            else identity
+        )
+
         for _ in range(config.layers):
             modules.extend(
                 [
                     nnx.Linear(features, config.hidden_units, rngs=rngs),
+                    norm,
                     config.activation_fn,
                     nnx.Dropout(rate=config.dropout, rngs=rngs),
                 ]
@@ -49,7 +64,8 @@ class DeepParameter(Parameter):
         self.model = nnx.Sequential(*modules)
 
     def logit(self, batch: Dict) -> Array:
-        return self.model(batch[self.config.use_feature]).squeeze()
+        x = self.input_norm(batch[self.config.use_feature])
+        return self.model(x).squeeze()
 
     def prob(self, batch: Dict) -> Array:
         return nnx.sigmoid(self.logit(batch))

@@ -1,0 +1,37 @@
+defaults:
+  - _self_
+  - dataset: baidu-ultr-uva
+  - parameter/examination: position
+  - parameter/attraction: deep-cross
+  - parameter/satisfaction: deep-cross
+  - model: pbm
+
+random_state: 42
+dataset_dir: /Users/philipphager/Documents/GitHub/clix/clax-datasets
+result_dir: /Users/philipphager/Documents/GitHub/clix/results
+experiment: "4-baidu-ultr-features"
+
+# Configure based on available hardware:
+train_batch_size: 512
+eval_batch_size: 512
+num_workers: 8
+
+# Configure training:
+learning_rate: 0.003
+epochs: 100
+early_stopping_patience: 0
+
+# Overwritten by the selected Baidu-ULTR-UVA dataset config:
+positions: 10
+
+# Select dataset ranges in [0, 2_372_947], overwritten in main.sh:
+train_sessions: [0, 1_700_000]
+val_sessions: [1_700_000, 2_000_000]
+test_sessions: [2_000_000, 2_372_947]
+test_rel_sessions: [0, 7_008]
+
+# Add clax base configs (so that you can select them in the defaults list):
+hydra:
+  searchpath:
+    - pkg://clax.config
+    - file://${oc.env:PWD}/../launcher

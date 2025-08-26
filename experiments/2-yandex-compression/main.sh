@@ -7,7 +7,7 @@
 #SBATCH --time=24:00:00
 
 python main.py -m \
-  experiment=2-yandex-embeddings/full/1 \
+  experiment=2-yandex-compression/full/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \
@@ -18,7 +18,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/full/2 \
+  experiment=2-yandex-compression/full/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \
@@ -29,7 +29,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/full/3 \
+  experiment=2-yandex-compression/full/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/full \
   parameter/satisfaction=embedding/full \
@@ -40,7 +40,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/2/1 \
+  experiment=2-yandex-compression/hash/2/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -52,7 +52,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/2/2 \
+  experiment=2-yandex-compression/hash/2/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -64,7 +64,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/2/3 \
+  experiment=2-yandex-compression/hash/2/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -76,7 +76,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/5/1 \
+  experiment=2-yandex-compression/hash/5/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -88,7 +88,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/5/2 \
+  experiment=2-yandex-compression/hash/5/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -100,7 +100,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/5/3 \
+  experiment=2-yandex-compression/hash/5/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -112,7 +112,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/10/1 \
+  experiment=2-yandex-compression/hash/10/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -124,7 +124,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/10/2 \
+  experiment=2-yandex-compression/hash/10/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -136,7 +136,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/10/3 \
+  experiment=2-yandex-compression/hash/10/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -148,7 +148,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/100/1 \
+  experiment=2-yandex-compression/hash/100/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -160,7 +160,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/100/2 \
+  experiment=2-yandex-compression/hash/100/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -172,7 +172,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/100/3 \
+  experiment=2-yandex-compression/hash/100/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -184,7 +184,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/1000/1 \
+  experiment=2-yandex-compression/hash/1000/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -196,7 +196,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/1000/2 \
+  experiment=2-yandex-compression/hash/1000/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -208,7 +208,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/hash/1000/3 \
+  experiment=2-yandex-compression/hash/1000/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
   parameter/satisfaction=embedding/hash \
@@ -220,7 +220,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/2/1 \
+  experiment=2-yandex-compression/qr/2/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -232,7 +232,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/2/2 \
+  experiment=2-yandex-compression/qr/2/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -244,7 +244,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/2/3 \
+  experiment=2-yandex-compression/qr/2/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -256,7 +256,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/5/1 \
+  experiment=2-yandex-compression/qr/5/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -268,7 +268,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/5/2 \
+  experiment=2-yandex-compression/qr/5/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -280,7 +280,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/5/3 \
+  experiment=2-yandex-compression/qr/5/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -292,7 +292,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/10/1 \
+  experiment=2-yandex-compression/qr/10/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -304,7 +304,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/10/2 \
+  experiment=2-yandex-compression/qr/10/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -316,7 +316,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/10/3 \
+  experiment=2-yandex-compression/qr/10/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -328,7 +328,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/100/1 \
+  experiment=2-yandex-compression/qr/100/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -340,7 +340,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/100/2 \
+  experiment=2-yandex-compression/qr/100/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -352,7 +352,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/100/3 \
+  experiment=2-yandex-compression/qr/100/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -364,7 +364,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/1000/1 \
+  experiment=2-yandex-compression/qr/1000/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -376,7 +376,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/1000/2 \
+  experiment=2-yandex-compression/qr/1000/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \
@@ -388,7 +388,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=2-yandex-embeddings/qr/1000/3 \
+  experiment=2-yandex-compression/qr/1000/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
   parameter/satisfaction=embedding/qr \

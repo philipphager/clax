@@ -8,7 +8,7 @@
 
 
 python main.py -m \
-  experiment=1-yandex-10m/1/ \
+  experiment=1-yandex-baseline/1/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[0,10_000_000] \
   val_sessions=[10_000_000,15_000_000] \
@@ -17,7 +17,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=1-yandex-10m/2/ \
+  experiment=1-yandex-baseline/2/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[10_000_000,20_000_000] \
   val_sessions=[20_000_000,25_000_000] \
@@ -26,7 +26,7 @@ python main.py -m \
   $@
 
 python main.py -m \
-  experiment=1-yandex-10m/3/ \
+  experiment=1-yandex-baseline/3/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[20_000_000,30_000_000] \
   val_sessions=[30_000_000,35_000_000] \

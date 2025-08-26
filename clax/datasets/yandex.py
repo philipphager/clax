@@ -53,7 +53,7 @@ class YandexDataset(BaseParquetDataset):
         batch: RecordBatch,
         begin_idx: int,
         end_idx: int,
-    ) -> Generator[Dict[str, Any]]:
+    ) -> Generator[Dict[str, Any], None, None]:
         query_ids = batch["query_id"].to_numpy(zero_copy_only=False)
         query_doc_ids = batch["query_doc_ids"].to_numpy(zero_copy_only=False)
         clicks = batch["clicks"].to_numpy(zero_copy_only=False)

@@ -48,7 +48,7 @@ class BaiduUltrDataset(BaseParquetDataset):
         batch: RecordBatch,
         begin_idx: int,
         end_idx: int,
-    ) -> Generator[Dict[str, Any]]:
+    ) -> Generator[Dict[str, Any], None, None]:
         query_doc_ids = batch["query_doc_ids"].to_numpy(zero_copy_only=False)
         clicks = batch["clicks"].to_numpy(zero_copy_only=False)
 
@@ -155,7 +155,7 @@ class BaiduUltrFeatureAnnotationDataset(BaseParquetDataset):
         batch: RecordBatch,
         begin_idx: int,
         end_idx: int,
-    ) -> Generator[Dict[str, Any]]:
+    ) -> Generator[Dict[str, Any], None, None]:
         query_doc_features = batch["features"].to_numpy(zero_copy_only=False)
         labels = batch["labels"].to_numpy(zero_copy_only=False)
 

@@ -37,3 +37,4 @@ min_train_sessions_per_eval_query: 10
 hydra:
   searchpath:
     - pkg://clax.config
+    - file://${oc.env:PWD}/../launcher

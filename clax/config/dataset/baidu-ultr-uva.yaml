@@ -3,6 +3,7 @@
 dataset:
   _target_: clax.datasets.BaiduUltrFeatureClickDataset
   dataset_dir: "${dataset_dir}/baidu-ultr-uva"
+  max_positions: 22
 
 positions: 22
 query_doc_features: 12

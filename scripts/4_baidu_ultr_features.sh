@@ -12,9 +12,9 @@ python main.py -m \
   dataset=baidu-ultr-uva \
   parameter/attraction=deep-cross \
   parameter/satisfaction=deep-cross \
-  train_sessions=[0,1_750_000] \
-  val_sessions=[1_750_000,2_000_000] \
-  test_sessions=[2_000_000,2_250_000] \
+  train_sessions=[500_000,2_500_000] \
+  val_sessions=[250_000,500_000] \
+  test_sessions=[0,250_000] \
   random_state=1 \
   $@
 
@@ -24,9 +24,9 @@ python main.py -m \
   dataset=baidu-ultr-uva \
   parameter/attraction=deep-cross \
   parameter/satisfaction=deep-cross \
-  train_sessions=[250_000,2_000_000] \
-  val_sessions=[2_000_000,2_250_000] \
-  test_sessions=[0,250_000] \
+  train_sessions=[500_000,2_500_000] \
+  val_sessions=[0,250_000] \
+  test_sessions=[250_000,500_000] \
   random_state=2 \
   $@
 
@@ -36,8 +36,8 @@ python main.py -m \
   dataset=baidu-ultr-uva \
   parameter/attraction=deep-cross \
   parameter/satisfaction=deep-cross \
-  train_sessions=[500_000,2_250_000] \
-  val_sessions=[0,250_000] \
-  test_sessions=[250_000,500_000] \
+  train_sessions=[0,1_750_000] \
+  val_sessions=[1_750_000,2_000_000] \
+  test_sessions=[2_000_000,2_500_000] \
   random_state=3 \
   $@

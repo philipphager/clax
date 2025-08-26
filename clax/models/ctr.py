@@ -63,6 +63,9 @@ class GlobalCTRModel(nnx.Module):
     def predict_clicks(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
+    def predict_relevance(self, batch: Dict) -> Array:
+        return self.predict_conditional_clicks(batch)
+
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> CTRModelOutput:
         ctr_idx = jnp.zeros_like(batch["query_doc_ids"])
         click_probs = self.ctr.prob({"ctr_idx": ctr_idx})
@@ -123,6 +126,9 @@ class RankCTRModel(nnx.Module):
     def predict_clicks(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
+    def predict_relevance(self, batch: Dict) -> Array:
+        return self.predict_conditional_clicks(batch)
+
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> Array:
         click_probs = self.ctr.prob(batch)
         clicks = batch["mask"] & jax.random.bernoulli(rngs(), click_probs)
@@ -179,6 +185,9 @@ class DocumentCTRModel(nnx.Module):
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def predict_clicks(self, batch: Dict) -> Array:
+        return self.predict_conditional_clicks(batch)
+
+    def predict_relevance(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> Array:
@@ -241,6 +250,9 @@ class DocumentRankCTRModel(nnx.Module):
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def predict_clicks(self, batch: Dict) -> Array:
+        return self.predict_conditional_clicks(batch)
+
+    def predict_relevance(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> Array:

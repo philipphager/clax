@@ -1,3 +1,4 @@
+import numpy as np
 from typing import Dict, List
 
 import jax
@@ -118,3 +119,14 @@ class MixtureModel(ClickModel):
         click_log_probs = nnx.logsumexp(click_log_probs, axis=-1)
 
         return click_log_probs
+
+    def predict_relevance(self, batch: Dict) -> Array:
+        prior_log_probs = self._get_prior_log_probs()
+
+        # Shape: (batch, positions, models)
+        relevance_log_probs_per_model = jnp.stack(
+            [model.predict_relevance(batch) for model in self.models], axis=-1
+        )
+
+        relevance_log_probs = relevance_log_probs_per_model + prior_log_probs
+        return nnx.logsumexp(relevance_log_probs, axis=-1)

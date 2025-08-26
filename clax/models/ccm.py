@@ -134,6 +134,9 @@ class ClickChainModel(nnx.Module):
         click_log_probs = exam_log_probs + log_probs["rel"]
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
+    def predict_relevance(self, batch: Dict) -> Array:
+        return self.attraction.log_prob(batch)
+
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> ClickChainModelOutput:
         rel_probs = self.attraction.prob(batch)
         tau1 = self.continuation_exam_no_click.prob()

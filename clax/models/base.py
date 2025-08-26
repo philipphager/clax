@@ -19,5 +19,9 @@ class ClickModel(nnx.Module, ABC):
         pass
 
     @abstractmethod
+    def predict_relevance(self, batch: Dict) -> Array:
+        pass
+
+    @abstractmethod
     def sample(self, batch: Dict, rngs: nnx.Rngs):
         pass

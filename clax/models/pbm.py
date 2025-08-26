@@ -73,6 +73,9 @@ class PositionBasedModel(ClickModel):
     def predict_clicks(self, batch: Dict) -> Array:
         return self.predict_conditional_clicks(batch)
 
+    def predict_relevance(self, batch: Dict) -> Array:
+        return self.attraction.log_prob(batch)
+
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> PositionBasedModelOutput:
         exam_probs = self.examination.prob(batch)
         attr_probs = self.attraction.prob(batch)

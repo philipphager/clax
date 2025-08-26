@@ -105,6 +105,9 @@ class CascadeModel(nnx.Module):
             attraction=attraction,
         )
 
+    def predict_relevance(self, batch: Dict) -> Array:
+        return self.attraction.log_prob(batch)
+
     @staticmethod
     def _no_clicks_before(clicks):
         """

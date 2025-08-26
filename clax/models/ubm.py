@@ -147,6 +147,9 @@ class UserBrowsingModel(nnx.Module):
 
         return click_log_probs
 
+    def predict_relevance(self, batch: Dict) -> Array:
+        return self.attraction.log_prob(batch)
+
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> UserBrowsingModelOutput:
         mask = batch["mask"]
         positions = batch["positions"]

@@ -139,6 +139,9 @@ class DynamicBayesianNetwork(nnx.Module):
         click_log_probs = exam_log_probs + log_probs["attr"]
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
+    def predict_relevance(self, batch: Dict) -> Array:
+        return self.attraction.log_prob(batch) + self.satisfaction.log_prob(batch)
+
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> DynamicBayesianNetworkOutput:
         mask = batch["mask"]
         n_batch, n_positions = mask.shape

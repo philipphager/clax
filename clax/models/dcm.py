@@ -133,6 +133,9 @@ class DependentClickModel(nnx.Module):
         click_log_probs = exam_log_probs + log_probs["attr"]
         return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
+    def predict_relevance(self, batch: Dict) -> Array:
+        return self.attraction.log_prob(batch)
+
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> Array:
         mask = batch["mask"]
         attr_probs = self.attraction.prob(batch)

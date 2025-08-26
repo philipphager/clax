@@ -61,9 +61,9 @@ class UniversalHash(nnx.Module):
         We replace the final % output with linear scaling to avoid modulo bias.
         """
 
-        assert (
-            len(hash_inputs) == self.num_args
-        ), f"UniversalHash expects {self.num_args} arguments, but got {len(hash_inputs)}"
+        assert len(hash_inputs) == self.num_args, (
+            f"UniversalHash expects {self.num_args} arguments, but got {len(hash_inputs)}"
+        )
 
         # Start with constant term in range [0, prime):
         result = self.coefficients[0]

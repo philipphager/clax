@@ -152,9 +152,9 @@ class BaseParquetDataset(IterableDataset, ABC):
             rows_processed = 0
             file = pq.ParquetFile(path)
 
-            assert (
-                query_column in file.schema_arrow.names
-            ), f"Query id '{query_column}' not found in parquet file."
+            assert query_column in file.schema_arrow.names, (
+                f"Query id '{query_column}' not found in parquet file."
+            )
 
             for batch in file.iter_batches():
                 batch_size = len(batch)

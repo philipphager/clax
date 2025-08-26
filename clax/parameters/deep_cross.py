@@ -30,7 +30,6 @@ class DeepCrossParameterConfig(ParameterConfig):
 
 
 class DeepCrossParameter(Parameter):
-
     def __init__(
         self,
         config: DeepCrossParameterConfig,

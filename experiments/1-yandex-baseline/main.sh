@@ -7,7 +7,7 @@
 #SBATCH --time=8:00:00
 
 
-python main.py -m \
+uv run main.py -m \
   experiment=1-yandex-baseline/1/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[0,10_000_000] \
@@ -16,7 +16,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=1-yandex-baseline/2/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[10_000_000,20_000_000] \
@@ -25,7 +25,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=1-yandex-baseline/3/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[20_000_000,30_000_000] \

@@ -23,6 +23,7 @@ uv run main.py -m \
   train_sessions=[200_000_000,800_000_000] \
   val_sessions=[800_000_000,900_000_000] \
   test_sessions=[900_000_000,1_000_000_000] \
+  compression_ratio=10 \
   random_state=2 \
   $@
 
@@ -32,5 +33,6 @@ uv run main.py -m \
   train_sessions=[400_000_000,1_000_000_000] \
   val_sessions=[1_000_000_000,1_100_000_000] \
   test_sessions=[1_100_000_000,1_200_000_000] \
+  compression_ratio=10 \
   random_state=3 \
   $@

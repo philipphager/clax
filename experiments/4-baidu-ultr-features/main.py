@@ -43,6 +43,7 @@ def main(config: DictConfig):
         collate_fn=train_dataset.collate_fn,
         num_workers=config.num_workers,
         persistent_workers=True,
+        pin_memory=True,
     )
     val_loader = DataLoader(
         val_dataset,

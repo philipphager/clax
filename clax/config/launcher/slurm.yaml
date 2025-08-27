@@ -12,8 +12,5 @@ hydra:
     partition: gpu
     gres: gpu:nvidia_rtx_a6000:1
 
-train_batch_size: 4096
-eval_batch_size: 8192
-
 dataset_dir: /ivi/ilps/personal/phager/clax-datasets
 result_dir: /ivi/ilps/personal/phager/clax-results

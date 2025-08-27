@@ -12,4 +12,4 @@ dataset:
     max_positions: "${positions}"
 
 positions: 22
-query_doc_features: 12
+query_doc_features: 768

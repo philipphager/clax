@@ -70,7 +70,7 @@ class BaiduUltrFeatureClickDataset(BaseParquetDataset):
         dataset_dir: Union[Path, str],
         session_range: Tuple[int, int],
         max_positions: int = 10,
-        file_glob: str = "part-*-split-*.parquet",
+        file_glob: str = "part-*_split-*.parquet",
         **kwargs,
     ):
         files = list(sorted(Path(dataset_dir).glob(file_glob)))
@@ -103,7 +103,7 @@ class BaiduUltrFeatureClickDataset(BaseParquetDataset):
         begin_idx: int,
         end_idx: int,
     ) -> Generator[Dict[str, Any], None, None]:
-        query_doc_features = batch["features"].to_numpy(zero_copy_only=False)
+        query_doc_features = batch["query_doc_features"].to_numpy(zero_copy_only=False)
         positions = batch["positions"].to_numpy(zero_copy_only=False)
         clicks = batch["clicks"].to_numpy(zero_copy_only=False)
 
@@ -156,7 +156,7 @@ class BaiduUltrFeatureAnnotationDataset(BaseParquetDataset):
         begin_idx: int,
         end_idx: int,
     ) -> Generator[Dict[str, Any], None, None]:
-        query_doc_features = batch["features"].to_numpy(zero_copy_only=False)
+        query_doc_features = batch["query_doc_features"].to_numpy(zero_copy_only=False)
         labels = batch["labels"].to_numpy(zero_copy_only=False)
 
         for idx in range(begin_idx, end_idx):

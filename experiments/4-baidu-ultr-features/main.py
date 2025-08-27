@@ -22,19 +22,19 @@ def main(config: DictConfig):
     print("Saving results to: ", result_dir)
 
     train_dataset = instantiate(
-        config.dataset,
+        config.dataset.clicks,
         session_range=config.train_sessions,
     )
     val_dataset = instantiate(
-        config.dataset,
+        config.dataset.clicks,
         session_range=config.val_sessions,
     )
     test_dataset = instantiate(
-        config.dataset,
+        config.dataset.clicks,
         session_range=config.test_sessions,
     )
-    relevance_dataset = BaiduUltrFeatureAnnotationDataset(
-        config.dataset.dataset_dir,
+    relevance_dataset = instantiate(
+        config.dataset.annotations,
         session_range=config.test_rel_sessions,
     )
 

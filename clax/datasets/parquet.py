@@ -54,7 +54,7 @@ class BaseParquetDataset(IterableDataset, ABC):
             file = pq.ParquetFile(path)
             rows_processed = 0
 
-            for batch in file.iter_batches():
+            for batch in file.iter_batches(batch_size=500):
                 batch_size = len(batch)
                 overlap_begin = max(0, begin_row - rows_processed)
                 overlap_end = min(batch_size, end_row - rows_processed)
@@ -152,9 +152,9 @@ class BaseParquetDataset(IterableDataset, ABC):
             rows_processed = 0
             file = pq.ParquetFile(path)
 
-            assert query_column in file.schema_arrow.names, (
-                f"Query id '{query_column}' not found in parquet file."
-            )
+            assert (
+                query_column in file.schema_arrow.names
+            ), f"Query id '{query_column}' not found in parquet file."
 
             for batch in file.iter_batches():
                 batch_size = len(batch)

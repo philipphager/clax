@@ -111,7 +111,7 @@ class BaiduUltrFeatureClickDataset(BaseParquetDataset):
             n = (positions[idx] <= self.max_positions).sum()
 
             yield {
-                "query_doc_features": np.array(list(query_doc_features[idx]))[:n],
+                "query_doc_features": np.vstack(query_doc_features[idx])[:n],
                 "clicks": clicks[idx][:n],
                 "positions": positions[idx][:n],
                 "mask": self.mask[:n],
@@ -163,7 +163,7 @@ class BaiduUltrFeatureAnnotationDataset(BaseParquetDataset):
             n = len(labels[idx])
 
             yield {
-                "query_doc_features": np.array(list(query_doc_features[idx])),
+                "query_doc_features": np.vstack(query_doc_features[idx])[:n],
                 "labels": labels[idx],
                 "mask": self.mask[:n],
                 "n": n,

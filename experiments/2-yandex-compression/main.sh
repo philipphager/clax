@@ -6,7 +6,7 @@
 #SBATCH --mem=4GB
 #SBATCH --time=24:00:00
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/full/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/full \
@@ -17,7 +17,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/full/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/full \
@@ -28,7 +28,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/full/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/full \
@@ -39,7 +39,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/2/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -51,7 +51,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/2/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -63,7 +63,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/2/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -75,7 +75,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/5/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -87,7 +87,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/5/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -99,7 +99,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/5/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -111,7 +111,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/10/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -123,7 +123,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/10/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -135,7 +135,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/10/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -147,7 +147,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/100/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -159,7 +159,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/100/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -171,7 +171,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/100/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -183,7 +183,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/1000/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -195,7 +195,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/1000/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -207,7 +207,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/hash/1000/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/hash \
@@ -219,7 +219,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/2/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -231,7 +231,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/2/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -243,7 +243,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/2/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -255,7 +255,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/5/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -267,7 +267,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/5/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -279,7 +279,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/5/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -291,7 +291,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/10/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -303,7 +303,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/10/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -315,7 +315,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/10/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -327,7 +327,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/100/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -339,7 +339,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/100/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -351,7 +351,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/100/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -363,7 +363,7 @@ python main.py -m \
   random_state=3 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/1000/1 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -375,7 +375,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/1000/2 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \
@@ -387,7 +387,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=2-yandex-compression/qr/1000/3 \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   parameter/attraction=embedding/qr \

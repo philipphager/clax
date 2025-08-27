@@ -6,7 +6,7 @@
 #SBATCH --mem=4GB
 #SBATCH --time=24:00:00
 
-python main.py -m \
+uv run main.py -m \
   experiment=3-baidu-ultr-embeddings/1/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[0,600_000_000] \
@@ -16,7 +16,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=3-baidu-ultr-embeddings/2/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   dataset=baidu-ultr \
@@ -26,7 +26,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=3-baidu-ultr-embeddings/3/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[400_000_000,1_000_000_000] \

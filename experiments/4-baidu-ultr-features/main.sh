@@ -6,7 +6,7 @@
 #SBATCH --mem=4GB
 #SBATCH --time=24:00:00
 
-python main.py -m \
+uv run main.py -m \
   experiment=4-baidu-ultr-features/1/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[0,1_850_000] \
@@ -15,7 +15,7 @@ python main.py -m \
   random_state=1 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=4-baidu-ultr-features/2/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[250_000,2_100_000] \
@@ -24,7 +24,7 @@ python main.py -m \
   random_state=2 \
   $@
 
-python main.py -m \
+uv run main.py -m \
   experiment=4-baidu-ultr-features/3/ \
   model=gctr,rctr,dctr,pbm,ubm,cm,ccm,dbn,sdbn,dcm \
   train_sessions=[500_000,2_350_000] \

@@ -12,9 +12,9 @@ result_dir: /Users/philipphager/Documents/GitHub/clix/results
 experiment: "4-baidu-ultr-features"
 
 # Configure based on available hardware:
-train_batch_size: 512
-eval_batch_size: 512
-num_workers: 4
+train_batch_size: 256
+eval_batch_size: 256
+num_workers: 8
 
 # Configure training:
 learning_rate: 0.003

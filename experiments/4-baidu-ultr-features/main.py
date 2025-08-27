@@ -12,7 +12,7 @@ from clax.datasets import BaiduUltrFeatureAnnotationDataset
 from clax.trainer import Trainer
 
 
-@hydra.main(version_base="1.3", config_path="clax/config/", config_name="config")
+@hydra.main(version_base="1.3", config_path=".", config_name="config")
 def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
     rngs = nnx.Rngs(config.random_state)

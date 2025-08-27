@@ -11,5 +11,5 @@ dataset:
     dataset_dir: "${dataset_dir}/baidu-ultr-uva"
     max_positions: "${positions}"
 
-positions: 22
+positions: 10
 query_doc_features: 768

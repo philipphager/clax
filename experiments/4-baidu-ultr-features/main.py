@@ -8,7 +8,6 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
-from clax.datasets import BaiduUltrFeatureAnnotationDataset
 from clax.trainer import Trainer
 
 

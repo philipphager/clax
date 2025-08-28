@@ -64,7 +64,9 @@ class GlobalCTRModel(nnx.Module):
         return self.predict_conditional_clicks(batch)
 
     def predict_relevance(self, batch: Dict) -> Array:
-        return self.predict_conditional_clicks(batch)
+        ctr_idx = jnp.zeros_like(batch["labels"])
+        click_log_probs = self.ctr.log_prob({"ctr_idx": ctr_idx})
+        return jnp.where(batch["mask"], click_log_probs, -jnp.inf)
 
     def sample(self, batch: Dict, rngs: nnx.Rngs) -> CTRModelOutput:
         ctr_idx = jnp.zeros_like(batch["positions"])

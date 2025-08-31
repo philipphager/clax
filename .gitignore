@@ -21,6 +21,7 @@ multirun/
 *.txt
 *.parquet
 clax-datasets/
+clax-results/
 results/
 
 # OS

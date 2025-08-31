@@ -17,7 +17,7 @@ class MixtureModelOutput:
 
 
 class MixtureModel(ClickModel):
-    name = "MixtureModel"
+    name = "Mixture"
 
     def __init__(
         self,
@@ -27,6 +27,7 @@ class MixtureModel(ClickModel):
     ):
         super().__init__()
         self.models = models
+        self.name = self._get_name()
         self.num_models = len(models)
         self.inverse_temperature = inverse_temperature
         self.model_prior_logits = nnx.Param(jnp.ones(self.num_models))
@@ -130,3 +131,9 @@ class MixtureModel(ClickModel):
 
         relevance_log_probs = relevance_log_probs_per_model + prior_log_probs
         return nnx.logsumexp(relevance_log_probs, axis=-1)
+
+    def _get_name(self):
+        model_names = ", ".join(
+            [getattr(model, "name") for model in self.models if hasattr(model, "name")]
+        )
+        return f"Mixture ({model_names})"

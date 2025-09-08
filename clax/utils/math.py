@@ -43,7 +43,3 @@ def log1mexp(x):
         jnp.log(-jnp.expm1(x)),  # x close to 0
         jnp.log1p(-jnp.exp(x)),  # x very negative
     )
-
-
-def exp_logp(log_probs: Array, *, where: Array) -> Array:
-    return jnp.where(where, jnp.exp(log_probs), 0.0)

@@ -38,17 +38,14 @@ class Trainer:
         model: nnx.Module,
         train_loader: DataLoader,
         val_loader: DataLoader,
-        train_click_metrics: Optional[Dict[str, Metric]] = None,
-        val_click_metrics: Optional[Dict[str, Metric]] = None,
+        click_metrics: Optional[Dict[str, Metric]] = None,
     ) -> pd.DataFrame:
-        # Ensure the loss is always present during training / validation:
-        train_metrics = train_click_metrics or {}
-        train_metrics = {**train_metrics, "loss": Average("loss")}
-        train_metrics = MultiMetric(**train_metrics)
+        train_metrics = MultiMetric(loss=Average("loss"))
 
-        val_metrics = val_click_metrics or self._default_click_metrics()
-        val_metrics = {**val_metrics, "loss": Average("loss")}
-        val_metrics = MultiMetric(**val_metrics)
+        # Ensure the loss is always present during validation:
+        click_metrics = click_metrics or self._default_click_metrics()
+        click_metrics = {**click_metrics, "loss": Average("loss")}
+        val_metrics = MultiMetric(**click_metrics)
 
         early_stopping = deepcopy(self.early_stopping)
         optimizer = nnx.Optimizer(model, self.optimizer)

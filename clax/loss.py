@@ -8,7 +8,7 @@ def binary_cross_entropy(
     y_predict: Array,
     y_true: Array,
     where: Array,
-    log_probs: bool = False,
+    log_probs: bool = True,
     aggregate: bool = True,
 ):
     if log_probs:

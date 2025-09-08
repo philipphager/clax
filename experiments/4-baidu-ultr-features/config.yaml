@@ -19,7 +19,6 @@ num_workers: 8
 # Configure training:
 learning_rate: 0.003
 epochs: 100
-early_stopping_patience: 0
 
 # Overwritten by the selected Baidu-ULTR-UVA dataset config:
 positions: 10

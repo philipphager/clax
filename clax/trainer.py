@@ -1,4 +1,6 @@
+from copy import deepcopy
 from functools import partial
+from typing import Dict, Optional
 
 import pandas as pd
 import rax
@@ -12,9 +14,10 @@ from clax.metrics import (
     LogLikelihood,
     Perplexity,
     ConditionalPerplexity,
-    Average,
     MultiMetric,
     RaxMetric,
+    Metric,
+    Average,
 )
 from clax.models.base import ClickModel
 
@@ -24,39 +27,31 @@ class Trainer:
         self,
         optimizer: GradientTransformation,
         epochs: int = 50,
-        patience: int = 0,
+        early_stopping: EarlyStopping = EarlyStopping(patience=0, min_delta=1e-5),
     ):
         self.optimizer = optimizer
         self.epochs = epochs
-        self.patience = patience
-        self.train_metrics = {
-            "loss": Average("loss"),
-        }
-        self.test_metrics = {
-            "loss": Average("loss"),
-            "ll": LogLikelihood(),
-            "ppl": Perplexity(),
-            "cond_ppl": ConditionalPerplexity(),
-        }
-        self.ranking_metrics = {
-            "dcg@10": RaxMetric(rax.dcg_metric, top_n=10),
-            "dcg@5": RaxMetric(rax.dcg_metric, top_n=5),
-            "dcg@3": RaxMetric(rax.dcg_metric, top_n=3),
-            "dcg@1": RaxMetric(rax.dcg_metric, top_n=1),
-            "mrr@10": RaxMetric(rax.mrr_metric, top_n=10),
-        }
+        self.early_stopping = early_stopping
 
     def train(
         self,
         model: nnx.Module,
         train_loader: DataLoader,
         val_loader: DataLoader,
+        train_click_metrics: Optional[Dict[str, Metric]] = None,
+        val_click_metrics: Optional[Dict[str, Metric]] = None,
     ) -> pd.DataFrame:
-        optimizer = nnx.Optimizer(model, self.optimizer)
-        train_metrics = MultiMetric(**self.train_metrics)
-        val_metrics = MultiMetric(**self.test_metrics)
+        # Ensure the loss is always present during training / validation:
+        train_metrics = train_click_metrics or {}
+        train_metrics = {**train_metrics, "loss": Average("loss")}
+        train_metrics = MultiMetric(**train_metrics)
 
-        early_stopping = EarlyStopping(patience=self.patience, min_delta=1e-5)
+        val_metrics = val_click_metrics or self._default_click_metrics()
+        val_metrics = {**val_metrics, "loss": Average("loss")}
+        val_metrics = MultiMetric(**val_metrics)
+
+        early_stopping = deepcopy(self.early_stopping)
+        optimizer = nnx.Optimizer(model, self.optimizer)
         best_state = nnx.state(model)
 
         logger = ProgressTable(
@@ -114,12 +109,16 @@ class Trainer:
         logger.close()
         return logger.to_df()
 
-    def test(
+    def test_clicks(
         self,
         model: nnx.Module,
         test_loader: DataLoader,
+        click_metrics: Optional[Dict[str, Metric]] = None,
     ) -> pd.DataFrame:
-        metrics = MultiMetric(**self.test_metrics)
+        test_metrics = click_metrics or self._default_click_metrics()
+        test_metrics = {**test_metrics, "loss": Average("loss")}
+        metrics = MultiMetric(**test_metrics)
+
         model.eval()
         logger = ProgressTable(
             columns=[
@@ -142,12 +141,15 @@ class Trainer:
         logger.close()
         return logger.to_df()
 
-    def test_relevance(
+    def test_ranking(
         self,
         model: nnx.Module,
         test_loader: DataLoader,
+        ranking_metrics: Optional[Dict[str, Metric]] = None,
     ) -> pd.DataFrame:
-        metrics = MultiMetric(**self.ranking_metrics)
+        metrics = ranking_metrics or self._default_ranking_metrics()
+        metrics = MultiMetric(**metrics)
+
         model.eval()
         logger = ProgressTable(
             columns=[
@@ -217,3 +219,21 @@ class Trainer:
             labels=batch["labels"],
             where=batch["mask"],
         )
+
+    @staticmethod
+    def _default_click_metrics() -> Dict[str, Metric]:
+        return {
+            "ll": LogLikelihood(),
+            "ppl": Perplexity(),
+            "cond_ppl": ConditionalPerplexity(),
+        }
+
+    @staticmethod
+    def _default_ranking_metrics() -> Dict[str, Metric]:
+        return {
+            "dcg@10": RaxMetric(rax.dcg_metric, top_n=10),
+            "dcg@5": RaxMetric(rax.dcg_metric, top_n=5),
+            "dcg@3": RaxMetric(rax.dcg_metric, top_n=3),
+            "dcg@1": RaxMetric(rax.dcg_metric, top_n=1),
+            "mrr@10": RaxMetric(rax.mrr_metric, top_n=10),
+        }

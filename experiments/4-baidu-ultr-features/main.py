@@ -71,7 +71,6 @@ def main(config: DictConfig):
     trainer = Trainer(
         optax.adamw(config.learning_rate),
         epochs=config.epochs,
-        patience=config.early_stopping_patience,
     )
 
     timer_start = perf_counter()
@@ -79,11 +78,11 @@ def main(config: DictConfig):
     timer_stop = perf_counter()
     train_df.to_csv(result_dir / f"train_{model.name.lower()}.csv", index=False)
 
-    test_df = trainer.test(model, test_loader)
+    test_df = trainer.test_clicks(model, test_loader)
     test_df["train_time_s"] = timer_stop - timer_start
     test_df.to_csv(result_dir / f"test_{model.name.lower()}.csv", index=False)
 
-    test_rel_df = trainer.test_relevance(model, test_relevance_loader)
+    test_rel_df = trainer.test_ranking(model, test_relevance_loader)
     test_rel_df.to_csv(result_dir / f"test_rel_{model.name.lower()}.csv", index=False)
 
 

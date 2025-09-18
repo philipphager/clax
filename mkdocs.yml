@@ -1,4 +1,9 @@
 site_name: CLAX - Fast and Flexible Neural Click Models in JAX
+docs_dir: docs/
+
+repo_name: "philipphager/clax"
+repo_url: "https://github.com/philipphager/clax"
+
 
 plugins:
   - mkdocstrings

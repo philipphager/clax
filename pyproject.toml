@@ -36,6 +36,7 @@ clax = ["config/**/*.yaml", "config/**/*.yml"]
 dev = [
     "black>=25.1.0",
     "mkdocs-material>=9.6.20",
+    "mkdocstrings[python]>=0.30.0",
 ]
 
 experiments = [

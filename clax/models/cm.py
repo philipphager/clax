@@ -7,6 +7,7 @@ from flax import struct
 from jax import Array
 
 from clax.loss import binary_cross_entropy
+from clax.models.base import ClickModel
 from clax.parameters import ParameterConfig, init_parameter, Parameter
 from clax.parameters.defaults import default_attraction_config
 from clax.utils.math import logits_to_log_probs, logits_to_complement_log_probs
@@ -19,7 +20,7 @@ class CascadeModelOutput:
     attraction: Array
 
 
-class CascadeModel(nnx.Module):
+class CascadeModel(ClickModel):
     """
     Cascade Model (CM)
 

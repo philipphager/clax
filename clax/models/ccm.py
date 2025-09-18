@@ -7,6 +7,7 @@ from flax import struct
 from jax import Array
 
 from clax.loss import binary_cross_entropy
+from clax.models.base import ClickModel
 from clax.parameters import (
     ParameterConfig,
     GlobalParameter,
@@ -29,7 +30,7 @@ class ClickChainModelOutput:
     satisfaction: Array
 
 
-class ClickChainModel(nnx.Module):
+class ClickChainModel(ClickModel):
     """
     Click Chain Model (CCM)
 

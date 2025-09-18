@@ -139,13 +139,13 @@ class LogLikelihood(RankBasedAverage):
     def update(
         self,
         *,
-        conditional_log_probs: Array,
+        cond_log_probs: Array,
         clicks: Array,
         where: Optional[Array] = None,
         **kwargs,
     ):
-        p_click = conditional_log_probs
-        p_no_click = log1mexp(conditional_log_probs)
+        p_click = cond_log_probs
+        p_no_click = log1mexp(cond_log_probs)
         log_likelihood = clicks * p_click + (1 - clicks) * p_no_click
 
         super().update_values(log_likelihood, where=where)
@@ -155,14 +155,14 @@ class ConditionalPerplexity(RankBasedAverage):
     def update(
         self,
         *,
-        conditional_log_probs: Array,
+        cond_log_probs: Array,
         clicks: Array,
         where: Optional[Array] = None,
         **kwargs,
     ):
         # Convert log probabilities ln(p) to log_2(p)
-        p_click = conditional_log_probs / jnp.log(2)
-        p_no_click = log1mexp(conditional_log_probs) / jnp.log(2)
+        p_click = cond_log_probs / jnp.log(2)
+        p_no_click = log1mexp(cond_log_probs) / jnp.log(2)
         log_likelihood = clicks * p_click + (1 - clicks) * p_no_click
 
         super().update_values(log_likelihood, where=where)

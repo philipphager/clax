@@ -7,6 +7,7 @@ from flax import struct
 from jax import Array
 
 from clax.loss import binary_cross_entropy
+from clax.models.base import ClickModel
 from clax.parameters import (
     GlobalParameter,
     build_parameter,
@@ -27,7 +28,7 @@ class CTRModelOutput:
     clicks: Array
 
 
-class GlobalCTRModel(nnx.Module):
+class GlobalCTRModel(ClickModel):
     """
     Global/Random Click Model (GCTR)
 
@@ -75,7 +76,7 @@ class GlobalCTRModel(nnx.Module):
         return CTRModelOutput(clicks=clicks)
 
 
-class RankCTRModel(nnx.Module):
+class RankCTRModel(ClickModel):
     """
     Rank-based Click-Through Rate Model (RCTR).
 
@@ -137,7 +138,7 @@ class RankCTRModel(nnx.Module):
         return CTRModelOutput(clicks=clicks)
 
 
-class DocumentCTRModel(nnx.Module):
+class DocumentCTRModel(ClickModel):
     """
     Document-based Click-Through Rate Model (DCTR).
 
@@ -198,7 +199,7 @@ class DocumentCTRModel(nnx.Module):
         return CTRModelOutput(clicks=clicks)
 
 
-class DocumentRankCTRModel(nnx.Module):
+class DocumentRankCTRModel(ClickModel):
     """
     Document-Rank based Click-Through Rate Model (RDCTR).
 

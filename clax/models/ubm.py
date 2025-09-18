@@ -8,6 +8,7 @@ from jax import Array
 from jax import lax
 
 from clax.loss import binary_cross_entropy
+from clax.models.base import ClickModel
 from clax.parameters import ParameterConfig, init_parameter, Parameter
 from clax.parameters.defaults import (
     default_attraction_config,
@@ -23,7 +24,7 @@ class UserBrowsingModelOutput:
     attraction: Array
 
 
-class UserBrowsingModel(nnx.Module):
+class UserBrowsingModel(ClickModel):
     """
     User Browsing Model (UBM)
 

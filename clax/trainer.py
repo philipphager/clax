@@ -194,11 +194,11 @@ class Trainer:
     ):
         loss = model.compute_loss(batch).mean()
         log_probs = model.predict_clicks(batch)
-        conditional_log_probs = model.predict_conditional_clicks(batch)
+        cond_log_probs = model.predict_conditional_clicks(batch)
         metrics.update(
             loss=loss,
             log_probs=log_probs,
-            conditional_log_probs=conditional_log_probs,
+            cond_log_probs=cond_log_probs,
             clicks=batch["clicks"],
             where=batch["mask"],
         )

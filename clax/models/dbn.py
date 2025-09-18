@@ -7,6 +7,7 @@ from flax import struct
 from jax import Array
 
 from clax.loss import binary_cross_entropy
+from clax.models.base import ClickModel
 from clax.parameters import (
     ParameterConfig,
     GlobalParameter,
@@ -32,7 +33,7 @@ class DynamicBayesianNetworkOutput:
     satisfaction: Array
 
 
-class DynamicBayesianNetwork(nnx.Module):
+class DynamicBayesianNetwork(ClickModel):
     """
     Dynamic Bayesian Network (DBN)
 

@@ -7,6 +7,7 @@ from flax import struct
 from jax import Array
 
 from clax.loss import binary_cross_entropy
+from clax.models.base import ClickModel
 from clax.parameters import ParameterConfig, init_parameter, Parameter
 from clax.parameters.defaults import (
     default_continuation_config,
@@ -32,7 +33,7 @@ class DependentClickModelConfig:
     continuation: ParameterConfig
 
 
-class DependentClickModel(nnx.Module):
+class DependentClickModel(ClickModel):
     """
     Dependent Click Model (DCM)
 

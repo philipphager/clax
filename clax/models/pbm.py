@@ -23,6 +23,62 @@ class PositionBasedModelOutput:
 
 
 class PositionBasedModel(ClickModel):
+    """
+    The Position-based model (PBM) assumes that users examine ranks independently
+    and only click on examined and attractive results.
+
+    Args:
+        positions (Optional[int], optional): Number position embeddings to allocate.
+            This parameter is not used if a custom examination module is provided.
+        query_doc_pairs (Optional[int], optional): Number of query-document
+            pairs to allocate in an embedding table. This parameter is not
+            used if a custom attraction module is provided.
+        examination (Optional[Parameter | ParameterConfig], optional): Custom
+            examination/bias parameter, which can be a parameter config or any
+            subclass of the Parameter base class.
+        attraction (Optional[Parameter | ParameterConfig], optional): Custom
+            attraction/relevance parameter, which can be a parameter config or any
+            subclass of the Parameter base class.
+        rngs (nnx.Rngs): A NNX random number generator used for model
+            initialization and stochastic operations.
+
+    Examples:
+        Create a basic cascade model with query-document pairs:
+
+            model = PositionBasedModel(
+                positions=10,
+                query_doc_pairs=1_000_000,
+                rngs=nnx.Rngs(42)
+            )
+
+        Configure a two-tower model with a linear combination of bias features and a
+        deep-cross network for document attraction:
+
+            model = PositionBasedModel(
+                examination=LinearParameterConfig(
+                    use_feature="bias_features",
+                    features=8,
+                ),
+                attraction=DeepCrossParameterConfig(
+                    use_feature="query_doc_features",
+                    features=136,
+                    cross_layers=2,
+                    deep_layers=2,
+                    combination=Combination.STACKED,
+                ),
+                rngs=nnx.Rngs(42),
+            )
+
+    References:
+        Matthew Richardson, Ewa Dominowska, and Robert Ragno.
+        "Predicting Clicks: Estimating the Click-through Rate for New Ads."
+        In WWW 2007.
+
+        Nick Craswell, Onno Zoeter, Michael Taylor, and Bill Ramsey.
+        "An experimental comparison of click position-bias models."
+        In WSDM 2008.
+    """
+
     name = "PBM"
 
     def __init__(

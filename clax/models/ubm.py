@@ -26,19 +26,38 @@ class UserBrowsingModelOutput:
 
 class UserBrowsingModel(ClickModel):
     """
-    User Browsing Model (UBM)
-
-    The UBM extends the PBM by making examination probability depend on both the
+    The UBM extends the PBM by making the examination probability depend on both the
     current position and the position of the last clicked document.
 
-    Model Assumptions:
-    - A click occurs if and only if a document is examined and attractive
-    - Examination probability depends on current position AND last clicked position
-    - Attraction probability depends only on query-document pair
-    - User examination is influenced by their last click location
+    Args:
+        positions (Optional[int], optional): Number positions used to allocate a 2D
+            embedding table of shape (positions, positions).
+            This parameter is not used if a custom examination module is provided.
+        query_doc_pairs (Optional[int], optional): Number of query-document
+            pairs to allocate in an embedding table. This parameter is not
+            used if a custom attraction module is provided.
+        examination (Optional[Parameter | ParameterConfig], optional): Custom
+            examination/bias parameter, which can be a parameter config or any
+            subclass of the Parameter base class.
+        attraction (Optional[Parameter | ParameterConfig], optional): Custom
+            attraction/relevance parameter, which can be a parameter config or any
+            subclass of the Parameter base class.
+        rngs (nnx.Rngs): A NNX random number generator used for model
+            initialization and stochastic operations.
+
+    Examples:
+        Create a basic cascade model with query-document pairs:
+
+            model = UserBrowsingModel(
+                positions=10,
+                query_doc_pairs=1_000_000,
+                rngs=nnx.Rngs(42)
+            )
 
     References:
-    - Dupret and Piwowarski (2008). "A user browsing model to predict search engine click data from past observations"
+        Georges E. Dupret and Benjamin Piwowarski.
+        "A user browsing model to predict search engine click data from past observations."
+        In SIGIR 2008.
     """
 
     name = "UBM"

@@ -43,7 +43,7 @@ class PositionBasedModel(ClickModel):
             initialization and stochastic operations.
 
     Examples:
-        Create a basic cascade model with query-document pairs:
+        Creating a basic Position-based Model:
 
             model = PositionBasedModel(
                 positions=10,

@@ -74,3 +74,39 @@ Each term in the sum represents a path to the current document: the probability 
 The UBM assumes that examination at position $k$ depends also on the position of the last clicked document $k'$. Similar to the PBM, users only click on examined and attractive documents:
 
 $$\log P(C=1 \mid d, k, C_{<k}) = \log \theta_{k, k'} + \log \gamma_{d}.$$
+
+------------------------------
+
+## Dependent Click Model (DCM)
+
+::: clax.DependentClickModel
+    options:
+      docstring_style: google
+      show_source: true
+      show_base_class: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      heading_level: 3
+
+
+#### Unconditional click probability
+
+The DCM assumes that users examine a list from top to bottom, click on attractive items $\gamma_d$, and after clicking have a rank-dependent probability $\lambda_k$ to continue browsing:
+
+$$
+\begin{split}
+    \log P(C=1 \mid d, k) &= \log(\epsilon_{k}) + \log(\gamma_{d})\\
+    \log(\epsilon_{k+1}) &= \log(\epsilon_k) + \log(\gamma_{d_k} \lambda_k + (1 - \gamma_{d_k})).\\
+\end{split}
+$$
+
+#### Conditional click probability
+
+Examination in the DCM changes based on the observed clicks. If a user clicks on a document, they continue to the next rank with probability $\lambda_k$ and if they do not click, we calculate the posterior probability of examining the next rank given that we observed no click using Bayes' rule:
+
+$$
+\begin{split}
+    \log P(C=1 \mid d, k, C_{<k}) &= \log(\epsilon_{k}) + \log(\gamma_{d})\\
+    \log(\epsilon_{k+1}) &= \log\left(c_k \lambda_k + (1 - c_k) \frac{(1 - \gamma_{d_k}) \epsilon_k}{1 - \gamma_{d_k} \epsilon_k}\right).\\
+\end{split}
+$$

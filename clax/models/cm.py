@@ -36,9 +36,12 @@ class CascadeModel(ClickModel):
             initialization and stochastic operations.
 
     Examples:
-        Create a basic cascade model with query-document pairs:
+        Creating a basic Cascade Model:
 
-            model = CascadeModel(query_doc_pairs=1_000_000, rngs=nnx.Rngs(42))
+            model = CascadeModel(
+                query_doc_pairs=1_000_000,
+                rngs=nnx.Rngs(42),
+            )
 
         Configure a deep network to user custom query-doc-features:
 

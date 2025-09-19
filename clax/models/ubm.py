@@ -46,13 +46,12 @@ class UserBrowsingModel(ClickModel):
             initialization and stochastic operations.
 
     Examples:
-        Create a basic cascade model with query-document pairs:
 
-            model = UserBrowsingModel(
-                positions=10,
-                query_doc_pairs=1_000_000,
-                rngs=nnx.Rngs(42)
-            )
+        model = UserBrowsingModel(
+            positions=10,
+            query_doc_pairs=1_000_000,
+            rngs=nnx.Rngs(42)
+        )
 
     References:
         Georges E. Dupret and Benjamin Piwowarski.

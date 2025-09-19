@@ -35,21 +35,39 @@ class DependentClickModelConfig:
 
 class DependentClickModel(ClickModel):
     """
-    Dependent Click Model (DCM)
 
-    DCM extends the cascade model to allow multiple clicks by introducing
-    rank-dependent continuation probabilities. Users may continue examining
-    after a click based on their current position in the ranking.
+    The Dependent Click Model (DCM) extends the cascade model to allow multiple clicks
+    per session by introducing rank-dependent continuation probabilities.
 
-    Assumptions:
-    - Users examine documents sequentially from top to bottom
-    - A click occurs if and only if a document is examined and attractive
-    - After clicking: continue with rank-dependent probability λ_r
-    - After examining but not clicking: always continue (probability 1)
-    - Implicit satisfaction: P(satisfied | click) = 1 - λ_r
+    Args:
+        positions (Optional[int], optional): Number of positions used to allocate
+            continuation probabilities. This parameter is not used if a custom
+            continuation module is provided.
+        query_doc_pairs (Optional[int], optional): Number of query-document
+            pairs to allocate in an embedding table. This parameter is not
+            used if a custom attraction module is provided.
+        attraction (Optional[Parameter | ParameterConfig], optional): Custom
+            attraction parameter, which can be a parameter config or any
+            subclass of the Parameter base class.
+        continuation (Optional[Parameter | ParameterConfig], optional): Custom
+            continuation parameter deciding how likely a user is to continue their
+            browsing session after clicking a document at the current position.
+            Can be a parameter config or any subclass of the Parameter base class.
+        rngs (nnx.Rngs): A NNX random number generator used for model
+            initialization and stochastic operations.
+
+    Examples:
+
+        model = DependentClickModel(
+            positions=10,
+            query_doc_pairs=1_000_000,
+            rngs=nnx.Rngs(42)
+        )
 
     References:
-    - Guo et al. (2009). "Efficient multiple-click models in web search"
+        Fan Guo, Chao Liu, and Yi Min Wang.
+        "Efficient multiple-click models in web search."
+        In WSDM 2009.
     """
 
     name = "DCM"

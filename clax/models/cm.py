@@ -22,20 +22,41 @@ class CascadeModelOutput:
 
 class CascadeModel(ClickModel):
     """
-    Cascade Model (CM)
+    The Cascade Model (CM) assumes that users scan results from top to bottom,
+    click on the first attractive document they find, and then stop their search.
 
-    The cascade model assumes users examine documents from top to bottom and stop
-    after clicking the first relevant document. The model can only explain sessions
-    with a single click.
+    Args:
+        query_doc_pairs (Optional[int], optional): Number of query-document
+            pairs to allocate in an embedding table. This parameter is not
+            used if a custom attraction module is provided.
+        attraction (Optional[Parameter | ParameterConfig], optional): Custom
+            attraction parameter, which can be a parameter config or any
+            subclass of the Parameter base class.
+        rngs (nnx.Rngs): A NNX random number generator used for model
+            initialization and stochastic operations.
 
-    Model Assumptions:
-    - Users examine documents sequentially from top to bottom
-    - The first document is always examined
-    - A click occurs if and only if a document is examined and attractive
-    - Users stop examining after the first click
+    Examples:
+        Create a basic cascade model with query-document pairs:
+
+            model = CascadeModel(query_doc_pairs=1_000_000, rngs=nnx.Rngs(42))
+
+        Configure a deep network to user custom query-doc-features:
+
+            attraction = DeepParameterConfig(
+                use_feature="query_doc_features",
+                features=16,
+                layers=2,
+                dropout=0.25,
+            )
+            model = CascadeModel(
+                attraction=attraction,
+                rngs=nnx.Rngs(42),
+            )
 
     References:
-    - Craswell et al. (2008). "An experimental comparison of click position-bias models"
+        Nick Craswell, Onno Zoeter, Michael Taylor, and Bill Ramsey.
+        "An experimental comparison of click position-bias models."
+        In WSDM 2008.
     """
 
     name = "CM"

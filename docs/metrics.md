@@ -40,7 +40,7 @@ $$
 \operatorname{LL}(\mathcal{D}) = \frac{1}{|\mathcal{D}|} \sum_{(d, k, c) \in \mathcal{D}} \Big[ c \log \hat{c} + (1 - c) \log \left(1 - \hat{c} \right) \Big],
 $$
 
-where $\hat{c} = P(C = 1 \mid d, k, C_{<k})$ are a model's click predictions, conditioned on clicks observed before the current rank $k$. Log-likelihood values are negative, with higher values (closer to zero) indicating better model fit.
+where $\hat{c} = P(C = 1 \mid d, k, C_{<k})$ are a model's click predictions for a document $d$ at rank $k$, conditioned on clicks observed before the current rank $C_{<k}$. Log-likelihood values are negative, with higher values (closer to zero) indicating better model fit.
 
 
 ::: clax.metrics.LogLikelihood
@@ -59,7 +59,7 @@ $$
 \operatorname{PPL}(\mathcal{D}) = 2^{- \frac{1}{|\mathcal{D}|} \sum_{(d, k, c) \in \mathcal{D}} \Big[ c \log_2 \hat{c} + (1 - c) \log_2 \left(1 - \hat{c} \right) \Big]},
 $$
 
-where $\hat{c} = P(C=1 \mid d, k, C_{<k})$ are a model's click predictions, conditioned on clicks observed before the current rank $k$. Note that models which adopt their behavior based on clicks in the current search session might score better in conditional predictions.
+where $\hat{c} = P(C=1 \mid d, k, C_{<k})$ are a model's click predictions for a document $d$ at rank $k$, conditioned on clicks observed before the current rank $C_{<k}$. Note that models which adopt their behavior based on clicks in the current search session might score better in conditional predictions.
 
 ::: clax.metrics.ConditionalPerplexity
     options:
@@ -78,7 +78,7 @@ $$
 \operatorname{PPL}(\mathcal{D}) = 2^{- \frac{1}{|\mathcal{D}|} \sum_{(d, k, c) \in \mathcal{D}} \Big[ c \log_2 \hat{c} + (1 - c) \log_2 \left(1 - \hat{c} \right) \Big]},
 $$
 
-where $\hat{c} = P(C=1 \mid d, k)$ are a model's unconditional click predictions. Meaning, a model has to predict all clicks for the current session without access to any clicks on earlier ranks in the session. 
+where $\hat{c} = P(C=1 \mid d, k)$ are a model's unconditional click predictions for a document $d$ at rank $k$. Meaning, a model has to predict all clicks for the current session without access to any clicks on earlier ranks in the session. 
 
 ::: clax.metrics.Perplexity
     options:

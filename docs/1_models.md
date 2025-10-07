@@ -1,4 +1,4 @@
-# Welcome to CLAX
+# Overview of Click Models
 
 ## Cascade Model (CM)
 

@@ -136,6 +136,24 @@ class RankBasedAverage(Metric, ABC):
 
 
 class LogLikelihood(RankBasedAverage):
+    """
+    Examples:
+        Compute the mean log-likelihood over a single query with three documents
+        from conditional log probabilities. Use `where = False` to mask out padding documents:
+
+            ll = LogLikelihood()
+            ll.update(
+                cond_log_probs=jnp.array([[-0.01, -10.0, -0.7]]),
+                clicks=jnp.array([[1, 0, 1]]),
+                where=jnp.array([[True, True, True]]),
+            )
+            ll.compute()
+
+        Compute the mean log-likelihood for each rank:
+
+            ll.compute_per_rank()
+    """
+
     def update(
         self,
         *,
@@ -152,6 +170,24 @@ class LogLikelihood(RankBasedAverage):
 
 
 class ConditionalPerplexity(RankBasedAverage):
+    """
+    Examples:
+        Compute the mean conditional perplexity over a single query with three documents
+        from conditional log probabilities. Use `where = False` to mask out padding documents:
+
+            cond_ppl = ConditionalPerplexity()
+            cond_ppl.update(
+                cond_log_probs=jnp.array([[-0.01, -10.0, -0.7]]),
+                clicks=jnp.array([[1, 0, 1]]),
+                where=jnp.array([[True, True, True]]),
+            )
+            cond_ppl.compute()
+
+        Compute the mean conditional perplexity for each rank:
+
+            cond_ppl.compute_per_rank()
+    """
+
     def update(
         self,
         *,
@@ -176,6 +212,24 @@ class ConditionalPerplexity(RankBasedAverage):
 
 
 class Perplexity(RankBasedAverage):
+    """
+    Examples:
+        Compute the mean (unconditional) perplexity over a single query with three documents
+        from unconditional log probabilities. Use `where = False` to mask out padding documents:
+
+            ppl = Perplexity()
+            ppl.update(
+                log_probs=jnp.array([[-0.01, -10.0, -0.7]]),
+                clicks=jnp.array([[1, 0, 1]]),
+                where=jnp.array([[True, True, True]]),
+            )
+            ppl.compute()
+
+        Compute the mean perplexity for each rank:
+
+            ppl.compute_per_rank()
+    """
+
     def update(
         self,
         *,

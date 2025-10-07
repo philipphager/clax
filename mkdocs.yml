@@ -4,22 +4,31 @@ docs_dir: docs/
 repo_name: "philipphager/clax"
 repo_url: "https://github.com/philipphager/clax"
 
-
 plugins:
   - mkdocstrings
+  - search
+  - bibtex:
+      bib_file: "docs/main.bib"
+
+markdown_extensions:
+  - footnotes
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 theme:
-  name: readthedocs
-#theme:
-#  name: material
-#  palette:
-#    - scheme: default
-#      media: "(prefers-color-scheme: light)"
-#      toggle:
-#        icon: material/weather-night
-#        name: Switch to dark mode
-#    - scheme: slate
-#      media: "(prefers-color-scheme: dark)"
-#      toggle:
-#        icon: material/weather-sunny
-#        name: Switch to light mode
+  name: material
+  palette:
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode

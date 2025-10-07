@@ -7,8 +7,6 @@ repo_url: "https://github.com/philipphager/clax"
 plugins:
   - mkdocstrings
   - search
-  - bibtex:
-      bib_file: "docs/main.bib"
 
 markdown_extensions:
   - footnotes

@@ -90,7 +90,7 @@ where $\hat{c} = P(C=1 \mid d, k)$ are a model's unconditional click predictions
       heading_level: 3
 
 ## Ranking Metrics
-Instead of re-implementing ranking metrics in CLAX, we opted to integrate with [RAX](https://rax.readthedocs.io/en/stable/index.html) the most popular ranking library in JAX. You can use [any ranking metric from RAX](https://rax.readthedocs.io/en/stable/api.html#module-rax._src.metrics) by wrapping it in a `RaxMetric` object. Note that below, `score` is the relevance prediction of a click model and `label` is typically an expert-annotated relevance label:
+Instead of re-implementing ranking metrics in CLAX, we opted to integrate with [RAX](https://rax.readthedocs.io/en/stable/index.html) the most popular ranking library in JAX. You can use [any ranking metric from RAX](https://rax.readthedocs.io/en/stable/api.html#module-rax._src.metrics) by wrapping it in a `RaxMetric` object. Below, `score` is the relevance prediction of a click model and `label` is typically an expert-annotated relevance label:
 
 ```Python
 import rax
@@ -104,5 +104,5 @@ metrics = MultiMetric(
 )
 
 metrics.update(scores=scores, labels=labels, where=mask)
-results = metrics.compute()
+metrics.compute()
 ```

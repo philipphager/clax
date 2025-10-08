@@ -35,21 +35,35 @@ class DynamicBayesianNetworkOutput:
 
 class DynamicBayesianNetwork(ClickModel):
     """
-    Dynamic Bayesian Network (DBN)
-
-    DBN extends the cascade model by introducing separate attraction and satisfaction
+    The DBN extends the cascade model by introducing separate attraction and satisfaction
     parameters, allowing users to continue examining after clicks if they are not
-    satisfied with the clicked item.
+    satisfied with the clicked item. Note that attraction and satisfaction parameters
+    can be customized to use completely different sets of features.
 
-    Assumptions:
-    - Users examine documents sequentially from top to bottom
-    - A click occurs if and only if a document is examined and attractive
-    - After clicking, users may be satisfied or dissatisfied
-    - Users continue examining only if not satisfied (either no click or unsatisfied click)
-    - Continuation probability γ governs likelihood of continuing after dissatisfaction
+    Args:
+        query_doc_pairs (Optional[int], optional): Number of query-document
+            pairs to allocate in an embedding table. This parameter is required
+            if no custom attraction or satisfaction module is provided.
+        attraction (Optional[Parameter | ParameterConfig], optional): Custom
+            attraction/relevance parameter, which can be a parameter config or any
+            subclass of the Parameter base class.
+        satisfaction (Optional[Parameter | ParameterConfig], optional): Custom
+            attraction/relevance parameter, which can be a parameter config or any
+            subclass of the Parameter base class.
+        rngs (nnx.Rngs): A NNX random number generator used for model
+            initialization and stochastic operations.
+
+    Examples:
+
+        model = DynamicBayesianNetwork(
+            query_doc_pairs=1_000_000,
+            rngs=nnx.Rngs(42)
+        )
 
     References:
-    - Chapelle and Zhang (2009). "A dynamic bayesian network click model for web search ranking"
+        Olivier Chapelle and Ya Zhang.
+        "A dynamic bayesian network click model for web search ranking."
+        In WWW 2009.
     """
 
     def __init__(

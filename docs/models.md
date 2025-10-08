@@ -153,4 +153,35 @@ $$
 
 ## Dynamic Bayesian Network (DBN)
 
+::: clax.DynamicBayesianNetwork
+    options:
+      docstring_style: google
+      show_source: true
+      show_base_class: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      heading_level: 3
 
+
+#### Unconditional click probability
+
+The DBN model separates the concepts of a document being attractive ($\gamma_d$) and being satisfying ($\sigma_d$). A user stops their search only if they click on an attractive document and are satisfied by it. If they do not click or are not satisfied by the clicked document, they continue browsing with a global continuation probability $\lambda$:
+
+$$
+\begin{split}
+    \log P(C=1 \mid d, k) &= \log(\gamma_d) + \log(\epsilon_k) \\
+    \log(\epsilon_{k+1}) &= \log(\epsilon_k) + \log(\lambda) + \log(1 - \gamma_{d_k}\sigma_{d_k}).\\
+\end{split}
+$$
+
+#### Conditional click probability
+
+The conditional click probability takes the user's actions in the current session into account. If a click was observed, we compute the probability of continuation based on satisfaction. If no click was observed, we compute the posterior probability of continuing to the next item:
+
+$$
+\begin{split}
+    \log P(C=1 \mid d, k, C_{<k}) &= \log(\gamma_d) + \log(\epsilon_k) \\
+    \log(\epsilon_{k+1}) &= \log(\lambda) + c_k \left[ \log(1 - \sigma_{d_k}) \right] \\
+    &\quad + (1-c_k)\left[ \log(1-\gamma_{d_k}) + \log(\epsilon_k) - \log(1 - \gamma_{d_k}\epsilon_k) \right].
+\end{split}
+$$

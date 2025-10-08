@@ -34,20 +34,32 @@ class ClickChainModel(ClickModel):
     """
     Click Chain Model (CCM)
 
-    The CCM extends the cascade model to handle multiple clicks by introducing three
-    continuation parameters to model examination behavior.
+    The CCM extends the cascade model to handle multiple clicks by introducing
+    probabilities for users to continue examination after not clicking a document,
+    clicking but not being satisfied, and clicking and being satisfied. In addition,
+    the CCM assumes that document attraction and satisfaction probabilities are identical.
 
-    Assumptions:
-    - Users examine documents sequentially from top to bottom
-    - A click occurs if and only if a document is both examined and attractive
-    - After each position, users decide whether to continue based on:
-      * τ₁: Probability of continuing after examining but not clicking
-      * τ₂: Probability of continuing after clicking but being dissatisfied
-      * τ₃: Probability of continuing after clicking and being satisfied
-    - Attraction and satisfaction probabilities are identical (both αᵤᵧ)
+    Args:
+        query_doc_pairs (Optional[int], optional): Number of query-document
+            pairs to allocate in an embedding table. This parameter is not
+            used if a custom attraction module is provided.
+        attraction (Optional[Parameter | ParameterConfig], optional): Custom
+            attraction / satisfaction parameter, which can be a parameter config or any
+            subclass of the Parameter base class.
+        rngs (nnx.Rngs): A NNX random number generator used for model
+            initialization and stochastic operations.
+
+    Examples:
+
+        model = ClickChainModel(
+            query_doc_pairs=1_000_000,
+            rngs=nnx.Rngs(42)
+        )
 
     References:
-    - Guo et al. (2009). "Click chain model in web search"
+        Fan Guo, Chao Liu, Anitha Kannan, Tom Minka, Michael Taylor, Yi-Min Wang, and Christos Faloutsos.
+        "Click Chain Model in Web Search."
+        In WWW 2009.
     """
 
     name = "CCM"

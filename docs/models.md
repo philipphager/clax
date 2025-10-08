@@ -110,3 +110,47 @@ $$
     \log(\epsilon_{k+1}) &= \log\left(c_k \lambda_k + (1 - c_k) \frac{(1 - \gamma_{d_k}) \epsilon_k}{1 - \gamma_{d_k} \epsilon_k}\right).\\
 \end{split}
 $$
+
+------------------------------
+
+## Click Chain Model (CCM)
+
+::: clax.ClickChainModel
+    options:
+      docstring_style: google
+      show_source: true
+      show_base_class: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      heading_level: 3
+
+#### Unconditional click probability
+
+The click chain model (CCM) extends the DCM assuming a total of three continuation scenarios that do not only explain continuation after clicking a document but also allow users to abandon a session without any clicks. First, $\tau_1$ is the probability of a user continuing to the next document after not clicking on the current document. Second, if the user clicks on the current document but is not satisfied, $\tau_2$ is the probability of the user continuing to the next position. And lastly, $\tau_3$ is the probability that a user clicks on the current item, finds it satisfying, but still wants to continue to the next document:
+
+$$
+\begin{split}
+    \log P(C=1 \mid d, k) &= \log(\gamma_d) + \log(\epsilon_k) \\
+    \log(\epsilon_{k+1}) &= \log(\epsilon_k) \\
+    &\quad + \log\left( \gamma_{d_k}((1-\gamma_{d_k})\tau_2 + \gamma_{d_k}\tau_3) \right. \\
+    &\quad \left. + (1-\gamma_{d_k})\tau_1 \right).
+\end{split}
+$$
+
+#### Conditional click probability
+
+When conditioning on the observed clicks, the update rule for the examination probability changes based on the user's action at the current rank. If a click occurred, we compute continuation based on satisfaction (equal to attractiveness $\gamma_d$) and the continuation probabilities $\tau_2$ and $\tau_3$. If no click was observed, we compute the posterior log probability of continuing to the next rank:
+
+$$
+\begin{split}
+    \log P(C=1 \mid d, k, C_{<k}) &= \log(\gamma_d) + \log(\epsilon_k) \\
+    \log(\epsilon_{k+1}) &= c_k \left[ \log\left(\gamma_{d_k}\tau_3 + (1-\gamma_{d_k})\tau_2 \right) \right] \\
+    &\quad + (1-c_k) \left[ \log(1-\gamma_{d_k}) + \log(\epsilon_k) + \log(\tau_1) - \log(1 - \gamma_{d_k}\epsilon_k) \right].
+\end{split}
+$$
+
+------------------------------
+
+## Dynamic Bayesian Network (DBN)
+
+

@@ -34,10 +34,10 @@ class ClickChainModel(ClickModel):
     """
     Click Chain Model (CCM)
 
-    The CCM extends the cascade model to handle multiple clicks by introducing
-    probabilities for users to continue examination after not clicking a document,
-    clicking but not being satisfied, and clicking and being satisfied. In addition,
-    the CCM assumes that document attraction and satisfaction probabilities are identical.
+    The CCM extends the DCM to allow users abandoning a session without any clicks
+    by introducing probabilities for users to continue examination after not clicking
+    a document, clicking but not being satisfied, and clicking and being satisfied.
+    The CCM assumes that document attraction and satisfaction probabilities are identical.
 
     Args:
         query_doc_pairs (Optional[int], optional): Number of query-document

@@ -15,8 +15,6 @@ from clax.trainer import Trainer
 def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
 
-    print(config.test)
-
     rngs = nnx.Rngs(config.random_state)
 
     result_dir = Path(f"{config.result_dir}/{config.experiment}")

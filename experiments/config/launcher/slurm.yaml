@@ -12,5 +12,5 @@ hydra:
     partition: gpu
     gres: gpu:nvidia_rtx_a6000:1
 
-dataset_dir: /ivi/ilps/personal/phager/clax-datasets
-result_dir: /ivi/ilps/personal/phager/clax-results
+dataset_dir: ???
+result_dir: ???

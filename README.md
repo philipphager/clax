@@ -109,6 +109,7 @@ Our paper's experiments are located in the `experiments/` directory. Each experi
 ```bash
    sbatch ./main.sh +launcher=slurm
 ```
+You can adjust the SLURM configuration to your cluster under: `experiments/config/slurm.yaml`
 
 ### Baseline Experiments
 

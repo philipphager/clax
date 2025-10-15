@@ -14,6 +14,9 @@ from clax.trainer import Trainer
 @hydra.main(version_base="1.3", config_path=".", config_name="config")
 def main(config: DictConfig):
     print(OmegaConf.to_yaml(config))
+
+    print(config.test)
+
     rngs = nnx.Rngs(config.random_state)
 
     result_dir = Path(f"{config.result_dir}/{config.experiment}")

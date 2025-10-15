@@ -69,6 +69,8 @@ We list our paper's experiments under `experiments/`. Each directory contains a 
 4. Run the experiment: `./main.sh`
 5. Optionally, you can run the experiment on a SLURM cluster with: `sbatch ./main.sh +launcher=slurm`
 
+Lastly, we provide the baseline experiments that we conducted with PyClick in a separate repository as they require the PyPy interpreter: https://github.com/philipphager/clax-baselines
+
 ### Generate documentation
 CLAX uses [mkdocs](https://mkdocstrings.github.io/python/) to generate the documentation:
 1. Install development dependencies: `uv sync --group dev`

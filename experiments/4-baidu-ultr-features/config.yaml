@@ -7,8 +7,8 @@ defaults:
   - model: pbm
 
 random_state: 42
-dataset_dir: /Users/philipphager/Documents/GitHub/clix/clax-datasets
-result_dir: /Users/philipphager/Documents/GitHub/clix/results
+dataset_dir: ./clax-datasets
+result_dir: ./clax-results
 experiment: "4-baidu-ultr-features"
 
 # Configure based on available hardware:

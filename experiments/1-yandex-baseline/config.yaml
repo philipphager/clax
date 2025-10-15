@@ -8,7 +8,7 @@ defaults:
 
 random_state: 42
 dataset_dir: ./clax-datasets
-result_dir: ./results
+result_dir: ./clax-results
 experiment: "1-yandex-baseline"
 
 # Val/test only on queries that occurred at least n times during training:

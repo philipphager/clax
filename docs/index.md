@@ -27,7 +27,7 @@ where `train_loader` and `val_loader` are, e.g., PyTorch data loaders.
 CLAX requires JAX. For installing JAX with CUDA support, please refer to the [JAX documentation](https://github.com/jax-ml/jax?tab=readme-ov-file#installation).
 CLAX itself is available via pypi:
 ```bash
-pip install clax
+pip install clax-core
 ```
 
 

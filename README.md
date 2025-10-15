@@ -8,7 +8,7 @@ The current documentation is available [here](https://philipphager.github.io/cla
 ## Installation
 CLAX requires JAX. For installing JAX with CUDA support, please refer to the [JAX documentation](https://github.com/jax-ml/jax?tab=readme-ov-file#installation). CLAX itself is available via pypi:
 ```
-pip install clax
+pip install clax-core
 ```
 
 ## Usage

@@ -112,8 +112,7 @@ Our paper's experiments are located in the `experiments/` directory. Each experi
 
 ### Baseline Experiments
 
-Baseline experiments using PyClick require the PyPy interpreter and are maintained in a separate repository:  
-**Repository:** https://github.com/philipphager/clax-baselines
+Baseline experiments using PyClick require the PyPy interpreter and are maintained in a separate repository: https://github.com/philipphager/clax-baselines
 
 ### Generate documentation
 CLAX uses [mkdocs](https://mkdocstrings.github.io/python/) to generate the documentation:

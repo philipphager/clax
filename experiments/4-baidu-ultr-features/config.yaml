@@ -33,4 +33,4 @@ test_rel_sessions: [0, 7_008]
 hydra:
   searchpath:
     - pkg://clax.config
-    - file://${oc.env:PWD}/../launcher
+    - file://${oc.env:PWD}/../config

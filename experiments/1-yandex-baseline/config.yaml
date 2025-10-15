@@ -7,8 +7,8 @@ defaults:
   - model: pbm
 
 random_state: 42
-dataset_dir: /Users/philipphager/Documents/GitHub/clix/clax-datasets
-result_dir: /Users/philipphager/Documents/GitHub/clix/results
+dataset_dir: ./clax-datasets
+result_dir: ./results
 experiment: "1-yandex-baseline"
 
 # Val/test only on queries that occurred at least n times during training:

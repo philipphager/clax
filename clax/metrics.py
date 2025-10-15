@@ -4,18 +4,16 @@ from typing import Optional, Any, Callable
 
 import jax.numpy as jnp
 from flax import nnx
-from flax.nnx.object import Object
-from flax.nnx.variablelib import Variable
 from jax import Array
 
 from clax.utils.math import log1mexp
 
 
-class MetricState(Variable):
+class MetricState(nnx.variablelib.Variable):
     pass
 
 
-class Metric(Object, ABC):
+class Metric(nnx.object.Object, ABC):
     @abstractmethod
     def reset(self):
         pass

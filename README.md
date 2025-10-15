@@ -62,9 +62,12 @@ To work on CLAX or running our project's experiments, follow this basic project 
 ### Run experiments
 We list our paper's experiments under `experiments/`. Each directory contains a Python script, a [Hydra]() config file, and a bash script with all experimental configurations. To run an experiment:
 1. Install additional dependencies for SLURM support and plotting: `uv sync --group experiments`
-2. Ensure the main script in the experiment directory of interest is executable: `chmod +x ./main.sh`
-3. Run the experiment: `./main.sh`
-4. Optionally, you can run the experiment on a SLURM cluster with: `sbatch ./main.sh +launcher=slurm`
+2. Download the compressed [Yandex and Baidu-ULTR datasets](https://huggingface.co/datasets/philipphager/clax-datasets/tree/main):
+   - `git clone https://huggingface.co/datasets/philipphager/clax-datasets`
+   - Note that by default, CLAX expects the datasets in under `clax-datasets/` in the project directory. However, you can update that path in the `config.yaml` of each experiment: `dataset_dir: /my/custom/path/to/datasets/`
+3. Ensure the main script in the experiment directory of interest is executable: `chmod +x ./main.sh`
+4. Run the experiment: `./main.sh`
+5. Optionally, you can run the experiment on a SLURM cluster with: `sbatch ./main.sh +launcher=slurm`
 
 ### Generate documentation
 CLAX uses [mkdocs](https://mkdocstrings.github.io/python/) to generate the documentation:

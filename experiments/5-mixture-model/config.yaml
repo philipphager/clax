@@ -9,8 +9,8 @@ defaults:
 models: [dctr,rctr,pbm]
 
 random_state: 42
-dataset_dir: ./clax-datasets
-result_dir: ./clax-results
+dataset_dir: ../../clax-datasets
+result_dir: ../../clax-results
 experiment: "5-mixture-model"
 
 # Configure based on available hardware:

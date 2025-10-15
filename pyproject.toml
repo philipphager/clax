@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clax-core"
-version = "0.1.3"
+version = "0.1.5"
 description = "A fast and flexible library for gradient-based click models"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,7 +22,10 @@ dependencies = [
 
 [tool.setuptools]
 include-package-data = true
-packages = ["clax", "clax.config", "clax.datasets", "clax.models", "clax.parameters", "clax.utils"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["clax*"]
 
 [project.optional-dependencies]
 cuda12 = [

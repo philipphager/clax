@@ -32,8 +32,8 @@ pip install clax
 
 
 ## Documentation
-- [Overview of Click Models implemented in CLAX](/models/)
-- [Evaluation metrics](/metrics/)
+- [Overview of Click Models implemented in CLAX](/2-models/)
+- [Evaluation metrics](/3-metrics/)
 - Modularity in CLAX
 - Implementing new click models in CLAX
 - Datasets

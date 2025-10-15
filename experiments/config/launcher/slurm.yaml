@@ -11,6 +11,3 @@ hydra:
     timeout_min: 3600
     partition: gpu
     gres: gpu:nvidia_rtx_a6000:1
-
-dataset_dir: ???
-result_dir: ???

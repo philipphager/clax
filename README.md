@@ -8,11 +8,11 @@ The current documentation is available [here](https://philipphager.github.io/cla
 ## Installation
 CLAX requires JAX. For installing JAX with CUDA support, please refer to the [JAX documentation](https://github.com/jax-ml/jax?tab=readme-ov-file#installation). CLAX itself is available via pypi:
 ```
-pip install clax-core
+pip install clax-models
 ```
 
 ## Usage
-CLAX is designed with sensible defaults, while also allowing for a high-level of customization. For example, training a [User Browsing Model](https://dl.acm.org/doi/abs/10.1145/1390334.1390392) in CLAX is as simple as:
+CLAX is designed with sensible defaults, while also allowing for a high-level of customization. E.g., training a [User Browsing Model](https://dl.acm.org/doi/abs/10.1145/1390334.1390392) in CLAX is as simple as:
 ```Python
 from clax import Trainer, UserBrowsingModel
 from flax import nnx
@@ -31,26 +31,7 @@ train_df = trainer.train(model, train_loader, val_loader)
 test_df = trainer.test(model, test_loader)
 ```
 
-However, the modular design of CLAX also allows for more complex models. For example, [Two-Tower models]() in unbiased learning-to-rank typically do not allocate separate relevance/attraction parameters for each query-document pair but generalize over a shared feature representation. CLAX allows to plug in any custom neural network as parameters. For example, let's add a deep-cross network to predict document attractiveness / relevance from features in our UBM:
-```Python
-from clax import UserBrowsingModel
-from clax.parameters import DeepCrossParameterConfig
-from flax import nnx
-
-model = UserBrowsingModel(
-    attraction=DeepCrossParameterConfig(
-        use_feature="query_doc_features",
-        features=136,
-        cross_layers=2,
-        deep_layers=2,
-    ),
-    positions=10,
-    rngs=nnx.Rngs(42),
-)
-```
-
-By default, `clax.parameters` supports linear models, deep networks, and deep-cross v2 networks. However, the parameter above can be any FLAX NNX module as long as it outputs a tensor in the shape expected by the model.
-
+However, the modular design of CLAX also allows for more complex models from [two-tower models](https://dl.acm.org/doi/abs/10.1145/3477495.3531837), [mixture models](https://dl.acm.org/doi/abs/10.1145/3477495.3531837), or plugging-in custom FLAX modules as model parameters. We provide usage examples for getting started under [examples/](https://github.com/philipphager/clax/tree/main/examples).
 
 ## Development & Reproducibility
 

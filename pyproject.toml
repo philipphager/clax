@@ -3,8 +3,8 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "clax-core"
-version = "0.1.5"
+name = "clax-models"
+version = "0.1.0"
 description = "A fast and flexible library for gradient-based click models"
 readme = "README.md"
 requires-python = ">=3.10"

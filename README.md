@@ -11,7 +11,7 @@ CLAX requires JAX. For installing JAX with CUDA support, please refer to the [JA
 pip install clax-models
 ```
 
-## Usage
+## Basic Usage
 CLAX is designed with sensible defaults, while also allowing for a high-level of customization. E.g., training a [User Browsing Model](https://dl.acm.org/doi/abs/10.1145/1390334.1390392) in CLAX is as simple as:
 ```Python
 from clax import Trainer, UserBrowsingModel
@@ -33,12 +33,10 @@ test_df = trainer.test(model, test_loader)
 
 However, the modular design of CLAX also allows for more complex models from [two-tower models](https://dl.acm.org/doi/abs/10.1145/3477495.3531837), [mixture models](https://dl.acm.org/doi/abs/10.1145/3477495.3531837), or plugging-in custom FLAX modules as model parameters. We provide usage examples for getting started under [examples/](https://github.com/philipphager/clax/tree/main/examples).
 
-## Development & Reproducibility
-
-This guide covers how to set up CLAX for development and reproduce the experiments from our paper.
+## Reproducibility & Development
+In the following, we cover how to reproduce the experiments from our paper or how to set up a fork of CLAX for development.
 
 ### Initial Setup
-
 1. **Install the UV package manager**  
    UV is a fast Python dependency manager. Install it from: https://github.com/astral-sh/uv
 
@@ -60,12 +58,13 @@ Our paper's experiments are located in the `experiments/` directory. Each experi
 - A [Hydra](https://hydra.cc/) config file for configuration management: `config.yaml`
 - A bash script with all experimental configurations: `main.sh`
 
-#### Setting up experiments
+To run an experiment, follow these steps.
+
 1. **Install experiment dependencies**
+Installs additional packages for SLURM support and data analysis/plotting.
 ```bash
    uv sync --group experiments
 ```
-   This installs additional packages needed for SLURM support and plotting.
 
 2. **Download datasets**  
    Clone the Yandex and Baidu-ULTR datasets from HuggingFace. If you have GIT LFS installed, clone the datasets using:
@@ -79,7 +78,7 @@ Our paper's experiments are located in the `experiments/` directory. Each experi
    dataset_dir: /my/custom/path/to/datasets/
 ```
 
-3. **Run the experiment script**  
+3. **Run an experiment script**  
    Navigate to your experiment of interest and run the bash script, e.g.:
 ```bash
    cd experiments/1-yandex-baseline/
@@ -92,15 +91,8 @@ Our paper's experiments are located in the `experiments/` directory. Each experi
 ```
 You can adjust the SLURM configuration to your cluster under: `experiments/config/slurm.yaml`
 
-### Baseline Experiments
-
+### PyClick Experiments
 Baseline experiments using PyClick require the PyPy interpreter and are maintained in a separate repository: https://github.com/philipphager/clax-baselines
-
-### Generate documentation
-CLAX uses [mkdocs](https://mkdocstrings.github.io/python/) to generate the documentation:
-1. Install development dependencies: `uv sync --group dev`
-2. Run mkdocs locally: `uv run mkdocs serve`
-
 
 ## Reference
 If CLAX is useful to you, please consider citing our paper: 

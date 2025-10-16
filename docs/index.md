@@ -1,6 +1,6 @@
 # Welcome to CLAX
 
-CLAX is a framework for training and evaluating fast and flexible neural clic models in JAX.
+CLAX is a framework for training and evaluating fast and flexible neural click models in JAX.
 
 For example, training a [User Browsing Model](https://dl.acm.org/doi/abs/10.1145/1390334.1390392) in CLAX is as simple as:
 ```Python
@@ -21,7 +21,7 @@ train_df = trainer.train(model, train_loader, val_loader)
 test_df = trainer.test(model, test_loader)
 ```
 
-where `train_loader` and `val_loader` are, e.g., PyTorch data loaders.
+However, the modular design of CLAX also allows for more complex models from [two-tower models](https://dl.acm.org/doi/abs/10.1145/3477495.3531837), [mixture models](https://dl.acm.org/doi/abs/10.1145/3477495.3531837), or plugging-in [custom FLAX modules](https://flax.readthedocs.io/en/v0.8.3/experimental/nnx/index.html) as model parameters. We provide usage examples for getting started under [examples/](https://github.com/philipphager/clax/tree/main/examples).
 
 ## Installation
 CLAX requires JAX. For installing JAX with CUDA support, please refer to the [JAX documentation](https://github.com/jax-ml/jax?tab=readme-ov-file#installation).

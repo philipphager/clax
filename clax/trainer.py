@@ -48,7 +48,7 @@ class Trainer:
         val_metrics = MultiMetric(**click_metrics)
 
         early_stopping = deepcopy(self.early_stopping)
-        optimizer = nnx.Optimizer(model, self.optimizer)
+        optimizer = nnx.ModelAndOptimizer(model, self.optimizer)
         best_state = nnx.state(model)
 
         logger = ProgressTable(

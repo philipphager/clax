@@ -11,13 +11,11 @@ from clax.metrics import (
     ConditionalPerplexity
 )
 
-metrics = MultiMetric(
-    **{
-        "ll": LogLikelihood(),
-        "ppl": Perplexity(),
-        "cond_ppl": ConditionalPerplexity(),
-    }
-)
+metrics = MultiMetric({
+    "ll": LogLikelihood(),
+    "ppl": Perplexity(),
+    "cond_ppl": ConditionalPerplexity(),
+})
 
 metrics.update(
     log_probs=log_probs,
@@ -96,12 +94,10 @@ Instead of re-implementing ranking metrics in CLAX, we opted to integrate with [
 import rax
 from clax.metrics import RaxMetric, MultiMetric
 
-metrics = MultiMetric(
-    **{
+metrics = MultiMetric({
         "dcg@10": RaxMetric(rax.dcg_metric, top_n=10),
         "mrr@10": RaxMetric(rax.mrr_metric, top_n=10),
-    }
-)
+})
 
 metrics.update(scores=scores, labels=labels, where=mask)
 metrics.compute()

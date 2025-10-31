@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Optional, Any, Callable
+from typing import Optional, Any, Callable, Dict
 
 import jax.numpy as jnp
 from flax import nnx
@@ -28,33 +28,27 @@ class Metric(nnx.object.Object, ABC):
 
 
 class MultiMetric(Metric):
-    def __init__(self, **metrics):
-        self.metric_names = []
-        metrics = deepcopy(metrics)
+    def __init__(self, metrics: Dict[str, Metric]):
+        self.metrics = deepcopy(metrics)
 
-        for metric_name, metric in metrics.items():
-            self.metric_names.append(metric_name)
-            vars(self)[metric_name] = metric
+    def reset(self):
+        for metric in self.metrics.values():
+            metric.reset()
 
-    def reset(self) -> None:
-        for metric_name in self.metric_names:
-            getattr(self, metric_name).reset()
+    def update(self, **updates):
+        for metric in self.metrics.values():
+            metric.update(**updates)
 
-    def update(self, **updates) -> None:
-        for metric_name in self.metric_names:
-            getattr(self, metric_name).update(**updates)
-
-    def compute(self, prefix: str = "") -> dict[str, Any]:
+    def compute(self, prefix: str = "") -> Dict[str, Any]:
         return {
-            f"{prefix}{metric_name}": getattr(self, metric_name).compute()
-            for metric_name in self.metric_names
+            f"{prefix}{name}": metric.compute() for name, metric in self.metrics.items()
         }
 
-    def compute_per_rank(self, prefix: str = "") -> dict[str, Any]:
+    def compute_per_rank(self, prefix: str = "") -> Dict[str, Any]:
         return {
-            f"{prefix}{metric_name}": getattr(self, metric_name).compute_per_rank()
-            for metric_name in self.metric_names
-            if isinstance(getattr(self, metric_name), RankBasedAverage)
+            f"{prefix}{name}": getattr(self, name).compute_per_rank()
+            for name, metric in self.metrics.items()
+            if isinstance(metric, RankBasedAverage)
         }
 
 

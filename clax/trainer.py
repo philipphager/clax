@@ -40,12 +40,12 @@ class Trainer:
         val_loader: DataLoader,
         click_metrics: Optional[Dict[str, Metric]] = None,
     ) -> pd.DataFrame:
-        train_metrics = MultiMetric(loss=Average("loss"))
+        train_metrics = MultiMetric({"loss": Average("loss")})
 
         # Ensure the loss is always present during validation:
         click_metrics = click_metrics or self._default_click_metrics()
         click_metrics = {**click_metrics, "loss": Average("loss")}
-        val_metrics = MultiMetric(**click_metrics)
+        val_metrics = MultiMetric(click_metrics)
 
         early_stopping = deepcopy(self.early_stopping)
         optimizer = nnx.ModelAndOptimizer(model, self.optimizer)
@@ -114,7 +114,7 @@ class Trainer:
     ) -> pd.DataFrame:
         test_metrics = click_metrics or self._default_click_metrics()
         test_metrics = {**test_metrics, "loss": Average("loss")}
-        metrics = MultiMetric(**test_metrics)
+        metrics = MultiMetric(test_metrics)
 
         model.eval()
         logger = ProgressTable(
@@ -145,7 +145,7 @@ class Trainer:
         ranking_metrics: Optional[Dict[str, Metric]] = None,
     ) -> pd.DataFrame:
         metrics = ranking_metrics or self._default_ranking_metrics()
-        metrics = MultiMetric(**metrics)
+        metrics = MultiMetric(metrics)
 
         model.eval()
         logger = ProgressTable(

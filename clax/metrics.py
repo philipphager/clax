@@ -46,7 +46,7 @@ class MultiMetric(Metric):
 
     def compute_per_rank(self, prefix: str = "") -> Dict[str, Any]:
         return {
-            f"{prefix}{name}": getattr(self, name).compute_per_rank()
+            f"{prefix}{name}": metric.compute_per_rank()
             for name, metric in self.metrics.items()
             if isinstance(metric, RankBasedAverage)
         }

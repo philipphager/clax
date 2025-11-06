@@ -1,9 +1,9 @@
 # CLAX: Fast and Flexible Neural Click Models in JAX
 
-[CLAX]() is a modular framework to build click models with gradient-based optimization in [JAX](https://github.com/jax-ml/jax) and [Flax NNX](https://flax.readthedocs.io/en/v0.8.3/experimental/nnx/index.html).
+[CLAX](https://arxiv.org/pdf/2511.03620) is a modular framework to build click models with gradient-based optimization in [JAX](https://github.com/jax-ml/jax) and [Flax NNX](https://flax.readthedocs.io/en/v0.8.3/experimental/nnx/index.html).
 CLAX is built to be fast, providing orders of magnitudes speed-up compared to classic EM-based frameworks, such as [PyClick](https://github.com/markovi/PyClick), by leveraging auto-diff and vectorized computations on GPUs.
 
-The current documentation is available [here](https://philipphager.github.io/clax/) and our pre-print [here]().
+The current documentation is available [here](https://philipphager.github.io/clax/) and our pre-print [here](https://arxiv.org/pdf/2511.03620).
 
 ## Installation
 CLAX requires JAX. For installing JAX with CUDA support, please refer to the [JAX documentation](https://github.com/jax-ml/jax?tab=readme-ov-file#installation). CLAX itself is available via pypi:

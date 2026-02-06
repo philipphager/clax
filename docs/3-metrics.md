@@ -45,7 +45,6 @@ where $\hat{c} = P(C = 1 \mid d, k, C_{<k})$ are a model's click predictions for
     options:
       docstring_style: google
       show_source: true
-      show_base_class: false
       show_root_heading: false
       show_root_toc_entry: false
       heading_level: 3
@@ -63,7 +62,6 @@ where $\hat{c} = P(C=1 \mid d, k, C_{<k})$ are a model's click predictions for a
     options:
       docstring_style: google
       show_source: true
-      show_base_class: false
       show_root_heading: false
       show_root_toc_entry: false
       heading_level: 3
@@ -82,7 +80,6 @@ where $\hat{c} = P(C=1 \mid d, k)$ are a model's unconditional click predictions
     options:
       docstring_style: google
       show_source: true
-      show_base_class: false
       show_root_heading: false
       show_root_toc_entry: false
       heading_level: 3

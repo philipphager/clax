@@ -6,7 +6,6 @@
     options:
       docstring_style: google
       show_source: true
-      show_base_class: false
       show_root_heading: false
       show_root_toc_entry: false
       heading_level: 3
@@ -37,7 +36,6 @@ $$
     options:
       docstring_style: google
       show_source: true
-      show_base_class: false
       show_root_heading: false
       show_root_toc_entry: false
       heading_level: 3
@@ -56,7 +54,6 @@ $$\log P(C = 1 \mid d, k) = \log \theta_k + \log \gamma_{d}.$$
     options:
       docstring_style: google
       show_source: true
-      show_base_class: false
       show_root_heading: false
       show_root_toc_entry: false
       heading_level: 3
@@ -83,7 +80,6 @@ $$\log P(C=1 \mid d, k, C_{<k}) = \log \theta_{k, k'} + \log \gamma_{d}.$$
     options:
       docstring_style: google
       show_source: true
-      show_base_class: false
       show_root_heading: false
       show_root_toc_entry: false
       heading_level: 3
@@ -119,7 +115,6 @@ $$
     options:
       docstring_style: google
       show_source: true
-      show_base_class: false
       show_root_heading: false
       show_root_toc_entry: false
       heading_level: 3
@@ -157,7 +152,6 @@ $$
     options:
       docstring_style: google
       show_source: true
-      show_base_class: false
       show_root_heading: false
       show_root_toc_entry: false
       heading_level: 3

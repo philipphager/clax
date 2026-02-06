@@ -32,9 +32,9 @@ pip install clax-models
 
 
 ## Documentation
-- [Overview of Click Models implemented in CLAX](2-models)
-- [Evaluation metrics](3-metrics)
-- [Numerical stability](4-numerical-stability)
+- [Overview of Click Models implemented in CLAX](2-models.md)
+- [Evaluation metrics](3-metrics.md)
+- [Numerical stability](4-numerical-stability.md)
 - Modularity in CLAX
 - Implementing new click models in CLAX
 - Datasets

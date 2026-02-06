@@ -28,7 +28,7 @@ $$
 $$
 
 ## Complements and cancellation
-Sometimes we need to compute the log of a complement $\log(1 - p)$, e.g., in the binary-cross entropy loss or when computing [log-posteriors in the DBN](/2-models/#dynamic-bayesian-network-dbn). Performing this step directly from log-probability $\log p$ requires computing: $\log(1 - \exp(\log p))$.
+Sometimes we need to compute the log of a complement $\log(1 - p)$, e.g., in the binary-cross entropy loss or when computing [log-posteriors in the DBN](2-models.md#dynamic-bayesian-network-dbn). Performing this step directly from log-probability $\log p$ requires computing: $\log(1 - \exp(\log p))$.
 
 This expression is numerically unstable in two ways: (i) underflow: when $p$ is very small, $\log p$ is very negative, causing $\exp(\log p)$ to underflow to zero; and (ii) catastrophic cancellation: when $p \approx 1$, we have $\exp(\log p) \approx 1$, making $1 - \exp(\log p) \approx 0$, since subtracting nearly equal floating point numbers leads to a loss of precision.[^2]
 
@@ -44,7 +44,7 @@ $$
 
 The implementation relies on the standard functions $\text{log1p}(x)$, which accurately computes $\log(1 + x)$, and $\text{expm1}(x)$, which accurately computes $\exp(x) - 1$, to avoid catastrophic cancellation.
 
-To summarize, CLAX performs all probability computations in log space for increased numerical stability, avoiding underflow and overflow as well as catastrophic cancellation. We list all models and their corresponding log-likelihood [here](/2-models).
+To summarize, CLAX performs all probability computations in log space for increased numerical stability, avoiding underflow and overflow as well as catastrophic cancellation. We list all models and their corresponding log-likelihood [here](2-models.md).
 
 [^1]: Pierre Blanchard, Desmond J. Higham, and Nicholas J. Higham. "Accurate Computation of the Log-Sum-Exp and Softmax Functions". arXiv preprint arXiv:1909.03469, 2019.
 [^2]: David Goldberg. "What Every Computer Scientist Should Know about Floating-Point Arithmetic". In ACM Computing Surveys, 1999.

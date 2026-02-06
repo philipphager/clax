@@ -44,7 +44,7 @@ $$
 
 The implementation relies on the standard functions $\text{log1p}(x)$, which accurately computes $\log(1 + x)$, and $\text{expm1}(x)$, which accurately computes $\exp(x) - 1$, to avoid catastrophic cancellation.
 
-To summarize, CLAX performs all probability computations in log space for increased numerical stability, avoiding underflow and overflow as well as catastrophic cancellation. We list all models and their corresponding log-likelihood [here](2-models.md).
+To summarize, CLAX performs all probability computations in log space for increased numerical stability, avoiding underflow and overflow as well as catastrophic cancellation.
 
 [^1]: Pierre Blanchard, Desmond J. Higham, and Nicholas J. Higham. "Accurate Computation of the Log-Sum-Exp and Softmax Functions". arXiv preprint arXiv:1909.03469, 2019.
 [^2]: David Goldberg. "What Every Computer Scientist Should Know about Floating-Point Arithmetic". In ACM Computing Surveys, 1999.

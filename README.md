@@ -3,7 +3,7 @@
 [CLAX](https://arxiv.org/pdf/2511.03620) is a modular framework to build click models with gradient-based optimization in [JAX](https://github.com/jax-ml/jax) and [Flax NNX](https://flax.readthedocs.io/en/v0.8.3/experimental/nnx/index.html).
 CLAX is built to be fast, providing orders of magnitudes speed-up compared to classic EM-based frameworks, such as [PyClick](https://github.com/markovi/PyClick), by leveraging auto-diff and vectorized computations on GPUs.
 
-The current documentation is available [here](https://philipphager.github.io/clax/) and our pre-print [here](https://arxiv.org/pdf/2511.03620).
+The current documentation is available [here](https://philipphager.github.io/clax/). For more context, read our [SIGIR paper](https://dl.acm.org/doi/epdf/10.1145/3805712.3808584) or our [longer pre-print](https://arxiv.org/pdf/2511.03620).
 
 ## Installation
 CLAX requires JAX. For installing JAX with CUDA support, please refer to the [JAX documentation](https://github.com/jax-ml/jax?tab=readme-ov-file#installation). CLAX itself is available via pypi:
@@ -98,10 +98,10 @@ Baseline experiments using PyClick require the PyPy interpreter and are maintain
 If CLAX is useful to you, please consider citing our paper: 
 
 ```
-@misc{hager2025clax,
+@inproceedings{hager2026clax,
   title = {CLAX: Fast and Flexible Neural Click Models in JAX},
   author  = {Philipp Hager and Onno Zoeter and Maarten de Rijke},
-  year  = {2025},
-  booktitle = {arxiv}
+  year  = {2026},
+  booktitle = {Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR`26)}
 }
 ```

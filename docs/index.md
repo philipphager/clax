@@ -43,10 +43,10 @@ pip install clax-models
 If you use CLAX, please consider citing our paper: 
 
 ```
-@misc{hager2025clax,
+@inproceedings{hager2026clax,
   title = {CLAX: Fast and Flexible Neural Click Models in JAX},
   author  = {Philipp Hager and Onno Zoeter and Maarten de Rijke},
-  year  = {2025},
-  booktitle = {arxiv}
+  year  = {2026},
+  booktitle = {Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR`26)}
 }
 ```
